@@ -1,0 +1,110 @@
+2013-12-30  Ichi Kanaya  <kanaya@pineapple.cc>
+
+	* polyphony.scm: renewing...
+
+2011-09-27  Ichi Kanaya  <kanaya@pineappledesign.org>
+
+	* polpyhony.scm (<animation>): jump-offset slot added.
+
+	* polpyhony.scm (*the-animation-collection*): baboon-wee offset adjusted.
+
+	* polyphony.scm (*the-animation-collection*): baboon-weeing added. forks to baboon-wee in 0 second. forked from baboon.
+
+	* polyphony.scm (*the-animation-collection*): baboon modified.
+
+2011-09-26  Ichi Kanaya  <kanaya@pineappledesign.org>
+
+	* polyphony.scm (rende-content): alpha tag.
+
+	* polyphony.scm (<animation>): alpha slot.
+
+	* polyphony.scm (all): relocated from polyphony-server.scm.
+
+	* polyphony-server.scm (render-content): ambient sound tag added.
+
+	* polpyhony-server.scm (render-content): now takes ?person=... instead of ?event=...
+
+2011-09-25  Ichi Kanaya  <kanaya@pineappledesign.org>
+
+	* polyphony-server.scm (all): many refactorings.
+
+	* polyphony-server.scm (<animation>): event-only slot added.
+
+	* polyphony-server.scm (*the-sound-collection*): removed all extensions.
+
+	* polyphony-server.scm (render-content): renders sound tag. Now the top level is <xml> tag.
+
+	* polyphony-server.scm (top level): sound list added.
+
+	* polyphony-server.scm (render-content): sound tag enabled.
+
+	* polyphony-server.scm (all): sound effect.
+
+	* polyphony-server.scm (render-content): depth tag.
+
+	* polyphony-server.scm (<animation>): depth slot.
+
+	* polyphony-server.scm (randomize-offset!): reimplemented.
+
+	* monophony-serevr.scm (all): relocated to polyphony-server.scm.
+
+	* polyphony-server.scm (all): renamed from monophony-server.scm.
+
+	* monophony-server.scm (*the-time-of-the-last-event*): added.
+
+	* monophony-server.scm (<event>): class definition removed.
+
+	* monophony-server.scm (animation-random-starter): probability -> 5%.
+
+2011-09-24  Ichi Kanaya  <kanaya@pineappledesign.org>
+
+	* monophony-server.scm (all): event handling feature added.
+
+	* programmer (brain): power drink installed.
+
+	* monophony-server.scm (render-content): time=all option no longer exists.
+
+	* monophony-server.scm (all): forked from the latest stable version of polyphony.scm.
+
+2011-09-23  Ichi Kanaya  <kanaya@pineappledesign.org>
+
+	* polyphony-server.scm (all): rebuild from (almost) scratch.
+
+2011-09-22  Ichi Kanaya  <kanaya@pineappledesign.org>
+
+	* polyphony-server.scm (run-server): calls animation-terminator! and animation-random-starter!
+
+	* polyphony-server.scm (top level): animation-terminator! and animation-random-starter! added.
+
+	* polyphony-server.scm (<animation>): title, animating, time-offset fields added. randomize-offset! method added. start!/stop! added.
+
+	* polyphony-server.scm (render-content): all-frame-tag-list takes kind parameter.
+
+	* polyphony-server.scm (milimeter->pixel): added.
+
+	* polyphony-server.scm (pixel->milimeter): added.
+
+	* polyphony-server.scm (top level): screen-width, screen-height, pixel-per-milimiter added.
+
+2011-09-19  Ichi Kanaya  <kanaya@pineappledesign.org>
+
+	* polyphony-server.scm (top level): *animation* hash table added. All *animation-of-xyz* global variables are removed.
+
+	* polyphony-server.scm (top level): added 'define-simple-animation' macro.
+
+	* polyphony-server.scm (<animation>): duration-of method added.
+
+	* polyphony-server.scm (ref [a <animation>] [t <number>]): real-modulo function added.
+
+	* polyphony-server.scm (tick): 1.0 -> 0.1 [second].
+
+	* polyphony-server.scm (handle-request): Accepts time=now parameter. Uses sys-gettimeofday.
+
+	* TODO.org (all): Added.
+
+2011-09-13  Ichi Kanaya  <kanaya@pineappledesign.org>
+
+	* index-ja.html (all): Added basic info of the server.
+
+	* polyphony-server.scm (all): Registered to BitBucket.org.
+
