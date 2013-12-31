@@ -868,404 +868,207 @@
 
 
 (define *the-animation-collection*
-  (let 
-      ([apple
-	(make-simple-animation
-	 :title 'apple
-	 :frame-name-prefix "Apple2/"
-	 :n-frames 31
-	 :offset '(4000 . 500)
-	 :canvas-size '(2313 . 1040)
-	 :from-jump? #t
-	 :sounds (append (make-list 15 'none)
-			 '(apple-touch-down)
-			 (make-list 15 'none)))]
-       [baboon-weeing
-	(make-animation-primitive 
-	 :title 'baboon-weeing
-	 :frame-names (append
-		       (map
-			(cut string-append "Baboon2/" <>)
-			(map number->string (iota 66 1))))
-	 :frame-numbers (iota 66)
-	 :offset '(4500 . 0)
-	 :canvas-size `(,(* 585 4) . ,(* 637 4))
-	 :from-jump? #t
-	 :sounds (append (make-list 23 'none)
-			 '(wee)
-			 (make-list 43 'none))
-	 :options '())]
-       [birds-blue
-	(make-birds-animation
-	 :title 'birds-blue
-	 :prefix "Birds/Birds_Blue/"
-	 :jumps-to 'birds-blue-take-off)]
-       [birds-orange
-	(make-birds-animation
-	 :title 'birds-orange
-	 :prefix "Birds/Birds_Orange/"
-	 :jumps-to 'birds-orange-take-off)]
-       [birds-blue-take-off
-	(make-birds-take-off-animation
-	 :title 'birds-blue-take-off
-	 :prefix1 "Birds/Birds_Blue/"
-	 :prefix2 "Birds/Birds_Blue/flying-"
-	 :jumped-from 'birds-blue)]
-       [birds-orange-take-off 
-	(make-birds-take-off-animation
-	 :title 'birds-orange-take-off
-	 :prefix1 "Birds/Birds_Orange/"
-	 :prefix2 "Birds/Birds_Orange/flying-"
-	 :jumped-from 'birds-orange)]
-       [papilionidae-blue
-	(make-papilionidae-animation
-	 :title 'papilionidae-blue
-	 :prefix "Butterfly/Papilionidae_Blue/"
-	 :jumps-to 'papilionidae-blue-touch-down)]
-       [papilionidae-purple
-	(make-papilionidae-animation
-	 :title 'papilionidae-purple
-	 :prefix "Butterfly/Papilionidae_Purple/"
-	 :jumps-to 'papilionidae-purple-touch-down)]
-       [papilionidae-white
-	(make-papilionidae-animation
-	 :title 'papilionidae-white
-	 :prefix "Butterfly/Papilionidae_White/"
-	 :jumps-to 'papilionidae-white-touch-down)]
-       [papilionidae-yellow
-	(make-papilionidae-animation
-	 :title 'papilionidae-yellow
-	 :prefix "Butterfly/Papilionidae_Yellow/"
-	 :jumps-to 'papilionidae-yellow-touch-down)]
-       [papilionidae-blue-touch-down 
-	(make-papilionidae-touch-down-animation
-	 :title 'papilionidae-blue-touch-down
-	 :prefix "Butterfly/Papilionidae_Blue/touch_down/10_"
-	 :jumped-from 'papilionidae-blue)]
-       [papilionidae-white-touch-down
-	(make-papilionidae-touch-down-animation
-	 :title 'papilionidae-white-touch-down
-	 :prefix "Butterfly/Papilionidae_White/touch_down/10_"
-	 :jumped-from 'papilionidae-white)]
-       [papilionidae-yellow-touch-down
-	(make-papilionidae-touch-down-animation
-	 :title 'papilionidae-yellow-touch-down
-	 :prefix "Butterfly/Papilionidae_Yellow/touch_down/10_"
-	 :jumped-from 'papilionidae-yellow)]
-       [papilionidae-purple-touch-down
-	(make-papilionidae-touch-down-animation
-	 :title 'papilionidae-purple-touch-down
-	 :prefix "Butterfly/Papilionidae_Purple/touch_down/10_"
-	 :jumped-from 'papilionidae-purple)]
-       [pieris-rapae-pink
-	(make-rapae-animation
-	 :title 'pieris-rapae-pink
-	 :prefix "Butterfly/Pieris_Rapae_Pink/" 
-	 :jumps-to 'pieris-rapae-pink-touch-down)]
-       [pieris-rapae-yellow 
-	(make-rapae-animation
-	 :title 'pieris-rapae-yellow
-	 :prefix "Butterfly/Pieris_Rapae_Yellow/" 
-	 :jumps-to 'pieris-rapae-yellow-touch-down)]
-       [pieris-rapae-pink-touch-down 
-	(make-rapae-touch-down-animation
-	 :title 'pieris-rapae-pink-touch-down 
-	 :prefix "Butterfly/Pieris_Rapae_Pink/touch_down/10_"
-	 :jumped-from 'pieris-rapae-pink)]
-       [pieris-rapae-yellow-touch-down
-	(make-rapae-touch-down-animation
-	 :title 'pieris-rapae-yellow-touch-down 
-	 :prefix "Butterfly/Pieris_Rapae_Yellow/touch_down/10_"
-	 :jumped-from 'pieris-rapae-yellow)]
-       [elephant
-	(let1
-	 frame-names
-	 (map
-	  (cut string-append "Elephant2/ex/ex" <>)
-	  (map
-	   number->string
-	   (append (iota 28 1) (iota (- 260 28) 30))))
-	 (make-animation-primitive
-	  :title 'elephant
-	  :frame-names frame-names
-	  :frame-offsets (make-list (length frame-names) point-zero)
-	  :frame-numbers (iota (length frame-names))
-	  :alphas (make-list (length frame-names) 1.0)
-	  :canvas-size `(,(* 984 10) . ,(* 289 10))  ; 8
-	  :offset '(1000 . -600)
-	  :from-jump? #t
-	  :sounds (make-list (length frame-names) 'none)
-	  :options '()))]
-       [fawn
-	(make-simple-animation
-	 :title 'fawn
-	 :frame-name-prefix "Fawn2/"
-	 :n-frames 116
-	 :from-jump? #t
-	 :canvas-size `(,(* 1188 8) . ,(* 213 8))
-	 :offset '(500 . 0)
-	 :sounds (make-list 116 'none))]
-       [fox
-	(make-simple-animation
-	 :title 'fox
-	 :frame-name-prefix "Fox2/"
-	 :n-frames 56
-	 :from-jump? #t
-	 :canvas-size `(,(* 1188 4) . ,(* 213 4))
-	 :offset '(0 . 0)
-	 :sounds (make-list 56 'none))]
-       #;[fox
-	(let1
-	 frame-names
-	 (map
-	  (cut string-append "Fox/" <>)
-	  (map number->string (times 3 (iota 6 1))))
-	 (make-animation-with-fade-in/out
-	  :title 'fox
-	  :from-jump? #t
-	  :frame-names frame-names
-	  :frame-offsets (append
-			  (make-list 6 point-zero)
-			  (make-list 6 (cons fox-stride 0))
-			  (make-list 6 (cons (* fox-stride 2) 0)))
-	  :frame-numbers (iota (length frame-names))
-	  :canvas-size `(,(* 585 4) . ,(* 425 4))
-	  :offset point-zero
-	  :x-random #t))]
-       [meercat
-	(make-simple-animation
-	 :title 'meercat
-	 :frame-name-prefix "Meercat2/"
-	 :n-frames 171
-	 :from-jump? #t
-	 :canvas-size `(,(* 1041 8) . ,(* 213 8))
-	 :offset '(0 . 200)
-	 :sounds (make-list 171 'none))]
-       #;[meercat
-	(let*
-	    ([frame-names
-	      (map
-	       (cut string-append "Meercat/" <>)
-	       (map
-		number->string
-		(append (iota 4 1) (iota 4 1) (iota 4 1))))]
-	     [n-frames (* 3 4)]
-	     [canvas-size (cons (* 585 2) (* 425 2))]
-	     [default-offsets
-	       `(,point-zero
-		 ,point-zero 
-		 ,point-zero
-		 (,(* 150 2) . 0)
-		 (,(* 150 2) . 0)
-		 (,(* 150 2) . 0)
-		 (,(* 150 2) . 0)
-		 (,(* 150 2 2) . 0)
-		 (,(* 150 2 2) . 0)
-		 (,(* 150 2 2) . 0)
-		 (,(* 150 2 2) . 0)
-		 (,(* 150 2 3) . 0))]
-	     [meercat-frame-set
-	      (make <frame-set>
-		:names frame-names
-		:n-names n-frames
-		:default-offsets default-offsets
-		:default-sizes (make-list n-frames canvas-size)
-		:default-matrices (make-list n-frames id-matrix-2x2)
-		:default-alphas (make-list n-frames 1.0)
-		:default-color-matrices (make-list n-frames id-matrix-3x3)
-		:default-depths (make-list n-frames 0)
-		:default-sounds (append
-				 '(meercat) (make-list 3 'none)
-				 '(meercat) (make-list 3 'none)
-				 '(meercat) (make-list 3 'none)))])
-	  (make <animation>
-	    :title 'meercat
-	    :frames        meercat-frame-set
-	    :n-frames n-frames
-	    :frame-numbers (iota n-frames)
-	    :timings       (durations->timings (make-list n-frames one-tick))
-	    :alphas        (make-list n-frames 1.0)
-	    :depth         (random-real)
-	    :offset        point-zero
-	    :x-random      #t
-	    :y-random      #f
-	    :from-jump?    #f
-	    :can-jump?     #f          ; #t
-	    :jumps-at      (* 26 2 one-tick)
-	    :jumps-to      'none
-	    :jump-offset   (cons (+ (* 300 4) (* elephant-step 2)) (* -400 4))  ;; elephant-step?
-	    :forking?      #t
-	    :loops-for     1
-	    :options       '()))]
-       #;[meercat-standing-up 
-	(make-animation-primitive
-	 :title 'meercat-standing-up
-	 :frame-names (map
-		       (cut string-append "Meercat/" <>)
-		       (map number->string (iota 7 5)))
-	 :frame-numbers (iota 7)
-	 :canvas-size (cons (* 585 2) (* 425 2))
-	 :from-jump? #t
-	 :jumped-from 'meercat
-	 :sounds (make-list 7 'none)
-	 :options '())]
-       [owl
-	(let* ([frame-names-primitive
-		(append '(1 2 3 3 3) (iota 14 4) (iota 12 6))]
-	       [frame-names
-		(map
-		 (cut string-append "Owl/" <>)
-		 (map number->string frame-names-primitive))]
-	       [n-frames 
-		(length frame-names-primitive)]
-	       [canvas-size 
-		`(,(* 585 2) . ,(* 425 2))]
-	       [default-offsets  
-		 (append
-		  (make-list 7 point-zero)  ; 1 2 3 3 3 4 5
-		  (map
-		   (cut cons <> 0)
-		   (durations->timings (make-list owl-step 28))))]
-	       [owl-frame-set
-		(make <frame-set>
-		  :names                  frame-names
-		  :n-names                n-frames
-		  :default-offsets        default-offsets
-		  :default-sizes          (make-list n-frames canvas-size)
-		  :default-matrices       (make-list n-frames id-matrix-2x2)
-		  :default-alphas         (make-list n-frames 1.0)
-		  :default-color-matrices (make-list n-frames id-matrix-3x3)
-		  :default-depths         (make-list n-frames 0)
-		  :default-sounds (append
-				   '(owl-coming)        ; 1
-				   (make-list 6 'none)  ; 2 3 3 3 4 5
-				   '(owl-flying)        ; 6
-				   (make-list 5 'none)  ; 7-11
-				   '(owl-flying)        ; 12
-				   (make-list 5 'none)  ; 13-17
-				   '(owl-flying)        ; 6
-				   (make-list 5 'none)  ; 7-11
-				   '(owl-flying)        ; 12
-				   (make-list 5 'none)))]) ; 13-17
-	  (make <animation>
-	    :title         'owl
-	    :frames        owl-frame-set
-	    :frame-numbers (iota n-frames)
-	    :timings       (durations->timings (make-list n-frames one-tick))
-	    :alphas        (make-list (* n-frames 10) 1.0)
-	    :depth         (random-real)
-	    :offset        point-zero
-	    :x-random      #t
-	    :y-random      #f
-	    :from-jump?    #f
-	    :can-jump?     #f
-	    :jumps-at      0
-	    :jumps-to      'none
-	    :jump-offset   point-zero
-	    :forking?      #f
-	    :loops-for     1
-	    :options       '()))]
-       [rabbit
-	(make-simple-animation
-	 :title 'rabbit
-	 :frame-name-prefix "Rabbit2/"
-	 :n-frames 189
-	 :from-jump? #t
-	 :canvas-size `(,(* 1188 6) . ,(* 213 6))
-	 :offset '(500 . 0) ; test
-	 :sounds (make-list 189 'none))]
-       #;[rabbit-to-right
-	(let1
-	 frame-names
-	 (map
-	  (cut string-append "Rabbit/run-from-left/" <>)
-	  (map number->string (times 3 (iota 14 29))))
-	 (make-animation-with-fade-in/out
-	  :title 'rabbit-to-right
-	  :frame-names frame-names
-	  :frame-offsets (append
-			  (make-list 14 point-zero)
-			  (make-list 14 `(,rabbit-to-right-step . 0))
-			  (make-list 14 `(,(* rabbit-to-right-step 2) . 0)))
-	  :frame-numbers (iota (length frame-names))
-	  :canvas-size `(,(* 585 2) . ,(* 425 2))
-	  :x-random #t
-	  :sounds (append
-		   (make-list 8 'none)
-		   '(rabbit)
-		   (make-list 5 'none)
-		   (make-list 8 'none)
-		   '(rabbit)
-		   (make-list 5 'none)
-		   (make-list 8 'none)
-		   '(rabbit)
-		   (make-list 5 'none))
-	  :options '()))]
-       #;[rabbit-to-left
-	(let1
-	 frame-names
-	 (map
-	  (cut string-append "Rabbit/run-from-right/" <>)
-	  (map
-	   number->string
-	   (append
-	    (reverse (iota 14 1)) 
-	    (reverse (iota 6 1))
-	    (reverse (iota 6 1)))))
-	 (make-animation-with-fade-in/out
-	  :title 'rabbit-to-left
-	  :frame-names frame-names
-	  :frame-offsets (append
-			  (make-list 14 point-zero)
-			  (make-list
-			   6
-			   `(,rabbit-to-left-step-x . ,rabbit-to-left-step-y))
-			  (make-list
-			   6
-			   `(,(* rabbit-to-left-step-y 2)
-			     . ,(* rabbit-to-left-step-y 2))))
-	  :frame-numbers (iota (length frame-names))
-	  :canvas-size `(,(* 585 2) . ,(* 425 2))
-	  :x-random #t
-	  :sounds (append
-		   (make-list 11 'none)
-		   '(rabbit)
-		   (make-list 2 'none)
-		   (make-list 3 'none)
-		   '(rabbit)
-		   (make-list 2 'none)
-		   (make-list 3 'none)
-		   '(rabbit)
-		   (make-list 2 'none))))]
-       [squirrel
-	(make-simple-animation
-	 :title 'squirrel
-	 :frame-name-prefix "Squirrel2/"
-	 :n-frames 23
-	 :from-jump? #t
-	 :canvas-size `(,(* 421 1.5) . ,(* 306 1.5))
-	 :offset '(3000 . 200)
-	 :sounds (make-list 23 'none))]
-       [tanuki
-	(make-simple-animation
-	 :title 'tanuki
-	 :frame-name-prefix "Tanuki2/"
-	 :n-frames 50
-	 :from-jump? #t
-	 :canvas-size `(,(* 883 8) . ,(* 213 8)) ; test
-	 :offset '(1000 . 200) ; test
-	 :sounds (make-list 50 'none))]
-       #;[tanuki-turn-back
-	(make-animation-primitive
-	 :title 'tanuki-turn-back
-	 :frame-names (map
-		       (cut string-append "tanuki/" <>)
-		       '("11" "11_2" "11" "11"))
-	 :frame-numbers (iota 4)
-	 :canvas-size `(,(* 585 2) . ,(* 425 2))
-	 :offset point-zero
-	 :sounds (make-list 4 'none)
-	 :options '())])
+  (let
+      ([apple                          (make-simple-animation
+					:title 'apple
+					:frame-name-prefix "Apple2/"
+					:n-frames 31
+					:offset '(4000 . 500)
+					:canvas-size '(2313 . 1040)
+					:from-jump? #t
+					:sounds (append (make-list 15 'none)
+							'(apple-touch-down)
+							(make-list 15 'none)))]
+       [baboon-weeing                  (make-animation-primitive 
+					:title 'baboon-weeing
+					:frame-names (append
+						      (map
+						       (cut string-append "Baboon2/" <>)
+						       (map number->string (iota 66 1))))
+					:frame-numbers (iota 66)
+					:offset '(4500 . 0)
+					:canvas-size `(,(* 585 4) . ,(* 637 4))
+					:from-jump? #t
+					:sounds (append (make-list 23 'none)
+							'(wee)
+							(make-list 43 'none))
+					:options '())]
+       [birds-blue                     (make-birds-animation
+					:title 'birds-blue
+					:prefix "Birds/Birds_Blue/"
+					:jumps-to 'birds-blue-take-off)]
+       [birds-orange                   (make-birds-animation
+					:title 'birds-orange
+					:prefix "Birds/Birds_Orange/"
+					:jumps-to 'birds-orange-take-off)]
+       [birds-blue-take-off            (make-birds-take-off-animation
+					:title 'birds-blue-take-off
+					:prefix1 "Birds/Birds_Blue/"
+					:prefix2 "Birds/Birds_Blue/flying-"
+					:jumped-from 'birds-blue)]
+       [birds-orange-take-off          (make-birds-take-off-animation
+					:title 'birds-orange-take-off
+					:prefix1 "Birds/Birds_Orange/"
+					:prefix2 "Birds/Birds_Orange/flying-"
+					:jumped-from 'birds-orange)]
+       [papilionidae-blue              (make-papilionidae-animation
+					:title 'papilionidae-blue
+					:prefix "Butterfly/Papilionidae_Blue/"
+					:jumps-to 'papilionidae-blue-touch-down)]
+       [papilionidae-purple            (make-papilionidae-animation
+					:title 'papilionidae-purple
+					:prefix "Butterfly/Papilionidae_Purple/"
+					:jumps-to 'papilionidae-purple-touch-down)]
+       [papilionidae-white             (make-papilionidae-animation
+					:title 'papilionidae-white
+					:prefix "Butterfly/Papilionidae_White/"
+					:jumps-to 'papilionidae-white-touch-down)]
+       [papilionidae-yellow            (make-papilionidae-animation
+					:title 'papilionidae-yellow
+					:prefix "Butterfly/Papilionidae_Yellow/"
+					:jumps-to 'papilionidae-yellow-touch-down)]
+       [papilionidae-blue-touch-down   (make-papilionidae-touch-down-animation
+					:title 'papilionidae-blue-touch-down
+					:prefix "Butterfly/Papilionidae_Blue/touch_down/10_"
+					:jumped-from 'papilionidae-blue)]
+       [papilionidae-white-touch-down  (make-papilionidae-touch-down-animation
+					:title 'papilionidae-white-touch-down
+					:prefix "Butterfly/Papilionidae_White/touch_down/10_"
+					:jumped-from 'papilionidae-white)]
+       [papilionidae-yellow-touch-down (make-papilionidae-touch-down-animation
+					:title 'papilionidae-yellow-touch-down
+					:prefix "Butterfly/Papilionidae_Yellow/touch_down/10_"
+					:jumped-from 'papilionidae-yellow)]
+       [papilionidae-purple-touch-down (make-papilionidae-touch-down-animation
+					:title 'papilionidae-purple-touch-down
+					:prefix "Butterfly/Papilionidae_Purple/touch_down/10_"
+					:jumped-from 'papilionidae-purple)]
+       [pieris-rapae-pink              (make-rapae-animation
+					:title 'pieris-rapae-pink
+					:prefix "Butterfly/Pieris_Rapae_Pink/" 
+					:jumps-to 'pieris-rapae-pink-touch-down)]
+       [pieris-rapae-yellow            (make-rapae-animation
+					:title 'pieris-rapae-yellow
+					:prefix "Butterfly/Pieris_Rapae_Yellow/" 
+					:jumps-to 'pieris-rapae-yellow-touch-down)]
+       [pieris-rapae-pink-touch-down   (make-rapae-touch-down-animation
+					:title 'pieris-rapae-pink-touch-down 
+					:prefix "Butterfly/Pieris_Rapae_Pink/touch_down/10_"
+					:jumped-from 'pieris-rapae-pink)]
+       [pieris-rapae-yellow-touch-down (make-rapae-touch-down-animation
+					:title 'pieris-rapae-yellow-touch-down 
+					:prefix "Butterfly/Pieris_Rapae_Yellow/touch_down/10_"
+					:jumped-from 'pieris-rapae-yellow)]
+       [elephant                       (let1 frame-names (map
+							  (cut string-append "Elephant2/ex/ex" <>)
+							  (map
+							   number->string
+							   (append (iota 28 1) (iota (- 260 28) 30))))
+					     (make-animation-primitive
+					      :title 'elephant
+					      :frame-names frame-names
+					      :frame-offsets (make-list (length frame-names) point-zero)
+					      :frame-numbers (iota (length frame-names))
+					      :alphas (make-list (length frame-names) 1.0)
+					      :canvas-size `(,(* 984 10) . ,(* 289 10))  ; 8
+					      :offset '(1000 . -600)
+					      :from-jump? #t
+					      :sounds (make-list (length frame-names) 'none)
+					      :options '()))]
+       [fawn                           (make-simple-animation
+					:title 'fawn
+					:frame-name-prefix "Fawn2/"
+					:n-frames 116
+					:from-jump? #t
+					:canvas-size `(,(* 1188 8) . ,(* 213 8))
+					:offset '(500 . 0)
+					:sounds (make-list 116 'none))]
+       [fox                            (make-simple-animation
+					:title 'fox
+					:frame-name-prefix "Fox2/"
+					:n-frames 56
+					:from-jump? #t
+					:canvas-size `(,(* 1188 4) . ,(* 213 4))
+					:offset '(0 . 0)
+					:sounds (make-list 56 'none))]
+       [meercat                        (make-simple-animation
+					:title 'meercat
+					:frame-name-prefix "Meercat2/"
+					:n-frames 171
+					:from-jump? #t
+					:canvas-size `(,(* 1041 8) . ,(* 213 8))
+					:offset '(0 . 200)
+					:sounds (make-list 171 'none))]
+       [owl                            (let*
+					   ([frame-names-primitive (append '(1 2 3 3 3) (iota 14 4) (iota 12 6))]
+					    [frame-names           (map (cut string-append "Owl/" <>) (map number->string frame-names-primitive))]
+					    [n-frames              (length frame-names-primitive)]
+					    [canvas-size           `(,(* 585 2) . ,(* 425 2))]
+					    [default-offsets       (append
+								    (make-list 7 point-zero)  ; 1 2 3 3 3 4 5
+								    (map (cut cons <> 0) (durations->timings (make-list owl-step 28))))]
+					    [owl-frame-set         (make <frame-set>
+								     :names                  frame-names
+								     :n-names                n-frames
+								     :default-offsets        default-offsets
+								     :default-sizes          (make-list n-frames canvas-size)
+								     :default-matrices       (make-list n-frames id-matrix-2x2)
+								     :default-alphas         (make-list n-frames 1.0)
+								     :default-color-matrices (make-list n-frames id-matrix-3x3)
+								     :default-depths         (make-list n-frames 0)
+								     :default-sounds         (append
+											      '(owl-coming)        ; 1
+											      (make-list 6 'none)  ; 2 3 3 3 4 5
+											      '(owl-flying)        ; 6
+											      (make-list 5 'none)  ; 7-11
+											      '(owl-flying)        ; 12
+											      (make-list 5 'none)  ; 13-17
+											      '(owl-flying)        ; 6
+											      (make-list 5 'none)  ; 7-11
+											      '(owl-flying)        ; 12
+											      (make-list 5 'none)))]) ; 13-17
+					 (make <animation>
+					   :title         'owl
+					   :frames        owl-frame-set
+					   :frame-numbers (iota n-frames)
+					   :timings       (durations->timings (make-list n-frames one-tick))
+					   :alphas        (make-list (* n-frames 10) 1.0)
+					   :depth         (random-real)
+					   :offset        point-zero
+					   :x-random      #t
+					   :y-random      #f
+					   :from-jump?    #f
+					   :can-jump?     #f
+					   :jumps-at      0
+					   :jumps-to      'none
+					   :jump-offset   point-zero
+					   :forking?      #f
+					   :loops-for     1
+					   :options       '()))]
+       [rabbit 	                       (make-simple-animation
+					:title 'rabbit
+					:frame-name-prefix "Rabbit2/"
+					:n-frames 189
+					:from-jump? #t
+					:canvas-size `(,(* 1188 6) . ,(* 213 6))
+					:offset '(500 . 0) ; test
+					:sounds (make-list 189 'none))]
+       [squirrel                       (make-simple-animation
+					:title 'squirrel
+					:frame-name-prefix "Squirrel2/"
+					:n-frames 23
+					:from-jump? #t
+					:canvas-size `(,(* 421 1.5) . ,(* 306 1.5))
+					:offset '(3000 . 200)
+					:sounds (make-list 23 'none))]
+       [tanuki                         (make-simple-animation
+					:title 'tanuki
+					:frame-name-prefix "Tanuki2/"
+					:n-frames 50
+					:from-jump? #t
+					:canvas-size `(,(* 883 8) . ,(* 213 8)) ; test
+					:offset '(1000 . 200) ; *** CHANGE ***
+					:sounds (make-list 50 'none))])
     (let1 hash-table (make-hash-table 'eqv?)
 	  (hash-table-put! hash-table 'apple                          apple)
 	  (hash-table-put! hash-table 'baboon-weeing                  baboon-weeing)
