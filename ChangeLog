@@ -1,6 +1,6 @@
 2013-12-31  Ichi Kanaya  <kanaya@Ichis-MacBook-Pro.local>
 
-	* polyphoni.scm (*the-animation-collection*): changed Y-offset of Tanuki from 200 to 100.
+	* polyphoni.scm (*the-animation-collection*): changed Y-offset of Tanuki from 200 to 0.
 
 	* polyphony.scm: reformatted the code.
 
