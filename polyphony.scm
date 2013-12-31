@@ -688,8 +688,63 @@
      :options       options)))
 
 (define (animation->animation-with-fade-out animation)
-  animation)
-
+  (let
+      ([title         (ref animation 'title)]
+       [frames        (ref animation 'frames)]
+       [n-frames      (+ (ref animation 'n-frames) 40)]
+       [frame-numbers (let1 frame-numbers-original (ref animation 'frame-numbers)
+			    (append
+			     frame-numbers-original
+			     (make-list 40 (last frame-numbers-original))))]  ; last from SRFI-1
+       [timings       (let*
+			  ([timings-original (ref animation 'timings)]
+			   [last-timing (last timings-original)])
+			(append
+			 timings-original
+			 (map (cut + <> last-timing) (durations->timings (make-list 40 one-tick)))))]
+       [alphas        (append
+		       (ref animation 'alphas)
+		       '(0.9 0.9 0.9 0.9  0.8 0.8 0.8 0.8  0.7 0.7 0.7 0.7  0.6 0.6 0.6 0.6  0.5 0.5 0.5 0.5  0.4 0.4 0.4 0.4  0.3 0.3 0.3 0.3  0.2 0.2 0.2 0.2
+			     0.1 0.1 0.1 0.1  0.1 0.1 0.1 0.1))]
+       [offset        (ref animation 'offset)]
+       [size          (ref animation 'size)]
+       [depth         (ref animation 'depth)]
+       [matrix        (ref animation 'matrix)]
+       [animating     (ref animation 'animating)]
+       [time-offset   (ref animation 'time-offset)]
+       [x-random      (ref animation 'x-random)]
+       [y-random      (ref animation 'y-random)]
+       [from-jump?    (ref animation 'from-jump?)]
+       [can-jump?     (ref animation 'can-jump?)]
+       [jumps-at      (ref animation 'jumps-at)]
+       [jumps-to      (ref animation 'jumps-to)]
+       [jumped-from   (ref animation 'jumped-from)]
+       [jump-offset   (ref animation 'jump-offset)]
+       [forking?      (ref animation 'forking?)]
+       [options       (ref animation 'options)])
+    (make <animation>
+     :title         title
+     :frames        frames
+     :n-frames      n-frames
+     :frame-numbers frame-numbers
+     :timings       timings
+     :alphas        alphas
+     :offset        offset
+     :size          size
+     :depth         depth
+     :matrix        matrix
+     :animating     animating
+     :time-offset   time-offset
+     :x-random      x-random
+     :y-random      y-random
+     :from-jump?    from-jump?
+     :can-jump?     can-jump?
+     :jumps-at      jumps-at
+     :jumps-to      jumps-to
+     :jumped-from   jumped-from
+     :jump-offset   jump-offset
+     :forking?      forking?
+     :options       options)))
 
 
 (define
@@ -1161,7 +1216,7 @@
 	  (hash-table-put! hash-table 'birds-orange                   birds-orange)
 	  (hash-table-put! hash-table 'birds-blue-take-off            birds-blue-take-off)
 	  (hash-table-put! hash-table 'birds-orange-take-off          birds-orange-take-off)
-	  (hash-table-put! hash-table 'papilionidae-blue              (animation->animation papilionidae-blue))
+	  (hash-table-put! hash-table 'papilionidae-blue              (animation->animation-with-fade-out papilionidae-blue))
 	  (hash-table-put! hash-table 'papilionidae-purple            papilionidae-purple)
 	  (hash-table-put! hash-table 'papilionidae-white             papilionidae-white)
 	  (hash-table-put! hash-table 'papilionidae-yellow            papilionidae-yellow)

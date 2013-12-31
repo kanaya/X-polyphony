@@ -1,5 +1,7 @@
 2013-12-31  Ichi Kanaya  <kanaya@pineapple.cc>
 
+	* polyphony.scm (animation->animation-with-fade-out): still debuging.
+	
 	* polyphony.scm (animation->animation): copy constructor of <animation> class.
 
 	* polyphony.scm (make-papilionidae-animation): fixed animation.
