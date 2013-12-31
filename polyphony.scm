@@ -1059,7 +1059,7 @@
 					:n-frames 23
 					:from-jump? #t
 					:canvas-size `(,(* 421 1.5) . ,(* 306 1.5))
-					:offset '(3000 . 200)
+					:offset '(3000 . 0)
 					:sounds (make-list 23 'none))]
        [tanuki                         (make-simple-animation
 					:title 'tanuki
