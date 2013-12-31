@@ -1,6 +1,8 @@
 2013-12-31  Ichi Kanaya  <kanaya@pineapple.cc>
 
-	* polyphoni.scm (*the-animation-collection*): changed Y-offset of Tanuki from 200 to 0.
+	* polypony.scm (image-prefix): changed from http://localhost/... to flie:///...
+
+	* polyphony.scm (*the-animation-collection*): changed Y-offset of Tanuki from 200 to 0.
 
 	* polyphony.scm (all): reformatted the code.
 
