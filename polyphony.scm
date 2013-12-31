@@ -634,6 +634,19 @@
 		     (make-list attack-and-decay-duration 'none))
      :options       options)))
 
+;;;
+;;; NEW!!
+;;; animation->animation-with-fade-out
+;;;
+
+(define (animation->animation animation) 
+  animation)
+
+(define (animation->animation-with-fade-out animation)
+  animation)
+
+
+
 (define
   (make-simple-animation
    :key
@@ -1103,7 +1116,7 @@
 	  (hash-table-put! hash-table 'birds-orange                   birds-orange)
 	  (hash-table-put! hash-table 'birds-blue-take-off            birds-blue-take-off)
 	  (hash-table-put! hash-table 'birds-orange-take-off          birds-orange-take-off)
-	  (hash-table-put! hash-table 'papilionidae-blue              papilionidae-blue)
+	  (hash-table-put! hash-table 'papilionidae-blue              (animation->animation papilionidae-blue))
 	  (hash-table-put! hash-table 'papilionidae-purple            papilionidae-purple)
 	  (hash-table-put! hash-table 'papilionidae-white             papilionidae-white)
 	  (hash-table-put! hash-table 'papilionidae-yellow            papilionidae-yellow)
