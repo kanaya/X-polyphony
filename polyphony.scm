@@ -639,8 +639,53 @@
 ;;; animation->animation-with-fade-out
 ;;;
 
-(define (animation->animation animation) 
-  animation)
+(define (animation->animation animation)  ; copy constructor
+  (let
+      ([title         (ref animation 'title)]
+       [frames        (ref animation 'frames)]
+       [n-frames      (ref animation 'n-frames)]
+       [frame-numbers (ref animation 'frame-numbers)]
+       [timings       (ref animation 'timings)]
+       [alphas        (ref animation 'alphas)]
+       [offset        (ref animation 'offset)]
+       [size          (ref animation 'size)]
+       [depth         (ref animation 'depth)]
+       [matrix        (ref animation 'matrix)]
+       [animating     (ref animation 'animating)]
+       [time-offset   (ref animation 'time-offset)]
+       [x-random      (ref animation 'x-random)]
+       [y-random      (ref animation 'y-random)]
+       [from-jump?    (ref animation 'from-jump?)]
+       [can-jump?     (ref animation 'can-jump?)]
+       [jumps-at      (ref animation 'jumps-at)]
+       [jumps-to      (ref animation 'jumps-to)]
+       [jumped-from   (ref animation 'jumped-from)]
+       [jump-offset   (ref animation 'jump-offset)]
+       [forking?      (ref animation 'forking?)]
+       [options       (ref animation 'options)])
+    (make <animation>
+     :title         title
+     :frames        frames
+     :n-frames      n-frames
+     :frame-numbers frame-numbers
+     :timings       timings
+     :alphas        alphas
+     :offset        offset
+     :size          size
+     :depth         depth
+     :matrix        matrix
+     :animating     animating
+     :time-offset   time-offset
+     :x-random      x-random
+     :y-random      y-random
+     :from-jump?    from-jump?
+     :can-jump?     can-jump?
+     :jumps-at      jumps-at
+     :jumps-to      jumps-to
+     :jumped-from   jumped-from
+     :jump-offset   jump-offset
+     :forking?      forking?
+     :options       options)))
 
 (define (animation->animation-with-fade-out animation)
   animation)
