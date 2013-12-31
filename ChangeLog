@@ -1,6 +1,10 @@
+2013-12-31  Ichi Kanaya  <kanaya@Ichis-MacBook-Pro.local>
+
+	* polyphony.scm: reformatted the code.
+
 2013-12-30  Ichi Kanaya  <kanaya@pineapple.cc>
 
-	* polyphony.scm: renewing...
+	* polyphony.scm: cloned from https://kanaya@bitbucket.org/kanaya/polyphony3
 
 2011-09-27  Ichi Kanaya  <kanaya@pineappledesign.org>
 
