@@ -2,8 +2,7 @@
 ;;; How to test
 ;;;
 ;;; (1) Run this script as 'gosh polyphony.scm'
-;;; (2) Access to http://localhost:8080/?time=now&person=1
-;;;     by a web browser or any http client
+;;; (2) Access to http://localhost:8080/?time=now&person=1 by a web browser or any http client
 ;;;
 
 ;;;
@@ -46,7 +45,7 @@
 (define id-matrix-2x2 '(1.0 0.0 0.0 1.0))
 (define id-matrix-3x3 '(1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0))
 
-(define image-prefix "http://localhost:80/~kanaya/Polyphony/")
+(define image-prefix "http://localhost:80/~kanaya/Polyphony/") ; the simulator accesses this address. (the rendering client ignores this prefix.)
 (define image-suffix ".png")
 
 (define attack-and-decay-duration 10)   ; [tick]
@@ -77,26 +76,18 @@
 
 (define *the-start-up-time* 0)
 
-(define (get-width p) 
-  (car p))
-(define (get-height p)
-  (cdr p))
-(define (pixel->milimeter v)
-  (/ v pixel-per-milimeter))
-(define (milimeter->pixel v)
-  (* v pixel-per-milimeter))
-(define (current-time) 
-  (define (sec+usec->sec s us)
-    (+ s (/ us 1000000.0)))
-  (receive
-   [sec usec]
+(define (get-width p) (car p))
+(define (get-height p) (cdr p))
+(define (pixel->milimeter v) (/ v pixel-per-milimeter))
+(define (milimeter->pixel v) (* v pixel-per-milimeter))
+(define (current-time)
+  (define (sec+usec->sec s us) (+ s (/ us 1000000.0)))
+  (receive [sec usec]
    (sys-gettimeofday)
    (- (sec+usec->sec sec usec) *the-start-up-time*)))
-(define (name->url name)
-  (string-append image-prefix name image-suffix))
+(define (name->url name) (string-append image-prefix name image-suffix))
 
-(define (times n lst)
-  (concatenate (make-list n lst)))
+(define (times n lst) (concatenate (make-list n lst)))
 
 ;;;
 ;;; <frame-set> class and <frame> class
@@ -112,39 +103,36 @@
 ;;;
 
 (define-class <frame-set> ()
-  ([names :init-keyword :names :init-value '()]
-   [n-names :init-keyword :n-names :init-value 0]
-   [default-offsets :init-keyword :default-offsets :init-value '()]
-   [default-sizes :init-keyword :default-sizes :init-value '()]
-   [default-matrices :init-keyword :default-matrices :init-value '()]
-   [default-alphas :init-keyword :default-alphas :init-value '()]
-   [default-color-matrices :init-keyword :default-color-matrices
-     :init-value '()]
-   [default-depths :init-keyword :default-depths :init-value '()]
-   [default-sounds :init-keyword :default-sounds :init-value '()]))
+  ([names                  :init-keyword :names                  :init-value '()]
+   [n-names                :init-keyword :n-names                :init-value 0]
+   [default-offsets        :init-keyword :default-offsets        :init-value '()]
+   [default-sizes          :init-keyword :default-sizes          :init-value '()]
+   [default-matrices       :init-keyword :default-matrices       :init-value '()]
+   [default-alphas         :init-keyword :default-alphas         :init-value '()]
+   [default-color-matrices :init-keyword :default-color-matrices :init-value '()]
+   [default-depths         :init-keyword :default-depths         :init-value '()]
+   [default-sounds         :init-keyword :default-sounds         :init-value '()]))
 
 (define-class <frame> ()
-  ([name :init-keyword :name :init-value "unnamed"]
-   [default-offset :init-keyword :default-offset :init-value point-zero]
-   [default-size :init-keyword :default-size :init-value point-hundred]
-   [default-matrix :init-keyword :default-matrix
-     :init-value id-matrix-2x2]
-   [default-color-matrix :init-keyword :default-color-matrix
-     :init-value id-matrix-3x3]
-   [default-sound :init-keyword :default-sound :init-value 'none]))
+  ([name                 :init-keyword :name                 :init-value "unnamed"]
+   [default-offset       :init-keyword :default-offset       :init-value point-zero]
+   [default-size         :init-keyword :default-size         :init-value point-hundred]
+   [default-matrix       :init-keyword :default-matrix       :init-value id-matrix-2x2]
+   [default-color-matrix :init-keyword :default-color-matrix :init-value id-matrix-3x3]
+   [default-sound        :init-keyword :default-sound        :init-value 'none]))
 
 (define-method ref ([fs <frame-set>] [i <integer>])
 					; returns <frame>
   (let*
-      [[n-names (ref fs 'n-names)]
-       [j (if (< i n-names) i 0)]]      ; boundary check
+      ([n-names (ref fs 'n-names)]
+       [j       (if (< i n-names) i 0)])      ; boundary check
     (make <frame>
-      :name (ref (ref fs 'names) j)
-      :default-offset (ref (ref fs 'default-offsets) j)
-      :default-size (ref (ref fs 'default-sizes) j)
-      :default-matrix (ref (ref fs 'default-matrices) j)
+      :name                 (ref (ref fs 'names) j)
+      :default-offset       (ref (ref fs 'default-offsets) j)
+      :default-size         (ref (ref fs 'default-sizes) j)
+      :default-matrix       (ref (ref fs 'default-matrices) j)
       :default-color-matrix (ref (ref fs 'default-color-matrices) j)
-      :default-sound (ref (ref fs 'default-sounds) j))))
+      :default-sound        (ref (ref fs 'default-sounds) j))))
 
 ;;;
 ;;; <animation> class
@@ -166,29 +154,29 @@
 ;;;
 
 (define-class <animation> ()
-  ([title :init-keyword :title :init-value 'untitled]
-   [frames :init-keyword :frames :init-value #f]
-   [n-frames :init-keyword :n-frames :init-value 0]
+  ([title         :init-keyword :title         :init-value 'untitled]
+   [frames        :init-keyword :frames        :init-value #f]
+   [n-frames      :init-keyword :n-frames      :init-value 0]
    [frame-numbers :init-keyword :frame-numbers :init-value '()]
-   [timings :init-keyword :timings :init-value '()]
-   [alphas :init-keyword :alphas :init-value '()]
-   [offset :init-keyword :offset :init-value point-zero]
-   [size :init-keyword :size :init-value point-one]
-   [depth :init-keyword :depth :init-value 0]
-   [matrix :init-keyword :matrix :init-value id-matrix-2x2]
-   [animating :init-keyword :animating :init-value #f]
-   [time-offset :init-keyword :time-offset :init-value 0]
-   [x-random :init-keyword :x-random :init-value #f]
-   [y-random :init-keyword :y-random :init-value #f]
-   [from-jump? :init-keyword :from-jump? :init-value #f]
-   [can-jump? :init-keyword :can-jump? :init-value #f]
-   [jumps-at :init-keyword :jumps-at :init-value 0]
-   [jumps-to :init-keyword :jumps-to :init-value 'none]
-   [jumped-from :init-keyword :jumped-from :init-value 'none]
-   [jump-offset :init-keyword :jump-offset :init-value point-zero]
-   [to-jump :init-keyword :to-jump :init-value #f] ; to be removed
-   [forking? :init-keyword :forking? :init-value #f]
-   [options :init-keyword :options :init-value '()]))
+   [timings       :init-keyword :timings       :init-value '()]
+   [alphas        :init-keyword :alphas        :init-value '()]
+   [offset        :init-keyword :offset        :init-value point-zero]
+   [size          :init-keyword :size          :init-value point-one]
+   [depth         :init-keyword :depth         :init-value 0]
+   [matrix        :init-keyword :matrix        :init-value id-matrix-2x2]
+   [animating     :init-keyword :animating     :init-value #f]
+   [time-offset   :init-keyword :time-offset   :init-value 0]
+   [x-random      :init-keyword :x-random      :init-value #f]
+   [y-random      :init-keyword :y-random      :init-value #f]
+   [from-jump?    :init-keyword :from-jump?    :init-value #f]
+   [can-jump?     :init-keyword :can-jump?     :init-value #f]
+   [jumps-at      :init-keyword :jumps-at      :init-value 0]
+   [jumps-to      :init-keyword :jumps-to      :init-value 'none]
+   [jumped-from   :init-keyword :jumped-from   :init-value 'none]
+   [jump-offset   :init-keyword :jump-offset   :init-value point-zero]
+   [to-jump       :init-keyword :to-jump       :init-value #f] ; to be removed
+   [forking?      :init-keyword :forking?      :init-value #f]
+   [options       :init-keyword :options       :init-value '()]))
 
 ;;;
 ;;; Randomize offset of animation
@@ -197,17 +185,17 @@
 (define-method randomize-offset! ([animation <animation>])
   (define (random-offset animation)
     (let
-	[[rx (* (random-real) (get-width screen-size))]
-	 [ry (* (random-real) (get-height screen-size))]
-	 [x (get-width (ref animation 'offset))]
-	 [y (get-height (ref animation 'offset))]
+	([rx       (* (random-real) (get-width screen-size))]
+	 [ry       (* (random-real) (get-height screen-size))]
+	 [x        (get-width (ref animation 'offset))]
+	 [y        (get-height (ref animation 'offset))]
 	 [x-random (ref animation 'x-random)]
-	 [y-random (ref animation 'y-random)]]
+	 [y-random (ref animation 'y-random)])
       (cond
        [(and x-random y-random) (cons rx ry)]
-       [x-random (cons rx y)]
-       [y-random (cons x ry)]
-       [else (cons x y)])))
+       [x-random                (cons rx y)]
+       [y-random                (cons x ry)]
+       [else                    (cons x y)])))
   (when (not (ref animation 'animating))
 	(set! (ref animation 'offset) (random-offset animation))))
 
@@ -234,36 +222,32 @@
 
 (define-method animation-ref-primitive ([animation <animation>] [n <number>])
 					; returns <frame> and <number>
-  (let1
-   n-frames
-   (ref animation 'n-frames)
-   (if (and (< n n-frames) (>= n 0))
-       (values
-	(ref (ref animation 'frames) n)
-	(ref (ref animation 'alphas) n))
-       (values
-	(ref (ref animation 'frames) (- n-frames 1))  ;; out of bound error?
-	(ref (ref animation 'alphas) (- n-frames 1))))))
+  (let1 n-frames (ref animation 'n-frames)
+	(if (and (< n n-frames) (>= n 0))
+	    (values
+	     (ref (ref animation 'frames) n)
+	     (ref (ref animation 'alphas) n))
+	    (values
+	     (ref (ref animation 'frames) (- n-frames 1))  ;; out of bound error?
+	     (ref (ref animation 'alphas) (- n-frames 1))))))
 
 (define-method ref ([animation <animation>] [time <number>])
 					; returns <frame> and <number>
   (define (index-of-nearest-time timings t)
-    (let1
-     less-than-time 
-     (partition (cut > t <>) timings)
-     (length less-than-time)))
+    (let1 less-than-time (partition (cut > t <>) timings)
+	  (length less-than-time)))
   (define (real-modulo t d) ;; needs faster argolithm!!!
     (if (< t d)
 	t
 	(real-modulo (- t d) d)))
   (let*
-      [[time-offset (ref animation 'time-offset)]
+      ([time-offset   (ref animation 'time-offset)]
        [relative-time (- time time-offset)]
-       [modulo-time (real-modulo relative-time (duration-of animation))]
-       [timings (ref animation 'timings)]
+       [modulo-time   (real-modulo relative-time (duration-of animation))]
+       [timings       (ref animation 'timings)]
        [frame-numbers (ref animation 'frame-numbers)]
-       [frame-index (index-of-nearest-time timings modulo-time)]
-       [frame-number (ref frame-numbers frame-index)]]
+       [frame-index   (index-of-nearest-time timings modulo-time)]
+       [frame-number  (ref frame-numbers frame-index)])
     (animation-ref-primitive animation frame-number)))
 
 ;;;
@@ -296,61 +280,43 @@
 
 (define (run-server)
   (define (get-request iport)
-    (rxmatch-case
-     (read-line iport)
-     [test eof-object? 'bad-request]
-     [_pattern_
-      (_ meth abs-path)
-      (list* meth abs-path (rfc822-read-headers iport))]
-     [#/^[A-Z]+/ () 'not-implemented]
-     [else 'bad-request]))
+    (rxmatch-case (read-line iport)
+		  [test       eof-object?       'bad-request]
+		  [_pattern_  (_ meth abs-path) (list* meth abs-path (rfc822-read-headers iport))]
+		  [#/^[A-Z]+/ ()                'not-implemented]
+		  [else       'bad-request]))
   (define (handle-request request oport)
-    (match
-     request
-     ['bad-request (display "HTTP/1.1 400 Bad Request\n" oport)]
-     ['not-implemented (display "HTTP/1.1 501 Not Implemented\n" oport)]
-     [(mthd abs-path . headers)
-      (receive
-       [auth path q frag]
-       (uri-decompose-hierarchical abs-path)
-       (let1
-	content
-	(render-content
-	 path
-	 (cgi-parse-parameters :query-string (or q ""))
-	 (current-time))
-	(when (not *freezing?*)
-	      (set! *the-last-content* content))
-	(display "HTTP/1.1 200 OK\n" oport)
-	(display "Content-Type: text/xml; charset=utf-8\n" oport)
-	(display #`"Content-Length: ,(string-size content)\n" oport)
-	(display "\n" oport)
-	(when (equal? mthd "GET")
-	      (if (not *freezing?*)
-		  (display content oport)
-		  (display *the-last-content* oport))))
-       (when (> (- (current-time) *t-last-event*) freezing-duration)
-	     (set! *freezing?* #f)))]
-     [else (display "Internal error. Sorry.")]))
-  (let1
-   server-sock
-   (make-server-socket 'inet 8080 :reuse-addr? #t)
-   (guard
-    [e
-     [else (socket-close server-sock) (raise e)]]
-    (let loop ([client (socket-accept server-sock)])
-      ;; animation
-      (animation-terminator! *the-animation-collection*)
-      (animation-random-starter! *the-animation-collection*)
-      ;; network
-      (guard 
-       [e
-	[else (socket-close client) (raise e)]]
-       (handle-request
-	(get-request (socket-input-port client))
-	(socket-output-port client))
-       (socket-close client))
-      (loop (socket-accept server-sock))))))
+    (match request
+     ['bad-request              (display "HTTP/1.1 400 Bad Request\n" oport)]
+     ['not-implemented          (display "HTTP/1.1 501 Not Implemented\n" oport)]
+     [(mthd abs-path . headers) (receive [auth path q frag] (uri-decompose-hierarchical abs-path)
+					 (let1 content (render-content path (cgi-parse-parameters :query-string (or q "")) (current-time))
+					       (when (not *freezing?*)
+						     (set! *the-last-content* content))
+					       (display "HTTP/1.1 200 OK\n" oport)
+					       (display "Content-Type: text/xml; charset=utf-8\n" oport)
+					       (display #`"Content-Length: ,(string-size content)\n" oport)
+					       (display "\n" oport)
+					       (when (equal? mthd "GET")
+						     (if (not *freezing?*)
+							 (display content oport)
+							 (display *the-last-content* oport))))
+					 (when (> (- (current-time) *t-last-event*) freezing-duration)
+					       (set! *freezing?* #f)))]
+     [else                      (display "Internal error. Sorry.")]))
+  (let1 server-sock (make-server-socket 'inet 8080 :reuse-addr? #t)
+	(guard (e [else (socket-close server-sock) (raise e)])
+	       (let loop ([client (socket-accept server-sock)])
+		 ;; animation
+		 (animation-terminator! *the-animation-collection*)
+		 (animation-random-starter! *the-animation-collection*)
+		 ;; network
+		 (guard (e [else (socket-close client) (raise e)])
+			(handle-request
+			 (get-request (socket-input-port client))
+			 (socket-output-port client))
+			(socket-close client))
+		 (loop (socket-accept server-sock))))))
 
 ;;;
 ;;; Rendering unit
@@ -375,41 +341,32 @@
 (define (render-content _ params now)   ; parameter path is not used
   ;; animation -> tag
   (define (animation->tag animation time)
-    (receive
-     [frame alpha]
-     (ref animation time)
-     (let*
-	 [[name (ref frame 'name)]
-	  [default-offset (ref frame 'default-offset)]
-	  [default-offset-x (get-width default-offset)]
-	  [default-offset-y (get-height default-offset)]
-	  [default-size (ref frame 'default-size)]
-	  [default-size-x (get-width default-size)]
-	  [default-size-y (get-height default-size)]
-	  [depth (ref animation 'depth)] 
-					; ignoring default-depth of each frames
-	  [sound
-	   (car
-	    (hash-table-get
-	     *the-sound-collection*
-	     (ref frame 'default-sound)))]
-	  [offset (ref animation 'offset)]
-	  [offset-x (get-width offset)]
-	  [offset-y (get-height offset)]]
-       #;(when (eq? (ref animation 'title) 'elephant)
-	     (print "elephant"))
-       `(image
-	 (@
-	  (source ,(name->url name))
-	  (id ,name)
-	  (position_x ,(+ default-offset-x offset-x))
-	  (position_y ,(+ default-offset-y offset-y))
-	  (position_z ,depth)
-	  (size_x ,default-size-x)
-	  (size_y ,default-size-y)
-	  (alpha ,alpha)
-	  (sound ,sound))
-	 ,name))))
+    (receive [frame alpha] (ref animation time)
+	     (let* 
+		 ([name             (ref frame 'name)]
+		  [default-offset   (ref frame 'default-offset)]
+		  [default-offset-x (get-width default-offset)]
+		  [default-offset-y (get-height default-offset)]
+		  [default-size     (ref frame 'default-size)]
+		  [default-size-x   (get-width default-size)]
+		  [default-size-y   (get-height default-size)]
+		  [depth            (ref animation 'depth)]  ; ignoring default-depth of each frames
+		  [sound            (car (hash-table-get *the-sound-collection* (ref frame 'default-sound)))]
+		  [offset           (ref animation 'offset)]
+		  [offset-x         (get-width offset)]
+		  [offset-y         (get-height offset)])
+	       `(image
+		 (@
+		  (source ,(name->url name))
+		  (id ,name)
+		  (position_x ,(+ default-offset-x offset-x))
+		  (position_y ,(+ default-offset-y offset-y))
+		  (position_z ,depth)
+		  (size_x ,default-size-x)
+		  (size_y ,default-size-y)
+		  (alpha ,alpha)
+		  (sound ,sound))
+		 ,name))))
   (define (animating-animations animations)
 					; animations is a hash table
 					; of <animations>
@@ -427,19 +384,12 @@
      (animating-animations animations)))
   (let-keywords
    (cgi-parameters->keyword-style-parameters params)
-   [[time "now"]
-    [person "none"]
-    . unknown-parameters]
+   ([time "now"] [person "none"] . unknown-parameters)
    (animation-event-catcher! *the-animation-collection* person)
    (let 
-       [[the-frame-tag-list
-	 (cond [(string=? time "now")
-		(frame-tag-list *the-animation-collection* now)]
-	       [else      
-		(frame-tag-list
-		 *the-animation-collection*
-		 (string->number time))])]
-	[stop-sound (not (string=? person "none"))]]
+       ([the-frame-tag-list (cond [(string=? time "now") (frame-tag-list *the-animation-collection* now)]
+				  [else                  (frame-tag-list *the-animation-collection* (string->number time))])]
+	[stop-sound         (not (string=? person "none"))])
      (srl:sxml->xml
       (list
        '*TOP*
@@ -493,8 +443,8 @@
 (define (animation-terminator! animations)
   (define (terminate-animation-if-time-is-out! _ animation)
     (let 
-	[[animating (ref animation 'animating)]
-	 [beginning (ref animation 'time-offset)]]
+	([animating (ref animation 'animating)]
+	 [beginning (ref animation 'time-offset)])
       (when (and animating
 		 (>
 		  (current-time)
@@ -551,9 +501,7 @@
 	(animation-kick-starter! *the-animation-collection* 'baboon-weeing)
 	(animation-kick-starter! *the-animation-collection* 'meercat)	
 	;; !!
-	(let1
-	 now
-	 (current-time)
+	(let1 now (current-time)
 	 (when (> (- now *t-last-event*) event-gate)
 	       (set! *t-last-event* now)
 	       #;(set! *freezing?* #t)
@@ -562,23 +510,14 @@
 		animations
 		(lambda
 		    [_ animation]
-		  (let1 
-		   can-jump?
-		   (ref animation 'can-jump?)
+		  (let1 can-jump? (ref animation 'can-jump?)
 		   (when can-jump?
 			 (let*
-			     [[next-animation-key (ref animation 'jumps-to)]
-			      [next-animation
-			       (hash-table-get
-				animations
-				next-animation-key)]
-			      [animation-offset (ref animation 'offset)]
-			      [animation-jump-offset
-			       (ref animation 'jump-offset)]
-			      [the-offset
-			       (pair-plus
-				animation-offset
-				animation-jump-offset)]]
+			     ([next-animation-key    (ref animation 'jumps-to)]
+			      [next-animation        (hash-table-get animations next-animation-key)]
+			      [animation-offset      (ref animation 'offset)]
+			      [animation-jump-offset (ref animation 'jump-offset)]
+			      [the-offset            (pair-plus animation-offset animation-jump-offset)])
 			   (if
 			    (not 
 			     (or
@@ -594,101 +533,96 @@
 (define
   (make-animation-primitive
    :key 
-   [title 'untitled]
-   [frame-names '()]
+   [title         'untitled]
+   [frame-names   '()]
    [frame-offsets '()]
    [frame-numbers '()]
-   [alphas '()]
-   [canvas-size point-zero]
-   [offset point-zero]
-   [x-random #f]
-   [y-random #f]
-   [from-jump? #f]
-   [can-jump? #f]
-   [jumps-at 0] ; [tick]                ; to be removed
-   [jumps-to 'none]
-   [jumped-from 'none]
-   [jump-offset point-zero]
-   [forking? #f]
-   [sounds '()]
-   [options '()])
+   [alphas        '()]
+   [canvas-size   point-zero]
+   [offset        point-zero]
+   [x-random      #f]
+   [y-random      #f]
+   [from-jump?    #f]
+   [can-jump?     #f]
+   [jumps-at      0] ; [tick]                ; to be removed
+   [jumps-to      'none]
+   [jumped-from   'none]
+   [jump-offset   point-zero]
+   [forking?      #f]
+   [sounds       '()]
+   [options      '()])
   (let*
-      [[n-frames (length frame-names)]
-       [n-numbers (length frame-numbers)]
-       [default-offsets
-	 (if (null? frame-offsets)
-	     (make-list n-numbers point-zero)
-	     frame-offsets)]
-       [frame-set
-	(make <frame-set>
-	  :names frame-names
-	  :n-names n-frames
-	  :default-offsets default-offsets
-	  :default-sizes (make-list n-frames canvas-size)
-	  :default-matrices (make-list n-frames id-matrix-2x2)
-	  :default-color-matrices (make-list n-frames id-matrix-3x3)
-	  :default-sounds sounds)]
-       [timings (durations->timings (make-list n-numbers one-tick))]
-       [alphas  (if (null? alphas) (make-list n-numbers 1.0) alphas)]]
+      ([n-frames        (length frame-names)]
+       [n-numbers       (length frame-numbers)]
+       [default-offsets (if (null? frame-offsets)
+			    (make-list n-numbers point-zero)
+			    frame-offsets)]
+       [frame-set       (make <frame-set>
+			  :names                  frame-names
+			  :n-names                n-frames
+			  :default-offsets        default-offsets
+			  :default-sizes          (make-list n-frames canvas-size)
+			  :default-matrices       (make-list n-frames id-matrix-2x2)
+			  :default-color-matrices (make-list n-frames id-matrix-3x3)
+			  :default-sounds         sounds)]
+       [timings         (durations->timings (make-list n-numbers one-tick))]
+       [alphas          (if (null? alphas) (make-list n-numbers 1.0) alphas)])
     (make <animation>
-      :title title
-      :frames frame-set
-      :n-frames n-numbers
+      :title         title
+      :frames        frame-set
+      :n-frames      n-numbers
       :frame-numbers frame-numbers
-      :timings timings
-      :alphas alphas
-      :depth (random-real)
-      :offset offset
-      :x-random x-random
-      :y-random y-random
-      :from-jump? from-jump?
-      :can-jump? can-jump?
-      :jumps-at (* jumps-at one-tick) ; [sec]
-      :jumps-to jumps-to
-      :jumped-from jumped-from
-      :jump-offset jump-offset
-      :forking? forking?
-      :options options)))
+      :timings       timings
+      :alphas        alphas
+      :depth         (random-real)
+      :offset        offset
+      :x-random      x-random
+      :y-random      y-random
+      :from-jump?    from-jump?
+      :can-jump?     can-jump?
+      :jumps-at      (* jumps-at one-tick) ; [sec]
+      :jumps-to      jumps-to
+      :jumped-from   jumped-from
+      :jump-offset   jump-offset
+      :forking?      forking?
+      :options       options)))
 
 (define
   (make-animation-with-fade-in/out
    :key 
-   [title 'untitled]
-   [frame-names '()]
+   [title         'untitled]
+   [frame-names   '()]
    [frame-offsets '()]
    [frame-numbers '()]
-   [canvas-size point-zero]
-   [offset point-zero]
-   [x-random #f]
-   [y-random #f]
-   [from-jump? #f]
-   [can-jump? #f]
-   [jumps-at 0] ; [tick]
-   [jumps-to 'none]
-   [jumped-from 'none]
-   [jump-offset point-zero]
-   [forking? #f]
-   [sounds '()]
-   [options '()])
+   [canvas-size   point-zero]
+   [offset        point-zero]
+   [x-random      #f]
+   [y-random      #f]
+   [from-jump?    #f]
+   [can-jump?     #f]
+   [jumps-at      0] ; [tick]
+   [jumps-to      'none]
+   [jumped-from   'none]
+   [jump-offset   point-zero]
+   [forking?      #f]
+   [sounds        '()]
+   [options       '()])
   (let* 
-      [[n-frames-original (length frame-names)]
-       [n-frames (+ n-frames-original (* 2 attack-and-decay-duration))]
-       [frame-offsets-asserted
-	(if (null? frame-offsets)
-	    (make-list n-frames point-zero)
-	    frame-offsets)]
-       [sounds-asserted
-	(if (null? sounds)
-	    (make-list n-frames 'none)
-	    sounds)]
-       [alphas
-	(append
-	 increasing
-	 (make-list n-frames-original 1)
-	 decreasing)]]
+      ([n-frames-original      (length frame-names)]
+       [n-frames               (+ n-frames-original (* 2 attack-and-decay-duration))]
+       [frame-offsets-asserted (if (null? frame-offsets)
+				   (make-list n-frames point-zero)
+				   frame-offsets)]
+       [sounds-asserted        (if (null? sounds)
+				   (make-list n-frames 'none)
+				   sounds)]
+       [alphas                 (append
+				increasing
+				(make-list n-frames-original 1)
+				decreasing)])
     (make-animation-primitive
-     :title title
-     :frame-names frame-names
+     :title         title
+     :frame-names   frame-names
      :frame-offsets (append
 		     (make-list
 		      attack-and-decay-duration
@@ -705,78 +639,78 @@
 		     (make-list
 		      attack-and-decay-duration
 		      (last frame-numbers)))
-     :canvas-size canvas-size
-     :offset offset
-     :x-random x-random
-     :y-random y-random
-     :from-jump? from-jump?
-     :can-jump? can-jump?
-     :jumps-at jumps-at
-     :jumps-to jumps-to
-     :jumped-from jumped-from
-     :jump-offset jump-offset
-     :forking? forking?
-     :alphas alphas
-     :sounds (append 
-	      (make-list attack-and-decay-duration 'none) 
-	      sounds-asserted
-	      (make-list attack-and-decay-duration 'none))
-     :options options)))
+     :canvas-size   canvas-size
+     :offset        offset
+     :x-random      x-random
+     :y-random      y-random
+     :from-jump?    from-jump?
+     :can-jump?     can-jump?
+     :jumps-at      jumps-at
+     :jumps-to      jumps-to
+     :jumped-from   jumped-from
+     :jump-offset   jump-offset
+     :forking?      forking?
+     :alphas        alphas
+     :sounds        (append 
+		     (make-list attack-and-decay-duration 'none) 
+		     sounds-asserted
+		     (make-list attack-and-decay-duration 'none))
+     :options       options)))
 
 (define
   (make-simple-animation
    :key
-   [title 'untitled]
+   [title             'untitled]
    [frame-name-prefix "{prefix}/"]
-   [n-frames 0]
-   [frame-offsets '()]
-   [canvas-size point-zero]
-   [offset point-zero]
-   [x-random #f]
-   [y-random #f]
-   [from-jump? #f]
-   [can-jump? #f]
-   [jumps-at 0] ; [tick]
-   [jumps-to 'none]
-   [jumped-from 'none]
-   [jump-offset point-zero]
-   [forking? #f]
-   [sounds '()]
-   [options '()])
+   [n-frames          0]
+   [frame-offsets     '()]
+   [canvas-size       point-zero]
+   [offset            point-zero]
+   [x-random          #f]
+   [y-random          #f]
+   [from-jump?        #f]
+   [can-jump?         #f]
+   [jumps-at          0] ; [tick]
+   [jumps-to          'none]
+   [jumped-from       'none]
+   [jump-offset       point-zero]
+   [forking?          #f]
+   [sounds           '()]
+   [options          '()])
   (make-animation-primitive ; make-animation-with-fade-in/out
-   :title title
-   :frame-names (map
-		 (cut string-append frame-name-prefix <>)
-		 (map number->string (iota n-frames 1)))
+   :title         title
+   :frame-names   (map
+		   (cut string-append frame-name-prefix <>)
+		   (map number->string (iota n-frames 1)))
    :frame-numbers (iota n-frames)
    :frame-offsets frame-offsets
-   :canvas-size canvas-size
-   :offset offset
-   :x-random x-random
-   :y-random y-random
-   :from-jump? from-jump?
-   :can-jump? can-jump?
-   :jumps-at jumps-at
-   :jumps-to jumps-to
-   :jumped-from jumped-from
-   :jump-offset jump-offset
-   :forking? forking?
-   :sounds sounds
-   :options options))
+   :canvas-size   canvas-size
+   :offset        offset
+   :x-random      x-random
+   :y-random      y-random
+   :from-jump?    from-jump?
+   :can-jump?     can-jump?
+   :jumps-at      jumps-at
+   :jumps-to      jumps-to
+   :jumped-from   jumped-from
+   :jump-offset   jump-offset
+   :forking?      forking?
+   :sounds        sounds
+   :options       options))
 
 (define
   (make-birds-animation
    :key
-   [title 'birds-white]
-   [prefix "{prefix}/"]
+   [title    'birds-white]
+   [prefix   "{prefix}/"]
    [jumps-to 'birds-white-take-off])
   (let1
    frame-name-primitive '(1 2 3 4 1 2 3 4 1 2 3 4 5 6 5 6 7 8 7)
    (make-animation-with-fade-in/out
     :title title
-    :frame-names (map
-		  (cut string-append prefix <>)
-		  (map number->string frame-name-primitive))
+    :frame-names   (map
+		    (cut string-append prefix <>)
+		    (map number->string frame-name-primitive))
     :frame-offsets `(,point-zero              ; 1
 		     ,point-zero              ; 2
 		     ,point-zero              ; 3
@@ -797,153 +731,145 @@
 		     (,(* birds-step 2) . 0)  ; 8
 		     (,(* birds-step 2) . 0)) ; 7
     :frame-numbers (iota (length frame-name-primitive))
-    :canvas-size '(585 . 425)
-    :offset point-zero
-    :x-random #t
-    :y-random #t
-    :can-jump? #t
-    :jumps-to jumps-to
-    :sounds (make-list (length frame-name-primitive) 'none)
-    :options '())))
+    :canvas-size   '(585 . 425)
+    :offset        point-zero
+    :x-random      #t
+    :y-random      #t
+    :can-jump?     #t
+    :jumps-to      jumps-to
+    :sounds        (make-list (length frame-name-primitive) 'none)
+    :options       '())))
 
 (define
   (make-birds-take-off-animation
    :key
-   [title 'birds-white-take-off]
-   [prefix1 "{prefix}/"]
-   [prefix2 "{prefix}/"]
+   [title       'birds-white-take-off]
+   [prefix1     "{prefix}/"]
+   [prefix2     "{prefix}/"]
    [jumped-from 'birds-white])
-  (let1
-   frame-names
-   (append 
-    (map
-     (cut string-append prefix1 <>)
-     (map number->string '(9 10 11 12 13)))
-    (map
-     (cut string-append prefix2 <>)
-     (map number->string (iota 8 1)))
-    (map 
-     (cut string-append prefix2 <>)
-     (map number->string (iota 8 1))))
-   (make-animation-primitive
-    :title title
-    :frame-names frame-names
-    :frame-offsets (append
-		    (make-list (+ 5 8) point-zero)
-		    (make-list 8 '(-210 . 0)))
-    :frame-numbers (iota (length frame-names))
-    :canvas-size '(585 . 425)
-    :from-jump? #t
-    :jumped-from jumped-from
-    :sounds (append
-	     (make-list 5 'none)
-	     '(birds-flying)
-	     (make-list 7 'none)
-	     '(birds-flying)
-	     (make-list 7 'none))
-    :options '())))
+  (let1 frame-names (append 
+		     (map
+		      (cut string-append prefix1 <>)
+		      (map number->string '(9 10 11 12 13)))
+		     (map
+		      (cut string-append prefix2 <>)
+		      (map number->string (iota 8 1)))
+		     (map 
+		      (cut string-append prefix2 <>)
+		      (map number->string (iota 8 1))))
+	(make-animation-primitive
+	 :title         title
+	 :frame-names   frame-names
+	 :frame-offsets (append
+			 (make-list (+ 5 8) point-zero)
+			 (make-list 8 '(-210 . 0)))
+	 :frame-numbers (iota (length frame-names))
+	 :canvas-size   '(585 . 425)
+	 :from-jump?    #t
+	 :jumped-from   jumped-from
+	 :sounds        (append
+			 (make-list 5 'none)
+			 '(birds-flying)
+			 (make-list 7 'none)
+			 '(birds-flying)
+			 (make-list 7 'none))
+	 :options       '())))
 
 (define
   (make-papilionidae-animation
    :key
-   [title 'papilionidae-white]
-   [prefix "{prefix}/"]
+   [title    'papilionidae-white]
+   [prefix   "{prefix}/"]
    [jumps-to 'papilionidae-white-touch-down])
-  (let1
-   frame-names
-   (map
-    (cut string-append prefix <>)
-    (map number->string (times 3 (iota 11 1))))
-   (make-animation-with-fade-in/out
-    :title title
-    :frame-names frame-names
-    :frame-offsets (append (make-list 11 point-zero)
-			   (make-list 11 (cons papilionidae-stride 0))
-			   (make-list
-			    11
-			    (cons (* papilionidae-stride 2) 0)))
-    :frame-numbers (iota (length frame-names))
-    :canvas-size '(585 . 425)
-    :offset point-zero
-    :x-random #t
-    :y-random #t
-    :can-jump? #t
-    :jumps-at 22                 ; [tick]
-    :jumps-to jumps-to
-    :jump-offset `(,(* papilionidae-stride 2) . 0)
-    :sounds (append
-	     '(butterfly) (make-list 10 'none)
-	     '(butterfly) (make-list 10 'none)
-	     '(butterfly) (make-list 10 'none))
-    :options '())))
+  (let1 frame-names (map
+		     (cut string-append prefix <>)
+		     (map number->string (times 3 (iota 11 1))))
+	(make-animation-with-fade-in/out
+	 :title         title
+	 :frame-names   frame-names
+	 :frame-offsets (append (make-list 11 point-zero)
+				(make-list 11 (cons papilionidae-stride 0))
+				(make-list
+				 11
+				 (cons (* papilionidae-stride 2) 0)))
+	 :frame-numbers (iota (length frame-names))
+	 :canvas-size   '(585 . 425)
+	 :offset        point-zero
+	 :x-random      #t
+	 :y-random      #t
+	 :can-jump?     #t
+	 :jumps-at      22                 ; [tick]
+	 :jumps-to      jumps-to
+	 :jump-offset   `(,(* papilionidae-stride 2) . 0)
+	 :sounds        (append
+			 '(butterfly) (make-list 10 'none)
+			 '(butterfly) (make-list 10 'none)
+			 '(butterfly) (make-list 10 'none))
+	 :options       '())))
 
 (define
   (make-papilionidae-touch-down-animation
    :key
-   [title 'papilionidae-white-touch-down]
-   [prefix "{prefix}/"]
+   [title       'papilionidae-white-touch-down]
+   [prefix      "{prefix}/"]
    [jumped-from 'papilionidae-white])
-  (let1
-   frame-names
-   (map
-    (cut string-append prefix <>)
-    (map number->string (iota 4 1)))
-   (make-animation-primitive
-    :title title
-    :frame-names frame-names
-    :frame-offsets (make-list (length frame-names) point-zero)
-    :frame-numbers (iota (length frame-names))
-    :canvas-size '(585 . 425)
-    :from-jump? #t
-    :jumped-from jumped-from
-    :sounds (make-list (length frame-names) 'none)
-    :options '())))
+  (let1 frame-names (map
+		     (cut string-append prefix <>)
+		     (map number->string (iota 4 1)))
+	(make-animation-primitive
+	 :title         title
+	 :frame-names   frame-names
+	 :frame-offsets (make-list (length frame-names) point-zero)
+	 :frame-numbers (iota (length frame-names))
+	 :canvas-size   '(585 . 425)
+	 :from-jump?    #t
+	 :jumped-from   jumped-from
+	 :sounds        (make-list (length frame-names) 'none)
+	 :options       '())))
 
 (define
   (make-rapae-animation
    :key
-   [title 'rapae-white]
-   [prefix "{prefix}/"]
+   [title    'rapae-white]
+   [prefix   "{prefix}/"]
    [jumps-to 'rapae-white-touch-down])
   (make-simple-animation 
-   :title title
+   :title             title
    :frame-name-prefix prefix
-   :n-frames 11
-   :canvas-size '(585 . 425)
-   :x-random #t
-   :y-random #t
-   :can-jump? #t
-   :jumps-at 9
-   :jumps-to jumps-to
-   :sounds (append '(butterfly) (make-list 10 'none))
-   :options '()))
+   :n-frames          11
+   :canvas-size       '(585 . 425)
+   :x-random          #t
+   :y-random          #t
+   :can-jump?         #t
+   :jumps-at          9
+   :jumps-to          jumps-to
+   :sounds            (append '(butterfly) (make-list 10 'none))
+   :options           '()))
 
 (define
   (make-rapae-touch-down-animation
    :key
-   [title 'rapae-white-touch-down]
-   [prefix "{prefix}/"]
+   [title       'rapae-white-touch-down]
+   [prefix      "{prefix}/"]
    [jumped-from 'rapae-white])
-  (let1
-   frame-names
-   (map
-    (cut string-append prefix <>)
-    (map number->string (iota 4 1)))
-   (make-animation-primitive
-    :title title
-    :frame-names frame-names
-    :frame-offsets (make-list (length frame-names) point-zero)
-    :frame-numbers (iota (length frame-names))
-    :canvas-size '(585 . 425)
-    :from-jump? #t
-    :jumped-from jumped-from
-    :sounds (make-list (length frame-names) 'none)
-    :options '())))
+  (let1 frame-names (map
+		     (cut string-append prefix <>)
+		     (map number->string (iota 4 1)))
+	(make-animation-primitive
+	 :title         title
+	 :frame-names   frame-names
+	 :frame-offsets (make-list (length frame-names) point-zero)
+	 :frame-numbers (iota (length frame-names))
+	 :canvas-size   '(585 . 425)
+	 :from-jump?    #t
+	 :jumped-from   jumped-from
+	 :sounds        (make-list (length frame-names) 'none)
+	 :options       '())))
 
 
 (define *the-animation-collection*
   (let 
-      [[apple
+      ([apple
 	(make-simple-animation
 	 :title 'apple
 	 :frame-name-prefix "Apple2/"
@@ -1339,174 +1265,78 @@
 	 :canvas-size `(,(* 585 2) . ,(* 425 2))
 	 :offset point-zero
 	 :sounds (make-list 4 'none)
-	 :options '())]]
-    (let1
-     hash-table
-     (make-hash-table 'eqv?)
-     (hash-table-put! hash-table 'apple apple)
-     (hash-table-put! hash-table 'baboon-weeing baboon-weeing)
-     #;(hash-table-put! hash-table 'baboon-wee baboon-wee)
-     (hash-table-put! hash-table 'birds-blue birds-blue)
-     (hash-table-put! hash-table 'birds-orange birds-orange)
-     (hash-table-put! hash-table 'birds-blue-take-off birds-blue-take-off)
-     (hash-table-put! hash-table 'birds-orange-take-off birds-orange-take-off)
-     (hash-table-put! hash-table 'papilionidae-blue papilionidae-blue)
-     (hash-table-put! hash-table 'papilionidae-purple papilionidae-purple)
-     (hash-table-put! hash-table 'papilionidae-white papilionidae-white)
-     (hash-table-put! hash-table 'papilionidae-yellow papilionidae-yellow)
-     (hash-table-put!
-      hash-table
-      'papilionidae-blue-touch-down
-      papilionidae-blue-touch-down)
-     (hash-table-put!
-      hash-table
-      'papilionidae-purple-touch-down
-      papilionidae-purple-touch-down)
-     (hash-table-put!
-      hash-table
-      'papilionidae-white-touch-down
-      papilionidae-white-touch-down)
-     (hash-table-put!
-      hash-table
-      'papilionidae-yellow-touch-down 
-      papilionidae-yellow-touch-down)
-     (hash-table-put! hash-table 'pieris-rapae-pink pieris-rapae-pink)
-     (hash-table-put! hash-table 'pieris-rapae-yellow pieris-rapae-yellow)
-     (hash-table-put!
-      hash-table
-      'pieris-rapae-pink-touch-down
-      pieris-rapae-pink-touch-down)
-     (hash-table-put!
-      hash-table
-      'pieris-rapae-yellow-touch-down 
-      pieris-rapae-yellow-touch-down)
-     (hash-table-put! hash-table 'elephant elephant)
-     (hash-table-put! hash-table 'fawn fawn)
-     (hash-table-put! hash-table 'fox fox)
-     (hash-table-put! hash-table 'meercat meercat)
+	 :options '())])
+    (let1 hash-table (make-hash-table 'eqv?)
+	  (hash-table-put! hash-table 'apple                          apple)
+	  (hash-table-put! hash-table 'baboon-weeing                  baboon-weeing)
+	  #;(hash-table-put! hash-table 'baboon-wee baboon-wee)
+	  (hash-table-put! hash-table 'birds-blue                     birds-blue)
+	  (hash-table-put! hash-table 'birds-orange                   birds-orange)
+	  (hash-table-put! hash-table 'birds-blue-take-off            birds-blue-take-off)
+	  (hash-table-put! hash-table 'birds-orange-take-off          birds-orange-take-off)
+	  (hash-table-put! hash-table 'papilionidae-blue              papilionidae-blue)
+	  (hash-table-put! hash-table 'papilionidae-purple            papilionidae-purple)
+	  (hash-table-put! hash-table 'papilionidae-white             papilionidae-white)
+	  (hash-table-put! hash-table 'papilionidae-yellow            papilionidae-yellow)
+	  (hash-table-put! hash-table 'papilionidae-blue-touch-down   papilionidae-blue-touch-down)
+	  (hash-table-put! hash-table 'papilionidae-purple-touch-down papilionidae-purple-touch-down)
+	  (hash-table-put! hash-table 'papilionidae-white-touch-down  papilionidae-white-touch-down)
+	  (hash-table-put! hash-table 'papilionidae-yellow-touch-down papilionidae-yellow-touch-down)
+	  (hash-table-put! hash-table 'pieris-rapae-pink              pieris-rapae-pink)
+	  (hash-table-put! hash-table 'pieris-rapae-yellow            pieris-rapae-yellow)
+	  (hash-table-put! hash-table 'pieris-rapae-pink-touch-down   pieris-rapae-pink-touch-down)
+	  (hash-table-put! hash-table 'pieris-rapae-yellow-touch-down pieris-rapae-yellow-touch-down)
+	  (hash-table-put! hash-table 'elephant                       elephant)
+	  (hash-table-put! hash-table 'fawn                           fawn)
+	  (hash-table-put! hash-table 'fox                            fox)
+	  (hash-table-put! hash-table 'meercat                        meercat)
 					;(hash-table-put! hash-table 'owl owl)
-     (hash-table-put! hash-table 'rabbit rabbit)
-     ;; (hash-table-put! hash-table 'rabbit-to-left rabbit-to-left)
-     ;; (hash-table-put! hash-table 'rabbit-to-right rabbit-to-right)
-     (hash-table-put! hash-table 'squirrel squirrel)
-     (hash-table-put! hash-table 'tanuki tanuki)
-     ;; (hash-table-put! hash-table 'tanuki-turn-back tanuki-turn-back)
-     hash-table)))
+	  (hash-table-put! hash-table 'rabbit                         rabbit)
+	  ;; (hash-table-put! hash-table 'rabbit-to-left rabbit-to-left)
+	  ;; (hash-table-put! hash-table 'rabbit-to-right rabbit-to-right)
+	  (hash-table-put! hash-table 'squirrel                       squirrel)
+	  (hash-table-put! hash-table 'tanuki                         tanuki)
+	  ;; (hash-table-put! hash-table 'tanuki-turn-back tanuki-turn-back)
+	  hash-table)))
 
 ;;;
 ;;; Sounds
 ;;;
 
 (define *the-sound-collection*
-  (let1
-   hash-table
-   (make-hash-table)
-   (hash-table-put!
-    hash-table
-    'ambient
-    '("ambient-64sec" . 64))
-   (hash-table-put!
-    hash-table
-    'apple-touch-down
-    '("apple_touch_down-1sec" . 1))
-   (hash-table-put!
-    hash-table
-    'apple-touch-down-2
-    '("apple_touch_down_2-1sec" . 2))
-   (hash-table-put!
-    hash-table
-    'baboon-voice
-    '("baboon_voice-4sec" . 4))
-   (hash-table-put!
-    hash-table
-    'birds-flying
-    '("birds_flying-3sec" . 3))
-   (hash-table-put!
-    hash-table
-    'birds-touch-down 
-    '("birds_touch_down-1sec" . 1))
-   (hash-table-put!
-    hash-table
-    'birds-twitter
-    '("birds_twitter-4sec" . 4))
-   (hash-table-put!
-    hash-table
-    'butterfly
-    '("butterfly-3sec" . 3))
-   (hash-table-put!
-    hash-table
-    'deer
-    '("deer-1sec" . 1))
-   (hash-table-put!
-    hash-table
-    'deer-snort 
-    '("deer_snort-3sec" . 3))
-   (hash-table-put!
-    hash-table
-    'elephant
-    '("elephant-11sec" . 11))
-   (hash-table-put!
-    hash-table
-    'elephant-eating-apple
-    '("elephant_eating_apple-6sec" . 6))
-   (hash-table-put!
-    hash-table
-    'fox
-    '("fox-1sec" . 1))
-   (hash-table-put!
-    hash-table 
-    'fox-tanuki-from-bush
-    '("fox_tanuki_from_bush-2sec" . 2))
-   (hash-table-put!
-    hash-table
-    'meercat
-    '("meercat-5sec" . 5))
-   (hash-table-put!
-    hash-table
-    'meercat-voice        
-    '("meercat_voice-1sec" . 1))
-   (hash-table-put!
-    hash-table
-    'owl-coming
-    '("owl_coming-6sec" . 6))
-   (hash-table-put!
-    hash-table 
-    'owl-crying
-    '("owl_crying-1sec" . 1))
-   (hash-table-put!
-    hash-table
-    'owl-flying 
-    '("owl_flying-1sec" . 1))
-   (hash-table-put!
-    hash-table
-    'rabbit
-    '("rabit-1sec" . 1))           ; spell miss!!
-   (hash-table-put!
-    hash-table 
-    'squirrel-voice 
-    '("squirell_voice-2sec" . 2))  ; spell miss!!
-   (hash-table-put! 
-    hash-table
-    'tanuki
-    '("tanuki-1sec" . 1))
-   (hash-table-put!
-    hash-table
-    'wee
-    '("wee-9sec" . 9))
-   (hash-table-put!
-    hash-table
-    'none
-    '("no-sound" . 0))
-   hash-table))
+  (let1 hash-table (make-hash-table)
+	(hash-table-put! hash-table 'ambient               '("ambient-64sec"              . 64))
+	(hash-table-put! hash-table 'apple-touch-down      '("apple_touch_down-1sec"      . 1))
+	(hash-table-put! hash-table 'apple-touch-down-2    '("apple_touch_down_2-1sec"    . 2))
+	(hash-table-put! hash-table 'baboon-voice          '("baboon_voice-4sec"          . 4))
+	(hash-table-put! hash-table 'birds-flying          '("birds_flying-3sec"          . 3))
+	(hash-table-put! hash-table 'birds-touch-down      '("birds_touch_down-1sec"      . 1))
+	(hash-table-put! hash-table 'birds-twitter         '("birds_twitter-4sec"         . 4))
+	(hash-table-put! hash-table 'butterfly             '("butterfly-3sec"             . 3))
+	(hash-table-put! hash-table 'deer                  '("deer-1sec"                  . 1))
+	(hash-table-put! hash-table 'deer-snort            '("deer_snort-3sec"            . 3))
+	(hash-table-put! hash-table 'elephant              '("elephant-11sec"             . 11))
+	(hash-table-put! hash-table 'elephant-eating-apple '("elephant_eating_apple-6sec" . 6))
+	(hash-table-put! hash-table 'fox                   '("fox-1sec"                   . 1))
+	(hash-table-put! hash-table 'fox-tanuki-from-bush  '("fox_tanuki_from_bush-2sec"  . 2))
+	(hash-table-put! hash-table 'meercat               '("meercat-5sec"               . 5))
+	(hash-table-put! hash-table 'meercat-voice         '("meercat_voice-1sec"         . 1))
+	(hash-table-put! hash-table 'owl-coming            '("owl_coming-6sec"            . 6))
+	(hash-table-put! hash-table 'owl-crying            '("owl_crying-1sec"            . 1))
+	(hash-table-put! hash-table 'owl-flying            '("owl_flying-1sec"            . 1))
+	(hash-table-put! hash-table 'rabbit                '("rabit-1sec"                 . 1))           ; spell miss!!
+	(hash-table-put! hash-table 'squirrel-voice        '("squirell_voice-2sec"        . 2))  ; spell miss!!
+	(hash-table-put! hash-table 'tanuki                '("tanuki-1sec"                . 1))
+	(hash-table-put! hash-table 'wee                   '("wee-9sec"                   . 9))
+	(hash-table-put! hash-table 'none                  '("no-sound"                   . 0))
+	hash-table))
 
 ;;;
 ;;; Main
 ;;;
 
 (define (main _)
-  (receive
-   [current-sec current-usec]
-   (sys-gettimeofday)
-   (set! *the-start-up-time* (+ current-sec (/ current-usec 1000000.0))))
-  (run-server) 
+  (receive [current-sec current-usec] (sys-gettimeofday)
+	   (set! *the-start-up-time* (+ current-sec (/ current-usec 1000000.0))))
+  (run-server)
   0)
