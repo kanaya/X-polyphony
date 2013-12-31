@@ -1067,7 +1067,7 @@
 					:n-frames 50
 					:from-jump? #t
 					:canvas-size `(,(* 883 8) . ,(* 213 8)) ; test
-					:offset '(1000 . 200) ; *** CHANGE ***
+					:offset '(1000 . 100) ; *** CHANGE ***
 					:sounds (make-list 50 'none))])
     (let1 hash-table (make-hash-table 'eqv?)
 	  (hash-table-put! hash-table 'apple                          apple)
