@@ -756,13 +756,11 @@
 (define
   (make-papilionidae-animation
    :key
-   [title    'papilionidae-white]
+   [title    'papilionidae-white]  ; okay?
    [prefix   "{prefix}/"]
-   [jumps-to 'papilionidae-white-touch-down])
-  (let1 frame-names (map
-		     (cut string-append prefix <>)
-		     (map number->string (times 3 (iota 11 1))))
-	(make-animation-with-fade-in/out
+   [jumps-to 'papilionidae-white-touch-down])  ; okay?
+  (let1 frame-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
+	(make-animation-primitive  ; make-animation-with-fade-in/out
 	 :title         title
 	 :frame-names   frame-names
 	 :frame-offsets (append (make-list 11 point-zero)
