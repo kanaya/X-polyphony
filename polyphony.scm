@@ -78,8 +78,6 @@
 
 (define (get-width p) (car p))
 (define (get-height p) (cdr p))
-(define (pixel->milimeter v) (/ v pixel-per-milimeter))
-(define (milimeter->pixel v) (* v pixel-per-milimeter))
 (define (current-time)
   (define (sec+usec->sec s us) (+ s (/ us 1000000.0)))
   (receive [sec usec]
@@ -372,8 +370,7 @@
 					; of <animations>
     (hash-table-fold
      animations
-     (lambda
-	 [_ animation lst]
+     (lambda [_ animation lst]
        (if (ref animation 'animating)
 	   (cons animation lst)
 	   lst))
@@ -461,32 +458,9 @@
 (define (animation-event-catcher! animations person)
 					; person is a string
   (define (pair-plus x y)
-    (cons
+    (cons 
      (+ (car x) (car y))
      (+ (cdr x) (cdr y))))
-  #;(hash-table-for-each 
-   animations
-   (lambda
-       [_ animation]
-     (when (ref animation 'to-jump)     ; to be removed
-	   (let*
-	       [[now (current-time)]
-		[jumps-at (ref animation 'jumps-at)]
-		[time-offset (ref animation 'time-offset)]
-		[jumps-at-relative (+ jumps-at time-offset)]]
-	     (when #t #;(> jumps-at-relative now)
-		   (let1 
-		    jumps-to
-		    (ref animation 'jumps-to)
-		    (set!
-		     (ref (hash-table-get animations jumps-to) 'animating)
-		     #t)
-		    (set!
-		     (ref (hash-table-get animations jumps-to) 'time-offset)
-		     (current-time))  ;; !!
-		    (set! (ref animation 'to-jump) #f)
-		    (when (not (ref animation 'forking?))
-			  (set! (ref animation 'animating) #f))))))))
   (when (not (string=? person "none"))
 	(print "jump")
 	(set! *the-current-person* (string->number person))
@@ -508,8 +482,7 @@
 	       #;(set! *loss-time* (+ *loss-time* freezing-duration))
 	       (hash-table-for-each
 		animations
-		(lambda
-		    [_ animation]
+		(lambda [_ animation]
 		  (let1 can-jump? (ref animation 'can-jump?)
 		   (when can-jump?
 			 (let*
@@ -529,6 +502,10 @@
 ;;;
 ;;; Animations
 ;;;
+
+;;
+;; Primitive animation setter
+
 
 (define
   (make-animation-primitive
@@ -696,6 +673,7 @@
    :jump-offset   jump-offset
    :forking?      forking?
    :sounds        sounds
+   ; :alphas      (make-list n-frames 0.3)  ; TEST TEST TEST
    :options       options))
 
 (define
@@ -707,7 +685,7 @@
   (let1
    frame-name-primitive '(1 2 3 4 1 2 3 4 1 2 3 4 5 6 5 6 7 8 7)
    (make-animation-with-fade-in/out
-    :title title
+    :title         title
     :frame-names   (map
 		    (cut string-append prefix <>)
 		    (map number->string frame-name-primitive))
@@ -778,13 +756,11 @@
 (define
   (make-papilionidae-animation
    :key
-   [title    'papilionidae-white]
+   [title    'papilionidae-white]  ; okay?
    [prefix   "{prefix}/"]
-   [jumps-to 'papilionidae-white-touch-down])
-  (let1 frame-names (map
-		     (cut string-append prefix <>)
-		     (map number->string (times 3 (iota 11 1))))
-	(make-animation-with-fade-in/out
+   [jumps-to 'papilionidae-white-touch-down])  ; okay?
+  (let1 frame-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
+	(make-animation-primitive  ; make-animation-with-fade-in/out
 	 :title         title
 	 :frame-names   frame-names
 	 :frame-offsets (append (make-list 11 point-zero)
@@ -849,9 +825,9 @@
 (define
   (make-rapae-touch-down-animation
    :key
-   [title       'rapae-white-touch-down]
+   [title       'rapae-white-touch-down]  ;; ???
    [prefix      "{prefix}/"]
-   [jumped-from 'rapae-white])
+   [jumped-from 'rapae-white]) ;; ???
   (let1 frame-names (map
 		     (cut string-append prefix <>)
 		     (map number->string (iota 4 1)))
@@ -869,7 +845,10 @@
 
 (define *the-animation-collection*
   (let
-      ([apple                          (make-simple-animation
+      (
+       ;; Apple
+       ;; Simple animation
+       [apple                          (make-simple-animation
 					:title 'apple
 					:frame-name-prefix "Apple2/"
 					:n-frames 31
@@ -879,6 +858,7 @@
 					:sounds (append (make-list 15 'none)
 							'(apple-touch-down)
 							(make-list 15 'none)))]
+       ;; Baboon-weeing
        [baboon-weeing                  (make-animation-primitive 
 					:title 'baboon-weeing
 					:frame-names (append
@@ -893,72 +873,105 @@
 							'(wee)
 							(make-list 43 'none))
 					:options '())]
+       ;; Birds Blue
+       ;; Bird animation
        [birds-blue                     (make-birds-animation
 					:title 'birds-blue
 					:prefix "Birds/Birds_Blue/"
 					:jumps-to 'birds-blue-take-off)]
+       ;; Birds Orange
+       ;; Bird animation
        [birds-orange                   (make-birds-animation
 					:title 'birds-orange
 					:prefix "Birds/Birds_Orange/"
 					:jumps-to 'birds-orange-take-off)]
+       ;; Birds Blue Take-off
+       ;; Bird-take-off animation
        [birds-blue-take-off            (make-birds-take-off-animation
 					:title 'birds-blue-take-off
 					:prefix1 "Birds/Birds_Blue/"
 					:prefix2 "Birds/Birds_Blue/flying-"
 					:jumped-from 'birds-blue)]
+       ;; Birds Orange Take-off
+       ;; Bird-take-off animation
        [birds-orange-take-off          (make-birds-take-off-animation
 					:title 'birds-orange-take-off
 					:prefix1 "Birds/Birds_Orange/"
 					:prefix2 "Birds/Birds_Orange/flying-"
 					:jumped-from 'birds-orange)]
+       ;; Papilionidae Blue
+       ;; Papilionidae animation
        [papilionidae-blue              (make-papilionidae-animation
 					:title 'papilionidae-blue
 					:prefix "Butterfly/Papilionidae_Blue/"
 					:jumps-to 'papilionidae-blue-touch-down)]
+       ;; Papilionidae Purple
+       ;; Papilioniade animation
        [papilionidae-purple            (make-papilionidae-animation
 					:title 'papilionidae-purple
 					:prefix "Butterfly/Papilionidae_Purple/"
 					:jumps-to 'papilionidae-purple-touch-down)]
+       ;; Papilionidae White
+       ;; Papilionidae animation
        [papilionidae-white             (make-papilionidae-animation
 					:title 'papilionidae-white
 					:prefix "Butterfly/Papilionidae_White/"
 					:jumps-to 'papilionidae-white-touch-down)]
+       ;; Papilionidae Yello
+       ;; Papilionidae animation
        [papilionidae-yellow            (make-papilionidae-animation
 					:title 'papilionidae-yellow
 					:prefix "Butterfly/Papilionidae_Yellow/"
 					:jumps-to 'papilionidae-yellow-touch-down)]
+       ;; Papilionidae Blue Touch-down
+       ;; Papilionidae-touch-down animation
        [papilionidae-blue-touch-down   (make-papilionidae-touch-down-animation
 					:title 'papilionidae-blue-touch-down
 					:prefix "Butterfly/Papilionidae_Blue/touch_down/10_"
 					:jumped-from 'papilionidae-blue)]
+       ;; Papilionidae White Touch-down
+       ;; Papilionidae-touch-down animation
        [papilionidae-white-touch-down  (make-papilionidae-touch-down-animation
 					:title 'papilionidae-white-touch-down
 					:prefix "Butterfly/Papilionidae_White/touch_down/10_"
 					:jumped-from 'papilionidae-white)]
+       ;; Papilionidae Yellow Touch-down
+       ;; Papilionidae-touch-down animation
        [papilionidae-yellow-touch-down (make-papilionidae-touch-down-animation
 					:title 'papilionidae-yellow-touch-down
 					:prefix "Butterfly/Papilionidae_Yellow/touch_down/10_"
 					:jumped-from 'papilionidae-yellow)]
+       ;; Papilionidae Purpule Touch-down
+       ;; Papilionidae-touch-down animation
        [papilionidae-purple-touch-down (make-papilionidae-touch-down-animation
 					:title 'papilionidae-purple-touch-down
 					:prefix "Butterfly/Papilionidae_Purple/touch_down/10_"
 					:jumped-from 'papilionidae-purple)]
+       ;; Pieris-Rapae Pink
+       ;; Rapae animation
        [pieris-rapae-pink              (make-rapae-animation
 					:title 'pieris-rapae-pink
 					:prefix "Butterfly/Pieris_Rapae_Pink/" 
 					:jumps-to 'pieris-rapae-pink-touch-down)]
+       ;; Pieris-Rapae Yellow
+       ;; Rapae animation
        [pieris-rapae-yellow            (make-rapae-animation
 					:title 'pieris-rapae-yellow
 					:prefix "Butterfly/Pieris_Rapae_Yellow/" 
 					:jumps-to 'pieris-rapae-yellow-touch-down)]
+       ;; Pieris-Rapae Pink Touch-down
+       ;; Rapae-touch-douwn animation
        [pieris-rapae-pink-touch-down   (make-rapae-touch-down-animation
 					:title 'pieris-rapae-pink-touch-down 
 					:prefix "Butterfly/Pieris_Rapae_Pink/touch_down/10_"
 					:jumped-from 'pieris-rapae-pink)]
+       ;; Pieris-Rapae Yellow Touch-down
+       ;; Rapae-touch-down animation
        [pieris-rapae-yellow-touch-down (make-rapae-touch-down-animation
 					:title 'pieris-rapae-yellow-touch-down 
 					:prefix "Butterfly/Pieris_Rapae_Yellow/touch_down/10_"
 					:jumped-from 'pieris-rapae-yellow)]
+       ;; Elephant
        [elephant                       (let1 frame-names (map
 							  (cut string-append "Elephant2/ex/ex" <>)
 							  (map
@@ -975,6 +988,8 @@
 					      :from-jump? #t
 					      :sounds (make-list (length frame-names) 'none)
 					      :options '()))]
+       ;; Fawn
+       ;; Simple animation
        [fawn                           (make-simple-animation
 					:title 'fawn
 					:frame-name-prefix "Fawn2/"
@@ -983,6 +998,8 @@
 					:canvas-size `(,(* 1188 8) . ,(* 213 8))
 					:offset '(500 . 0)
 					:sounds (make-list 116 'none))]
+       ;; Fox
+       ;; Simple animation
        [fox                            (make-simple-animation
 					:title 'fox
 					:frame-name-prefix "Fox2/"
@@ -991,6 +1008,8 @@
 					:canvas-size `(,(* 1188 4) . ,(* 213 4))
 					:offset '(0 . 0)
 					:sounds (make-list 56 'none))]
+       ;; Meercat
+       ;; Simple animation
        [meercat                        (make-simple-animation
 					:title 'meercat
 					:frame-name-prefix "Meercat2/"
@@ -999,6 +1018,7 @@
 					:canvas-size `(,(* 1041 8) . ,(* 213 8))
 					:offset '(0 . 200)
 					:sounds (make-list 171 'none))]
+       ;; Owl
        [owl                            (let*
 					   ([frame-names-primitive (append '(1 2 3 3 3) (iota 14 4) (iota 12 6))]
 					    [frame-names           (map (cut string-append "Owl/" <>) (map number->string frame-names-primitive))]
@@ -1045,6 +1065,8 @@
 					   :forking?      #f
 					   :loops-for     1
 					   :options       '()))]
+       ;; Rabbit
+       ;; Simple animation
        [rabbit 	                       (make-simple-animation
 					:title 'rabbit
 					:frame-name-prefix "Rabbit2/"
@@ -1053,6 +1075,8 @@
 					:canvas-size `(,(* 1188 6) . ,(* 213 6))
 					:offset '(500 . 0) ; test
 					:sounds (make-list 189 'none))]
+       ;; Squirrel
+       ;; Simple animation
        [squirrel                       (make-simple-animation
 					:title 'squirrel
 					:frame-name-prefix "Squirrel2/"
@@ -1061,6 +1085,8 @@
 					:canvas-size `(,(* 421 1.5) . ,(* 306 1.5))
 					:offset '(3000 . 0)
 					:sounds (make-list 23 'none))]
+       ;; Tanuki
+       ;; Simple animation
        [tanuki                         (make-simple-animation
 					:title 'tanuki
 					:frame-name-prefix "Tanuki2/"
@@ -1139,7 +1165,6 @@
 ;;;
 
 (define (main _)
-  (receive [current-sec current-usec] (sys-gettimeofday)
-	   (set! *the-start-up-time* (+ current-sec (/ current-usec 1000000.0))))
+  (set! *the-start-up-time* (current-time))
   (run-server)
   0)
