@@ -370,8 +370,7 @@
 					; of <animations>
     (hash-table-fold
      animations
-     (lambda
-	 [_ animation lst]
+     (lambda [_ animation lst]
        (if (ref animation 'animating)
 	   (cons animation lst)
 	   lst))
@@ -459,32 +458,9 @@
 (define (animation-event-catcher! animations person)
 					; person is a string
   (define (pair-plus x y)
-    (cons
+    (cons 
      (+ (car x) (car y))
      (+ (cdr x) (cdr y))))
-  #;(hash-table-for-each 
-   animations
-   (lambda
-       [_ animation]
-     (when (ref animation 'to-jump)     ; to be removed
-	   (let*
-	       [[now (current-time)]
-		[jumps-at (ref animation 'jumps-at)]
-		[time-offset (ref animation 'time-offset)]
-		[jumps-at-relative (+ jumps-at time-offset)]]
-	     (when #t #;(> jumps-at-relative now)
-		   (let1 
-		    jumps-to
-		    (ref animation 'jumps-to)
-		    (set!
-		     (ref (hash-table-get animations jumps-to) 'animating)
-		     #t)
-		    (set!
-		     (ref (hash-table-get animations jumps-to) 'time-offset)
-		     (current-time))  ;; !!
-		    (set! (ref animation 'to-jump) #f)
-		    (when (not (ref animation 'forking?))
-			  (set! (ref animation 'animating) #f))))))))
   (when (not (string=? person "none"))
 	(print "jump")
 	(set! *the-current-person* (string->number person))
@@ -506,8 +482,7 @@
 	       #;(set! *loss-time* (+ *loss-time* freezing-duration))
 	       (hash-table-for-each
 		animations
-		(lambda
-		    [_ animation]
+		(lambda [_ animation]
 		  (let1 can-jump? (ref animation 'can-jump?)
 		   (when can-jump?
 			 (let*
@@ -527,6 +502,10 @@
 ;;;
 ;;; Animations
 ;;;
+
+;;
+;; Primitive animation setter
+
 
 (define
   (make-animation-primitive
@@ -694,7 +673,7 @@
    :jump-offset   jump-offset
    :forking?      forking?
    :sounds        sounds
-   :alphas        (make-list n-frames 0.3)  ; TRICK TRICK TRICK
+   ; :alphas      (make-list n-frames 0.3)  ; TEST TEST TEST
    :options       options))
 
 (define
