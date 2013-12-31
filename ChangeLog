@@ -1,5 +1,7 @@
 2013-12-31  Ichi Kanaya  <kanaya@pineapple.cc>
 
+	* polyphony.scm (animation->animation): copy constructor of <animation> class.
+
 	* polyphony.scm (make-papilionidae-animation): fixed animation.
 	
 	* polyphony.scm (*the-animation-collection*): changed Y-offset of Squirrel to 0.
