@@ -45,7 +45,7 @@
 (define id-matrix-2x2 '(1.0 0.0 0.0 1.0))
 (define id-matrix-3x3 '(1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0))
 
-(define image-prefix "http://localhost:80/~kanaya/Polyphony/") ; the simulator accesses this address. (the rendering client ignores this prefix.)
+(define image-prefix "file:///Users/kanaya/Documents/polyphony-animation-material/") ; the simulator accesses this address. (the rendering client ignores this prefix.)
 (define image-suffix ".png")
 
 (define attack-and-decay-duration 10)   ; [tick]
