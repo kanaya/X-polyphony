@@ -685,7 +685,7 @@
   (let1
    frame-name-primitive '(1 2 3 4 1 2 3 4 1 2 3 4 5 6 5 6 7 8 7)
    (make-animation-with-fade-in/out
-    :title title
+    :title         title
     :frame-names   (map
 		    (cut string-append prefix <>)
 		    (map number->string frame-name-primitive))
