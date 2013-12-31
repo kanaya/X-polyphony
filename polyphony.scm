@@ -78,8 +78,6 @@
 
 (define (get-width p) (car p))
 (define (get-height p) (cdr p))
-(define (pixel->milimeter v) (/ v pixel-per-milimeter))
-(define (milimeter->pixel v) (* v pixel-per-milimeter))
 (define (current-time)
   (define (sec+usec->sec s us) (+ s (/ us 1000000.0)))
   (receive [sec usec]
@@ -1139,7 +1137,6 @@
 ;;;
 
 (define (main _)
-  (receive [current-sec current-usec] (sys-gettimeofday)
-	   (set! *the-start-up-time* (+ current-sec (/ current-usec 1000000.0))))
+  (set! *the-start-up-time* (current-time))
   (run-server)
   0)
