@@ -827,9 +827,9 @@
 (define
   (make-rapae-touch-down-animation
    :key
-   [title       'rapae-white-touch-down]
+   [title       'rapae-white-touch-down]  ;; ???
    [prefix      "{prefix}/"]
-   [jumped-from 'rapae-white])
+   [jumped-from 'rapae-white]) ;; ???
   (let1 frame-names (map
 		     (cut string-append prefix <>)
 		     (map number->string (iota 4 1)))
