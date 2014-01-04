@@ -165,6 +165,7 @@
    [time-offset   :init-keyword :time-offset   :init-value 0]             ; real
    [x-random      :init-keyword :x-random      :init-value #f]            ; boolean
    [y-random      :init-keyword :y-random      :init-value #f]            ; boolean
+   [bottom-half   :init-keyword :bottom-half   :init-value #f]            ; boolean
    [from-jump?    :init-keyword :from-jump?    :init-value #f]            ; boolean
    [can-jump?     :init-keyword :can-jump?     :init-value #f]            ; boolean
    [jumps-at      :init-keyword :jumps-at      :init-value 0]             ; cardinal
@@ -184,15 +185,23 @@
     (let
 	([rx       (* (random-real) (get-width screen-size))]
 	 [ry       (* (random-real) (get-height screen-size))]
+	 [rybh     (* (random-real) (* (get-height screen-size) 0.5))]
 	 [x        (get-width (ref animation 'offset))]
 	 [y        (get-height (ref animation 'offset))]
 	 [x-random (ref animation 'x-random)]
-	 [y-random (ref animation 'y-random)])
-      (cond
-       [(and x-random y-random) (cons rx ry)]
-       [x-random                (cons rx y)]
-       [y-random                (cons x ry)]
-       [else                    (cons x y)])))
+	 [y-random (ref animation 'y-random)]
+	 [bh       (ref animation 'bottom-half)])
+      (if (not bh)
+	  (cond
+	   [(and x-random y-random) (cons rx ry)]
+	   [x-random                (cons rx y)]
+	   [y-random                (cons x ry)]
+	   [else                    (cons x y)])
+	  (cond
+	   [(and x-random y-random) (cons rx rybh)]
+	   [x-random                (cons rx y)]
+	   [y-random                (cons x rybh)]
+	   [else                    (cons x y)]))))
   (when (not (ref animation 'animating))
 	(set! (ref animation 'offset) (random-offset animation))))
 
@@ -516,6 +525,7 @@
    [offset        point-zero]
    [x-random      #f]
    [y-random      #f]
+   [bottom-half   #f]
    [from-jump?    #f]
    [can-jump?     #f]
    [jumps-at      0] ; [tick]                ; to be removed
@@ -552,6 +562,7 @@
       :offset        offset
       :x-random      x-random
       :y-random      y-random
+      :bottom-half   bottom-half
       :from-jump?    from-jump?
       :can-jump?     can-jump?
       :jumps-at      (* jumps-at one-tick) ; [sec]
@@ -694,7 +705,7 @@
        [alphas        (let1 alphas-original (ref animation 'alphas)
 			    (append
 			     (make-list (- (length alphas-original) 10) 1.0)
-			     '(0.9 0.8 0.7 0.6 0.5 0.4 0.3 0.2 0.1 0.0)))]
+			     '(1.0 0.9 0.8 0.7 0.6 0.5 0.4 0.3 0.2 0.1)))]
        [offset        (ref animation 'offset)]
        [size          (ref animation 'size)]
        [depth         (ref animation 'depth)]
@@ -815,6 +826,7 @@
     :offset        point-zero
     :x-random      #t
     :y-random      #t
+    :bottom-half   #t
     :can-jump?     #t
     :jumps-to      jumps-to
     :sounds        (make-list (length frame-name-primitive) 'none)
