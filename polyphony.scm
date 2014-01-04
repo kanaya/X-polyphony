@@ -63,6 +63,7 @@
 (define owl-step (* 50 2))
 (define tanuki-stride (* -200 2))
 (define papilionidae-stride -475)
+(define papilionidae-rev-stride 475)
 (define fox-stride (* -250 4))
 
 (define *t-last-event* 0)
@@ -867,20 +868,39 @@
 			 (make-list 7 'none))
 	 :options       '())))
 
-(define
-  (make-papilionidae-animation
-   :key
-   [title    'papilionidae-white]
-   [prefix   "{prefix}/"]
-   [jumps-to 'papilionidae-white-touch-down])
+(define (make-papilionidae-animation :key [title 'papilionidae-white] [prefix "{prefix}/"] [jumps-to 'papilionidae-white-touch-down])
   (let1 frame-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
-	(make-animation-primitive  ; make-animation-with-fade-in/out
+	(make-animation-primitive
 	 :title         title
 	 :frame-names   frame-names
 	 :frame-offsets (append
 			 (make-list 11 point-zero)
 			 (make-list 11 (cons papilionidae-stride 0))
 			 (make-list 11 (cons (* papilionidae-stride 2) 0)))
+	 :frame-numbers (iota (length frame-names))
+	 :canvas-size   '(585 . 425)
+	 :offset        point-zero
+	 :x-random      #t
+	 :y-random      #t
+	 :can-jump?     #t
+	 :jumps-at      22                 ; [tick]
+	 :jumps-to      jumps-to
+	 :jump-offset   `(,(* papilionidae-stride 2) . 0)
+	 :sounds        (append
+			 '(butterfly) (make-list 10 'none)
+			 '(butterfly) (make-list 10 'none)
+			 '(butterfly) (make-list 10 'none))
+	 :options       '())))
+
+(define (make-papilionidae-rev-animation :key [title 'papilionidae-white] [prefix "{prefix}/"] [jumps-to 'papilionidae-white-touch-down])
+  (let1 frame-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
+	(make-animation-primitive
+	 :title         title
+	 :frame-names   frame-names
+	 :frame-offsets (append
+			 (make-list 11 point-zero)
+			 (make-list 11 (cons papilionidae-rev-stride 0))
+			 (make-list 11 (cons (* papilionidae-rev-stride 2) 0)))
 	 :frame-numbers (iota (length frame-names))
 	 :canvas-size   '(585 . 425)
 	 :offset        point-zero
@@ -1027,11 +1047,19 @@
 					:title 'papilionidae-blue
 					:prefix "Butterfly/Papilionidae_Blue/"
 					:jumps-to 'papilionidae-blue-touch-down)]
+       [papilionidae-blue-rev          (make-papilionidae-rev-animation
+					:title 'papilionidae-blue-rev
+					:prefix "Butterfly/Papilionidae_Blue_Rev/"
+					:jumps-to 'papilionidae-blue-touch-down)]
        ;; Papilionidae Purple
        ;; Papilioniade animation
        [papilionidae-purple            (make-papilionidae-animation
 					:title 'papilionidae-purple
 					:prefix "Butterfly/Papilionidae_Purple/"
+					:jumps-to 'papilionidae-purple-touch-down)]
+       [papilionidae-purple-rev        (make-papilionidae-rev-animation
+					:title 'papilionidae-purple-rev
+					:prefix "Butterfly/Papilionidae_Purple_Rev/"
 					:jumps-to 'papilionidae-purple-touch-down)]
        ;; Papilionidae White
        ;; Papilionidae animation
@@ -1039,11 +1067,19 @@
 					:title 'papilionidae-white
 					:prefix "Butterfly/Papilionidae_White/"
 					:jumps-to 'papilionidae-white-touch-down)]
-       ;; Papilionidae Yello
+       [papilionidae-white-rev         (make-papilionidae-rev-animation
+					:title 'papilionidae-white-rev
+					:prefix "Butterfly/Papilionidae_White_Rev/"
+					:jumps-to 'papilionidae-white-touch-down)]
+       ;; Papilionidae Yellow
        ;; Papilionidae animation
        [papilionidae-yellow            (make-papilionidae-animation
 					:title 'papilionidae-yellow
 					:prefix "Butterfly/Papilionidae_Yellow/"
+					:jumps-to 'papilionidae-yellow-touch-down)]
+       [papilionidae-yellow-rev        (make-papilionidae-rev-animation
+					:title 'papilionidae-yellow-rev
+					:prefix "Butterfly/Papilionidae_Yellow_Rev/"
 					:jumps-to 'papilionidae-yellow-touch-down)]
        ;; Papilionidae Blue Touch-down
        ;; Papilionidae-touch-down animation
@@ -1237,6 +1273,10 @@
 	  (hash-table-put! hash-table 'papilionidae-purple            (animation->animation-with-fade-out papilionidae-purple))
 	  (hash-table-put! hash-table 'papilionidae-white             (animation->animation-with-fade-out papilionidae-white))
 	  (hash-table-put! hash-table 'papilionidae-yellow            (animation->animation-with-fade-out papilionidae-yellow))
+	  (hash-table-put! hash-table 'papilionidae-blue-rev          (animation->animation-with-fade-out papilionidae-blue-rev))
+	  (hash-table-put! hash-table 'papilionidae-purple-rev        (animation->animation-with-fade-out papilionidae-purple-rev))
+	  (hash-table-put! hash-table 'papilionidae-white-rev         (animation->animation-with-fade-out papilionidae-white-rev))
+	  (hash-table-put! hash-table 'papilionidae-yellow-rev        (animation->animation-with-fade-out papilionidae-yellow-rev))
 	  (hash-table-put! hash-table 'papilionidae-blue-touch-down   papilionidae-blue-touch-down)
 	  (hash-table-put! hash-table 'papilionidae-purple-touch-down papilionidae-purple-touch-down)
 	  (hash-table-put! hash-table 'papilionidae-white-touch-down  papilionidae-white-touch-down)
@@ -1255,7 +1295,7 @@
 	  (hash-table-put! hash-table 'rabbit                         (animation->animation-with-fade-out rabbit))
 	  ;; (hash-table-put! hash-table 'rabbit-to-left rabbit-to-left)
 	  ;; (hash-table-put! hash-table 'rabbit-to-right rabbit-to-right)
-	  (hash-table-put! hash-table 'squirrel                       (animation->animation-with-fade-out squirrel))
+	  (hash-table-put! hash-table 'squirrel                       squirrel)
 	  (hash-table-put! hash-table 'tanuki                         (animation->animation-with-fade-out tanuki))
 	  ;; (hash-table-put! hash-table 'tanuki-turn-back tanuki-turn-back)
 	  hash-table)))
