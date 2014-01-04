@@ -1,5 +1,7 @@
 2014-01-04  Ichi Kanaya  <kanaya@pineapple.cc>
 
+	* polyphoni.scm (all): swallowtail of reverse direction.
+	
 	* polyphony.scm (all): rapae of reverse direction.
 	
 	* polyphony.scm (animation->animation-with-fade-out): it just adds fade-out effect but does not add freeze effect.
