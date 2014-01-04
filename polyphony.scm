@@ -688,23 +688,14 @@
   (let
       ([title         (ref animation 'title)]
        [frames        (ref animation 'frames)]
-       [n-frames      (+ (ref animation 'n-frames) 10)]
-       [frame-numbers (let1 frame-numbers-original (ref animation 'frame-numbers)
-			    (append
-			     frame-numbers-original
-			     (make-list 10 (last frame-numbers-original))))]  ; last from SRFI-1
-       [timings       (let*
-			  ([timings-original (ref animation 'timings)]
-			   [last-timing      (last timings-original)])
-			(append
-			 timings-original
-			 (map (cut + <> last-timing) (durations->timings (make-list 10 one-tick)))))]
+       [n-frames      (ref animation 'n-frames)]
+       [frame-numbers (ref animation 'frame-numbers)]
+       [timings       (ref animation 'timings)]
        [alphas        (let1 alphas-original (ref animation 'alphas)
 			    (append
 			     (make-list (- (length alphas-original) 10) 1.0)
-			     '(0.9 0.8 0.7 0.6 0.5 0.4 0.3 0.2 0.1 0.0)
-			     (make-list 10 0.0)))]
-       [offset        (ref animation 'offset)]  ;; should expand...
+			     '(0.9 0.8 0.7 0.6 0.5 0.4 0.3 0.2 0.1 0.0)))]
+       [offset        (ref animation 'offset)]
        [size          (ref animation 'size)]
        [depth         (ref animation 'depth)]
        [matrix        (ref animation 'matrix)]
@@ -720,9 +711,6 @@
        [jump-offset   (ref animation 'jump-offset)]
        [forking?      (ref animation 'forking?)]
        [options       (ref animation 'options)])
-    (print "hello.")
-    (print "length of alphas-original is " (length (ref animation 'alphas)))
-    (print "length of alphas is " (length alphas))
     (make <animation>
      :title         title
      :frames        frames
@@ -1209,7 +1197,7 @@
 					:offset '(1000 . 0) ; *** CHANGE ***
 					:sounds (make-list 50 'none))])
     (let1 hash-table (make-hash-table 'eqv?)
-	  (hash-table-put! hash-table 'apple                          apple)
+	  (hash-table-put! hash-table 'apple                          (animation->animation-with-fade-out apple))
 	  (hash-table-put! hash-table 'baboon-weeing                  baboon-weeing)
 	  ;; (hash-table-put! hash-table 'baboon-wee baboon-wee)
 	  (hash-table-put! hash-table 'birds-blue                     (animation->animation-with-fade-out birds-blue))
