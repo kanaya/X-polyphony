@@ -119,8 +119,7 @@
    [default-color-matrix :init-keyword :default-color-matrix :init-value id-matrix-3x3]
    [default-sound        :init-keyword :default-sound        :init-value 'none]))
 
-(define-method ref ([fs <frame-set>] [i <integer>])
-					; returns <frame>
+(define-method ref ([fs <frame-set>] [i <integer>]) ; returns <frame>
   (let*
       ([n-names (ref fs 'n-names)]
        [j       (if (< i n-names) i 0)])      ; boundary check
@@ -152,28 +151,29 @@
 ;;;
 
 (define-class <animation> ()
-  ([title         :init-keyword :title         :init-value 'untitled]
-   [frames        :init-keyword :frames        :init-value #f]
-   [n-frames      :init-keyword :n-frames      :init-value 0]
-   [frame-numbers :init-keyword :frame-numbers :init-value '()]
-   [timings       :init-keyword :timings       :init-value '()]
-   [alphas        :init-keyword :alphas        :init-value '()]
-   [offset        :init-keyword :offset        :init-value point-zero]
-   [size          :init-keyword :size          :init-value point-one]
-   [depth         :init-keyword :depth         :init-value 0]
-   [matrix        :init-keyword :matrix        :init-value id-matrix-2x2]
-   [animating     :init-keyword :animating     :init-value #f]
-   [time-offset   :init-keyword :time-offset   :init-value 0]
-   [x-random      :init-keyword :x-random      :init-value #f]
-   [y-random      :init-keyword :y-random      :init-value #f]
-   [from-jump?    :init-keyword :from-jump?    :init-value #f]
-   [can-jump?     :init-keyword :can-jump?     :init-value #f]
-   [jumps-at      :init-keyword :jumps-at      :init-value 0]
-   [jumps-to      :init-keyword :jumps-to      :init-value 'none]
-   [jumped-from   :init-keyword :jumped-from   :init-value 'none]
-   [jump-offset   :init-keyword :jump-offset   :init-value point-zero]
-   [to-jump       :init-keyword :to-jump       :init-value #f] ; to be removed
-   [forking?      :init-keyword :forking?      :init-value #f]
+  ([title         :init-keyword :title         :init-value 'untitled]     ; symbol
+   [frames        :init-keyword :frames        :init-value #f]            ; <frame-set>
+   [n-frames      :init-keyword :n-frames      :init-value 0]             ; cardinal
+   [frame-numbers :init-keyword :frame-numbers :init-value '()]           ; array of cardinal
+   [timings       :init-keyword :timings       :init-value '()]           ; array of real
+   [alphas        :init-keyword :alphas        :init-value '()]           ; array of real
+   [offset        :init-keyword :offset        :init-value point-zero]    ; array of pair of real
+   [size          :init-keyword :size          :init-value point-one]     ; array of pair of real
+   [depth         :init-keyword :depth         :init-value 0]             ; real
+   [matrix        :init-keyword :matrix        :init-value id-matrix-2x2] ; array of real
+   [animating     :init-keyword :animating     :init-value #f]            ; boolean
+   [time-offset   :init-keyword :time-offset   :init-value 0]             ; real
+   [x-random      :init-keyword :x-random      :init-value #f]            ; boolean
+   [y-random      :init-keyword :y-random      :init-value #f]            ; boolean
+   [bottom-half   :init-keyword :bottom-half   :init-value #f]            ; boolean
+   [from-jump?    :init-keyword :from-jump?    :init-value #f]            ; boolean
+   [can-jump?     :init-keyword :can-jump?     :init-value #f]            ; boolean
+   [jumps-at      :init-keyword :jumps-at      :init-value 0]             ; cardinal
+   [jumps-to      :init-keyword :jumps-to      :init-value 'none]         ; cardinal
+   [jumped-from   :init-keyword :jumped-from   :init-value 'none]         ; cardinal
+   [jump-offset   :init-keyword :jump-offset   :init-value point-zero]    ; pair of real
+   [to-jump       :init-keyword :to-jump       :init-value #f]            ; (to be removed)
+   [forking?      :init-keyword :forking?      :init-value #f]            ; boolean
    [options       :init-keyword :options       :init-value '()]))
 
 ;;;
@@ -185,15 +185,23 @@
     (let
 	([rx       (* (random-real) (get-width screen-size))]
 	 [ry       (* (random-real) (get-height screen-size))]
+	 [rybh     (* (random-real) (* (get-height screen-size) 0.5))]
 	 [x        (get-width (ref animation 'offset))]
 	 [y        (get-height (ref animation 'offset))]
 	 [x-random (ref animation 'x-random)]
-	 [y-random (ref animation 'y-random)])
-      (cond
-       [(and x-random y-random) (cons rx ry)]
-       [x-random                (cons rx y)]
-       [y-random                (cons x ry)]
-       [else                    (cons x y)])))
+	 [y-random (ref animation 'y-random)]
+	 [bh       (ref animation 'bottom-half)])
+      (if (not bh)
+	  (cond
+	   [(and x-random y-random) (cons rx ry)]
+	   [x-random                (cons rx y)]
+	   [y-random                (cons x ry)]
+	   [else                    (cons x y)])
+	  (cond
+	   [(and x-random y-random) (cons rx rybh)]
+	   [x-random                (cons rx y)]
+	   [y-random                (cons x rybh)]
+	   [else                    (cons x y)]))))
   (when (not (ref animation 'animating))
 	(set! (ref animation 'offset) (random-offset animation))))
 
@@ -218,8 +226,7 @@
 ;;; Ref for animation
 ;;;
 
-(define-method animation-ref-primitive ([animation <animation>] [n <number>])
-					; returns <frame> and <number>
+(define-method animation-ref-primitive ([animation <animation>] [n <number>]) ; returns <frame> and <number>
   (let1 n-frames (ref animation 'n-frames)
 	(if (and (< n n-frames) (>= n 0))
 	    (values
@@ -227,10 +234,9 @@
 	     (ref (ref animation 'alphas) n))
 	    (values
 	     (ref (ref animation 'frames) (- n-frames 1))  ;; out of bound error?
-	     (ref (ref animation 'alphas) (- n-frames 1))))))
+	     0.5 #;(ref (ref animation 'alphas) (- n-frames 1))))))
 
-(define-method ref ([animation <animation>] [time <number>])
-					; returns <frame> and <number>
+(define-method ref ([animation <animation>] [time <number>]) ; returns <frame> and <number>
   (define (index-of-nearest-time timings t)
     (let1 less-than-time (partition (cut > t <>) timings)
 	  (length less-than-time)))
@@ -505,7 +511,7 @@
 
 ;;
 ;; Primitive animation setter
-
+;;
 
 (define
   (make-animation-primitive
@@ -519,6 +525,7 @@
    [offset        point-zero]
    [x-random      #f]
    [y-random      #f]
+   [bottom-half   #f]
    [from-jump?    #f]
    [can-jump?     #f]
    [jumps-at      0] ; [tick]                ; to be removed
@@ -555,6 +562,7 @@
       :offset        offset
       :x-random      x-random
       :y-random      y-random
+      :bottom-half   bottom-half
       :from-jump?    from-jump?
       :can-jump?     can-jump?
       :jumps-at      (* jumps-at one-tick) ; [sec]
@@ -564,7 +572,7 @@
       :forking?      forking?
       :options       options)))
 
-(define
+#;(define
   (make-animation-with-fade-in/out
    :key 
    [title         'untitled]
@@ -634,6 +642,111 @@
 		     (make-list attack-and-decay-duration 'none))
      :options       options)))
 
+;;;
+;;; NEW!!
+;;; animation->animation-with-fade-out
+;;;
+
+(define (animation->animation animation)  ; copy constructor
+  (let
+      ([title         (ref animation 'title)]
+       [frames        (ref animation 'frames)]
+       [n-frames      (ref animation 'n-frames)]
+       [frame-numbers (ref animation 'frame-numbers)]
+       [timings       (ref animation 'timings)]
+       [alphas        (ref animation 'alphas)]
+       [offset        (ref animation 'offset)]
+       [size          (ref animation 'size)]
+       [depth         (ref animation 'depth)]
+       [matrix        (ref animation 'matrix)]
+       [animating     (ref animation 'animating)]
+       [time-offset   (ref animation 'time-offset)]
+       [x-random      (ref animation 'x-random)]
+       [y-random      (ref animation 'y-random)]
+       [from-jump?    (ref animation 'from-jump?)]
+       [can-jump?     (ref animation 'can-jump?)]
+       [jumps-at      (ref animation 'jumps-at)]
+       [jumps-to      (ref animation 'jumps-to)]
+       [jumped-from   (ref animation 'jumped-from)]
+       [jump-offset   (ref animation 'jump-offset)]
+       [forking?      (ref animation 'forking?)]
+       [options       (ref animation 'options)])
+    (make <animation>
+     :title         title
+     :frames        frames
+     :n-frames      n-frames
+     :frame-numbers frame-numbers
+     :timings       timings
+     :alphas        alphas
+     :offset        offset
+     :size          size
+     :depth         depth
+     :matrix        matrix
+     :animating     animating
+     :time-offset   time-offset
+     :x-random      x-random
+     :y-random      y-random
+     :from-jump?    from-jump?
+     :can-jump?     can-jump?
+     :jumps-at      jumps-at
+     :jumps-to      jumps-to
+     :jumped-from   jumped-from
+     :jump-offset   jump-offset
+     :forking?      forking?
+     :options       options)))
+
+(define (animation->animation-with-fade-out animation)
+  (let
+      ([title         (ref animation 'title)]
+       [frames        (ref animation 'frames)]
+       [n-frames      (ref animation 'n-frames)]
+       [frame-numbers (ref animation 'frame-numbers)]
+       [timings       (ref animation 'timings)]
+       [alphas        (let1 alphas-original (ref animation 'alphas)
+			    (append
+			     (make-list (- (length alphas-original) 10) 1.0)
+			     '(1.0 0.9 0.8 0.7 0.6 0.5 0.4 0.3 0.2 0.1)))]
+       [offset        (ref animation 'offset)]
+       [size          (ref animation 'size)]
+       [depth         (ref animation 'depth)]
+       [matrix        (ref animation 'matrix)]
+       [animating     (ref animation 'animating)]
+       [time-offset   (ref animation 'time-offset)]
+       [x-random      (ref animation 'x-random)]
+       [y-random      (ref animation 'y-random)]
+       [from-jump?    (ref animation 'from-jump?)]
+       [can-jump?     (ref animation 'can-jump?)]
+       [jumps-at      (ref animation 'jumps-at)]
+       [jumps-to      (ref animation 'jumps-to)]
+       [jumped-from   (ref animation 'jumped-from)]
+       [jump-offset   (ref animation 'jump-offset)]
+       [forking?      (ref animation 'forking?)]
+       [options       (ref animation 'options)])
+    (make <animation>
+     :title         title
+     :frames        frames
+     :n-frames      n-frames
+     :frame-numbers frame-numbers
+     :timings       timings
+     :alphas        alphas
+     :offset        offset
+     :size          size
+     :depth         depth
+     :matrix        matrix
+     :animating     animating
+     :time-offset   time-offset
+     :x-random      x-random
+     :y-random      y-random
+     :from-jump?    from-jump?
+     :can-jump?     can-jump?
+     :jumps-at      jumps-at
+     :jumps-to      jumps-to
+     :jumped-from   jumped-from
+     :jump-offset   jump-offset
+     :forking?      forking?
+     :options       options)))
+
+
 (define
   (make-simple-animation
    :key
@@ -684,7 +797,7 @@
    [jumps-to 'birds-white-take-off])
   (let1
    frame-name-primitive '(1 2 3 4 1 2 3 4 1 2 3 4 5 6 5 6 7 8 7)
-   (make-animation-with-fade-in/out
+   (make-animation-primitive ; make-animation-with-fade-in/out
     :title         title
     :frame-names   (map
 		    (cut string-append prefix <>)
@@ -713,6 +826,7 @@
     :offset        point-zero
     :x-random      #t
     :y-random      #t
+    :bottom-half   #t
     :can-jump?     #t
     :jumps-to      jumps-to
     :sounds        (make-list (length frame-name-primitive) 'none)
@@ -756,18 +870,17 @@
 (define
   (make-papilionidae-animation
    :key
-   [title    'papilionidae-white]  ; okay?
+   [title    'papilionidae-white]
    [prefix   "{prefix}/"]
-   [jumps-to 'papilionidae-white-touch-down])  ; okay?
+   [jumps-to 'papilionidae-white-touch-down])
   (let1 frame-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
 	(make-animation-primitive  ; make-animation-with-fade-in/out
 	 :title         title
 	 :frame-names   frame-names
-	 :frame-offsets (append (make-list 11 point-zero)
-				(make-list 11 (cons papilionidae-stride 0))
-				(make-list
-				 11
-				 (cons (* papilionidae-stride 2) 0)))
+	 :frame-offsets (append
+			 (make-list 11 point-zero)
+			 (make-list 11 (cons papilionidae-stride 0))
+			 (make-list 11 (cons (* papilionidae-stride 2) 0)))
 	 :frame-numbers (iota (length frame-names))
 	 :canvas-size   '(585 . 425)
 	 :offset        point-zero
@@ -1096,35 +1209,35 @@
 					:offset '(1000 . 0) ; *** CHANGE ***
 					:sounds (make-list 50 'none))])
     (let1 hash-table (make-hash-table 'eqv?)
-	  (hash-table-put! hash-table 'apple                          apple)
+	  (hash-table-put! hash-table 'apple                          (animation->animation-with-fade-out apple))
 	  (hash-table-put! hash-table 'baboon-weeing                  baboon-weeing)
-	  #;(hash-table-put! hash-table 'baboon-wee baboon-wee)
-	  (hash-table-put! hash-table 'birds-blue                     birds-blue)
-	  (hash-table-put! hash-table 'birds-orange                   birds-orange)
+	  ;; (hash-table-put! hash-table 'baboon-wee baboon-wee)
+	  (hash-table-put! hash-table 'birds-blue                     (animation->animation-with-fade-out birds-blue))
+	  (hash-table-put! hash-table 'birds-orange                   (animation->animation-with-fade-out birds-orange))
 	  (hash-table-put! hash-table 'birds-blue-take-off            birds-blue-take-off)
 	  (hash-table-put! hash-table 'birds-orange-take-off          birds-orange-take-off)
-	  (hash-table-put! hash-table 'papilionidae-blue              papilionidae-blue)
-	  (hash-table-put! hash-table 'papilionidae-purple            papilionidae-purple)
-	  (hash-table-put! hash-table 'papilionidae-white             papilionidae-white)
-	  (hash-table-put! hash-table 'papilionidae-yellow            papilionidae-yellow)
+	  (hash-table-put! hash-table 'papilionidae-blue              (animation->animation-with-fade-out papilionidae-blue))
+	  (hash-table-put! hash-table 'papilionidae-purple            (animation->animation-with-fade-out papilionidae-purple))
+	  (hash-table-put! hash-table 'papilionidae-white             (animation->animation-with-fade-out papilionidae-white))
+	  (hash-table-put! hash-table 'papilionidae-yellow            (animation->animation-with-fade-out papilionidae-yellow))
 	  (hash-table-put! hash-table 'papilionidae-blue-touch-down   papilionidae-blue-touch-down)
 	  (hash-table-put! hash-table 'papilionidae-purple-touch-down papilionidae-purple-touch-down)
 	  (hash-table-put! hash-table 'papilionidae-white-touch-down  papilionidae-white-touch-down)
 	  (hash-table-put! hash-table 'papilionidae-yellow-touch-down papilionidae-yellow-touch-down)
-	  (hash-table-put! hash-table 'pieris-rapae-pink              pieris-rapae-pink)
-	  (hash-table-put! hash-table 'pieris-rapae-yellow            pieris-rapae-yellow)
+	  (hash-table-put! hash-table 'pieris-rapae-pink              (animation->animation-with-fade-out pieris-rapae-pink))
+	  (hash-table-put! hash-table 'pieris-rapae-yellow            (animation->animation-with-fade-out pieris-rapae-yellow))
 	  (hash-table-put! hash-table 'pieris-rapae-pink-touch-down   pieris-rapae-pink-touch-down)
 	  (hash-table-put! hash-table 'pieris-rapae-yellow-touch-down pieris-rapae-yellow-touch-down)
-	  (hash-table-put! hash-table 'elephant                       elephant)
-	  (hash-table-put! hash-table 'fawn                           fawn)
-	  (hash-table-put! hash-table 'fox                            fox)
-	  (hash-table-put! hash-table 'meercat                        meercat)
-					;(hash-table-put! hash-table 'owl owl)
-	  (hash-table-put! hash-table 'rabbit                         rabbit)
+	  (hash-table-put! hash-table 'elephant                       (animation->animation-with-fade-out elephant))
+	  (hash-table-put! hash-table 'fawn                           (animation->animation-with-fade-out fawn))
+	  (hash-table-put! hash-table 'fox                            (animation->animation-with-fade-out fox))
+	  (hash-table-put! hash-table 'meercat                        (animation->animation-with-fade-out meercat))
+	  ;; (hash-table-put! hash-table 'owl owl)
+	  (hash-table-put! hash-table 'rabbit                         (animation->animation-with-fade-out rabbit))
 	  ;; (hash-table-put! hash-table 'rabbit-to-left rabbit-to-left)
 	  ;; (hash-table-put! hash-table 'rabbit-to-right rabbit-to-right)
-	  (hash-table-put! hash-table 'squirrel                       squirrel)
-	  (hash-table-put! hash-table 'tanuki                         tanuki)
+	  (hash-table-put! hash-table 'squirrel                       (animation->animation-with-fade-out squirrel))
+	  (hash-table-put! hash-table 'tanuki                         (animation->animation-with-fade-out tanuki))
 	  ;; (hash-table-put! hash-table 'tanuki-turn-back tanuki-turn-back)
 	  hash-table)))
 
