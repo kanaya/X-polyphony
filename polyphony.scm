@@ -916,13 +916,22 @@
 	 :sounds        (make-list (length frame-names) 'none)
 	 :options       '())))
 
-(define
-  (make-rapae-animation
-   :key
-   [title    'rapae-white]
-   [prefix   "{prefix}/"]
-   [jumps-to 'rapae-white-touch-down])
+(define (make-rapae-animation :key [title 'rapae-white] [prefix "{prefix}/"] [jumps-to 'rapae-white-touch-down]) 
   (make-simple-animation 
+   :title             title
+   :frame-name-prefix prefix
+   :n-frames          11
+   :canvas-size       '(585 . 425)
+   :x-random          #t
+   :y-random          #t
+   :can-jump?         #t
+   :jumps-at          9
+   :jumps-to          jumps-to
+   :sounds            (append '(butterfly) (make-list 10 'none))
+   :options           '()))
+
+(define (make-rapae-rev-animation :key [title 'rapae-rev-white] [prefix "{prefix}/"] [jumps-to 'rapae-white-touch-down])
+  (make-simple-animation
    :title             title
    :frame-name-prefix prefix
    :n-frames          11
@@ -1063,15 +1072,23 @@
        ;; Pieris-Rapae Pink
        ;; Rapae animation
        [pieris-rapae-pink              (make-rapae-animation
-					:title 'pieris-rapae-pink
-					:prefix "Butterfly/Pieris_Rapae_Pink/" 
+					:title    'pieris-rapae-pink
+					:prefix   "Butterfly/Pieris_Rapae_Pink/" 
 					:jumps-to 'pieris-rapae-pink-touch-down)]
+       [pieris-rapae-pink-rev          (make-rapae-rev-animation
+					:title    'pieris-rapae-pink-rev
+					:prefix   "Butterfly/Pieris_Rapae_Pink_Rev/"
+					:jumps-to 'pieris-rapae-pink-touch-down)] ; dummy
        ;; Pieris-Rapae Yellow
        ;; Rapae animation
        [pieris-rapae-yellow            (make-rapae-animation
-					:title 'pieris-rapae-yellow
-					:prefix "Butterfly/Pieris_Rapae_Yellow/" 
+					:title    'pieris-rapae-yellow
+					:prefix   "Butterfly/Pieris_Rapae_Yellow/" 
 					:jumps-to 'pieris-rapae-yellow-touch-down)]
+       [pieris-rapae-yellow-rev        (make-rapae-rev-animation
+					:title    'pieris-rapae-yellow-rev
+					:prefix   "Butterfly/Pieris_Rapae_Yellow_Rev/"
+					:jumps-to 'pieris-rapae-yellow-touch-down)] ; dummy
        ;; Pieris-Rapae Pink Touch-down
        ;; Rapae-touch-douwn animation
        [pieris-rapae-pink-touch-down   (make-rapae-touch-down-animation
@@ -1226,6 +1243,8 @@
 	  (hash-table-put! hash-table 'papilionidae-yellow-touch-down papilionidae-yellow-touch-down)
 	  (hash-table-put! hash-table 'pieris-rapae-pink              (animation->animation-with-fade-out pieris-rapae-pink))
 	  (hash-table-put! hash-table 'pieris-rapae-yellow            (animation->animation-with-fade-out pieris-rapae-yellow))
+	  (hash-table-put! hash-table 'pieris-rapae-pink-rev          (animation->animation-with-fade-out pieris-rapae-pink-rev))
+	  (hash-table-put! hash-table 'pieris-rapae-yellow-rev        (animation->animation-with-fade-out pieris-rapae-yellow-rev))
 	  (hash-table-put! hash-table 'pieris-rapae-pink-touch-down   pieris-rapae-pink-touch-down)
 	  (hash-table-put! hash-table 'pieris-rapae-yellow-touch-down pieris-rapae-yellow-touch-down)
 	  (hash-table-put! hash-table 'elephant                       (animation->animation-with-fade-out elephant))
@@ -1266,7 +1285,7 @@
 	(hash-table-put! hash-table 'owl-coming            '("owl_coming-6sec"            . 6))
 	(hash-table-put! hash-table 'owl-crying            '("owl_crying-1sec"            . 1))
 	(hash-table-put! hash-table 'owl-flying            '("owl_flying-1sec"            . 1))
-	(hash-table-put! hash-table 'rabbit                '("rabit-1sec"                 . 1))           ; spell miss!!
+	(hash-table-put! hash-table 'rabbit                '("rabit-1sec"                 . 1))  ; spell miss!!
 	(hash-table-put! hash-table 'squirrel-voice        '("squirell_voice-2sec"        . 2))  ; spell miss!!
 	(hash-table-put! hash-table 'tanuki                '("tanuki-1sec"                . 1))
 	(hash-table-put! hash-table 'wee                   '("wee-9sec"                   . 9))
