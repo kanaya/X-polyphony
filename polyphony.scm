@@ -505,7 +505,7 @@
 
 ;;
 ;; Primitive animation setter
-
+;;
 
 (define
   (make-animation-primitive
@@ -691,7 +691,7 @@
   (let
       ([title         (ref animation 'title)]
        [frames        (ref animation 'frames)]
-       [n-frames      (ref animation 'n-frames)]  ; do not add 40?
+       [n-frames      (ref animation 'n-frames)]
        [frame-numbers (let1 frame-numbers-original (ref animation 'frame-numbers)
 			    (append
 			     frame-numbers-original
@@ -702,10 +702,10 @@
 			(append
 			 timings-original
 			 (map (cut + <> last-timing) (durations->timings (make-list 40 one-tick)))))]
-       [alphas        (let1 n-frame-numbers (length (ref animation 'frame-numbers))
+       [alphas        (let1 alphas-original (ref animation 'alphas)
 			    (append
-			     (make-list (- n-frame-numbers 0) 0.3)
-			     #;'(0.9 0.9 0.9 0.9  0.8 0.8 0.8 0.8  0.7 0.7 0.7 0.7  0.6 0.6 0.6 0.6  0.5 0.5 0.5 0.5  0.4 0.4 0.4 0.4  0.3 0.3 0.3 0.3  0.2 0.2 0.2 0.2
+			     alphas-original
+			     '(0.9 0.9 0.9 0.9  0.8 0.8 0.8 0.8  0.7 0.7 0.7 0.7  0.6 0.6 0.6 0.6  0.5 0.5 0.5 0.5  0.4 0.4 0.4 0.4  0.3 0.3 0.3 0.3  0.2 0.2 0.2 0.2
 				   0.1 0.1 0.1 0.1  0.1 0.1 0.1 0.1)))]
        [offset        (ref animation 'offset)]
        [size          (ref animation 'size)]
@@ -870,9 +870,9 @@
 (define
   (make-papilionidae-animation
    :key
-   [title    'papilionidae-white]  ; okay?
+   [title    'papilionidae-white]
    [prefix   "{prefix}/"]
-   [jumps-to 'papilionidae-white-touch-down])  ; okay?
+   [jumps-to 'papilionidae-white-touch-down])
   (let1 frame-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
 	(make-animation-primitive  ; make-animation-with-fade-in/out
 	 :title         title

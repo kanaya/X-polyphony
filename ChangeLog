@@ -1,3 +1,7 @@
+2014-01-04  Ichi Kanaya  <kanaya@pineapple.cc>
+
+	* 
+
 2013-12-31  Ichi Kanaya  <kanaya@pineapple.cc>
 
 	* polyphony.scm (animation->animation-with-fade-out): still debuging.
@@ -30,7 +34,7 @@
 
 2011-09-26  Ichi Kanaya  <kanaya@pineappledesign.org>
 
-	* polyphony.scm (rende-content): alpha tag.
+	* polyphony.scm (render-content): alpha tag.
 
 	* polyphony.scm (<animation>): alpha slot.
 
