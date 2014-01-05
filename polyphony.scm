@@ -573,78 +573,7 @@
       :forking?      forking?
       :options       options)))
 
-#;(define
-  (make-animation-with-fade-in/out
-   :key 
-   [title         'untitled]
-   [frame-names   '()]
-   [frame-offsets '()]
-   [frame-numbers '()]
-   [canvas-size   point-zero]
-   [offset        point-zero]
-   [x-random      #f]
-   [y-random      #f]
-   [from-jump?    #f]
-   [can-jump?     #f]
-   [jumps-at      0] ; [tick]
-   [jumps-to      'none]
-   [jumped-from   'none]
-   [jump-offset   point-zero]
-   [forking?      #f]
-   [sounds        '()]
-   [options       '()])
-  (let* 
-      ([n-frames-original      (length frame-names)]
-       [n-frames               (+ n-frames-original (* 2 attack-and-decay-duration))]
-       [frame-offsets-asserted (if (null? frame-offsets)
-				   (make-list n-frames point-zero)
-				   frame-offsets)]
-       [sounds-asserted        (if (null? sounds)
-				   (make-list n-frames 'none)
-				   sounds)]
-       [alphas                 (append
-				increasing
-				(make-list n-frames-original 1)
-				decreasing)])
-    (make-animation-primitive
-     :title         title
-     :frame-names   frame-names
-     :frame-offsets (append
-		     (make-list
-		      attack-and-decay-duration
-		      (first frame-offsets-asserted))
-		     frame-offsets-asserted
-		     (make-list
-		      attack-and-decay-duration
-		      (last frame-offsets-asserted)))
-     :frame-numbers (append
-		     (make-list
-		      attack-and-decay-duration 
-		      (first frame-numbers))
-		     frame-numbers
-		     (make-list
-		      attack-and-decay-duration
-		      (last frame-numbers)))
-     :canvas-size   canvas-size
-     :offset        offset
-     :x-random      x-random
-     :y-random      y-random
-     :from-jump?    from-jump?
-     :can-jump?     can-jump?
-     :jumps-at      jumps-at
-     :jumps-to      jumps-to
-     :jumped-from   jumped-from
-     :jump-offset   jump-offset
-     :forking?      forking?
-     :alphas        alphas
-     :sounds        (append 
-		     (make-list attack-and-decay-duration 'none) 
-		     sounds-asserted
-		     (make-list attack-and-decay-duration 'none))
-     :options       options)))
-
 ;;;
-;;; NEW!!
 ;;; animation->animation-with-fade-out
 ;;;
 
