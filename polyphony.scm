@@ -36,10 +36,7 @@
 (define p-appearance 0.01)              ; [/1]
 
 (define one-tick 0.125)                 ; [s]
-(define time-slot 600.0)                ; [s]
 (define event-gate 5)                   ; [s]
-(define event-gate-after 5)             ; [s]
-
 (define freezing-duration 5)            ; [s]
 
 (define id-matrix-2x2 '(1.0 0.0 0.0 1.0))
@@ -47,10 +44,6 @@
 
 (define image-prefix "file:///Users/kanaya/Documents/polyphony-animation-material/") ; the simulator accesses this address. (the rendering client ignores this prefix.)
 (define image-suffix ".png")
-
-(define attack-and-decay-duration 10)   ; [tick]
-(define increasing '(0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0))
-(define decreasing '(1.0 0.9 0.8 0.7 0.6 0.5 0.4 0.3 0.2 0.1))
 
 (define duration-of-ambient-sound 6.4)  ; [s]
 (define *t-ambient-sound-started* 0)    ; [s]
@@ -75,15 +68,16 @@
 ;;; Utilities
 ;;;
 
-(define *the-start-up-time* 0)
-
 (define (get-width p) (car p))
 (define (get-height p) (cdr p))
+
+(define *the-start-up-time* 0)
 (define (current-time)
   (define (sec+usec->sec s us) (+ s (/ us 1000000.0)))
   (receive [sec usec]
    (sys-gettimeofday)
    (- (sec+usec->sec sec usec) *the-start-up-time*)))
+
 (define (name->url name) (string-append image-prefix name image-suffix))
 
 (define (times n lst) (concatenate (make-list n lst)))
