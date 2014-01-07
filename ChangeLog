@@ -1,6 +1,10 @@
+2014-01-07  Ichi Kanaya  <kanaya@pineapple.cc>
+
+	* polyphony.scm (all): frame-set -> cel-set. frame -> cel.
+
 2014-01-04  Ichi Kanaya  <kanaya@pineapple.cc>
 
-	* polyphoni.scm (all): swallowtail of reverse direction.
+	* polyphony.scm (all): swallowtail of reverse direction.
 	
 	* polyphony.scm (all): rapae of reverse direction.
 	
