@@ -146,30 +146,30 @@
 ;;;
 
 (define-class <animation> ()
-  ([title         :init-keyword :title         :init-value 'untitled]     ; symbol
+  ([title       :init-keyword :title       :init-value 'untitled]     ; symbol
    [cels        :init-keyword :cels        :init-value #f]            ; <cel-set>
    [n-cels      :init-keyword :n-cels      :init-value 0]             ; cardinal
    [cel-numbers :init-keyword :cel-numbers :init-value '()]           ; array of cardinal
-   [timings       :init-keyword :timings       :init-value '()]           ; array of real
-   [alphas        :init-keyword :alphas        :init-value '()]           ; array of real
-   [offset        :init-keyword :offset        :init-value point-zero]    ; array of pair of real
-   [size          :init-keyword :size          :init-value point-one]     ; array of pair of real
-   [depth         :init-keyword :depth         :init-value 0]             ; real
-   [matrix        :init-keyword :matrix        :init-value id-matrix-2x2] ; array of real
-   [animating     :init-keyword :animating     :init-value #f]            ; boolean
-   [time-offset   :init-keyword :time-offset   :init-value 0]             ; real
-   [x-random      :init-keyword :x-random      :init-value #f]            ; boolean
-   [y-random      :init-keyword :y-random      :init-value #f]            ; boolean
-   [bottom-half   :init-keyword :bottom-half   :init-value #f]            ; boolean
-   [from-jump?    :init-keyword :from-jump?    :init-value #f]            ; boolean
-   [can-jump?     :init-keyword :can-jump?     :init-value #f]            ; boolean
-   [jumps-at      :init-keyword :jumps-at      :init-value 0]             ; cardinal
-   [jumps-to      :init-keyword :jumps-to      :init-value 'none]         ; cardinal
-   [jumped-from   :init-keyword :jumped-from   :init-value 'none]         ; cardinal
-   [jump-offset   :init-keyword :jump-offset   :init-value point-zero]    ; pair of real
-   [to-jump       :init-keyword :to-jump       :init-value #f]            ; (to be removed)
-   [forking?      :init-keyword :forking?      :init-value #f]            ; boolean
-   [options       :init-keyword :options       :init-value '()]))
+   [timings     :init-keyword :timings     :init-value '()]           ; array of real
+   [alphas      :init-keyword :alphas      :init-value '()]           ; array of real
+   [offset      :init-keyword :offset      :init-value point-zero]    ; array of pair of real
+   [size        :init-keyword :size        :init-value point-one]     ; array of pair of real
+   [depth       :init-keyword :depth       :init-value 0]             ; real
+   [matrix      :init-keyword :matrix      :init-value id-matrix-2x2] ; array of real
+   [animating   :init-keyword :animating   :init-value #f]            ; boolean
+   [time-offset :init-keyword :time-offset :init-value 0]             ; real
+   [x-random    :init-keyword :x-random    :init-value #f]            ; boolean
+   [y-random    :init-keyword :y-random    :init-value #f]            ; boolean
+   [bottom-half :init-keyword :bottom-half :init-value #f]            ; boolean
+   [from-jump?  :init-keyword :from-jump?  :init-value #f]            ; boolean
+   [can-jump?   :init-keyword :can-jump?   :init-value #f]            ; boolean
+   [jumps-at    :init-keyword :jumps-at    :init-value 0]             ; cardinal
+   [jumps-to    :init-keyword :jumps-to    :init-value 'none]         ; cardinal
+   [jumped-from :init-keyword :jumped-from :init-value 'none]         ; cardinal
+   [jump-offset :init-keyword :jump-offset :init-value point-zero]    ; pair of real
+   [to-jump     :init-keyword :to-jump     :init-value #f]            ; (to be removed)
+   [forking?    :init-keyword :forking?    :init-value #f]            ; boolean
+   [options     :init-keyword :options     :init-value '()]))
 
 ;;;
 ;;; Randomize offset of animation
@@ -244,9 +244,9 @@
        [relative-time (- time time-offset)]
        [modulo-time   (real-modulo relative-time (duration-of animation))]
        [timings       (ref animation 'timings)]
-       [cel-numbers (ref animation 'cel-numbers)]
-       [cel-index   (index-of-nearest-time timings modulo-time)]
-       [cel-number  (ref cel-numbers cel-index)])
+       [cel-numbers   (ref animation 'cel-numbers)]
+       [cel-index     (index-of-nearest-time timings modulo-time)]
+       [cel-number    (ref cel-numbers cel-index)])
     (animation-ref-primitive animation cel-number)))
 
 ;;;
@@ -386,8 +386,8 @@
    (animation-event-catcher! *the-animation-collection* person)
    (let 
        ([the-cel-tag-list (cond [(string=? time "now") (cel-tag-list *the-animation-collection* now)]
-				  [else                  (cel-tag-list *the-animation-collection* (string->number time))])]
-	[stop-sound         (not (string=? person "none"))])
+				[else                  (cel-tag-list *the-animation-collection* (string->number time))])]
+	[stop-sound       (not (string=? person "none"))])
      (srl:sxml->xml
       (list
        '*TOP*
@@ -466,6 +466,7 @@
 	(print "jump")
 	(set! *the-current-person* (string->number person))
 	;; !!
+	(animation-kick-starter! *the-animation-collection* 'mazak-birds)
 	(animation-kick-starter! *the-animation-collection* 'apple)
 	(animation-kick-starter! *the-animation-collection* 'elephant)
 	(animation-kick-starter! *the-animation-collection* 'tanuki)
@@ -511,32 +512,32 @@
 (define
   (make-animation-primitive
    :key 
-   [title         'untitled]
+   [title       'untitled]
    [cel-names   '()]
    [cel-offsets '()]
    [cel-numbers '()]
-   [alphas        '()]
-   [canvas-size   point-zero]
-   [offset        point-zero]
-   [x-random      #f]
-   [y-random      #f]
-   [bottom-half   #f]
-   [from-jump?    #f]
-   [can-jump?     #f]
-   [jumps-at      0] ; [tick]                ; to be removed
-   [jumps-to      'none]
-   [jumped-from   'none]
-   [jump-offset   point-zero]
-   [forking?      #f]
-   [sounds       '()]
-   [options      '()])
+   [alphas      '()]
+   [canvas-size point-zero]
+   [offset      point-zero]
+   [x-random    #f]
+   [y-random    #f]
+   [bottom-half #f]
+   [from-jump?  #f]
+   [can-jump?   #f]
+   [jumps-at    0] ; [tick]                ; to be removed
+   [jumps-to    'none]
+   [jumped-from 'none]
+   [jump-offset point-zero]
+   [forking?    #f]
+   [sounds      ()]
+   [options     ()])
   (let*
-      ([n-cels        (length cel-names)]
+      ([n-cels          (length cel-names)]
        [n-numbers       (length cel-numbers)]
        [default-offsets (if (null? cel-offsets)
 			    (make-list n-numbers point-zero)
 			    cel-offsets)]
-       [cel-set       (make <cel-set>
+       [cel-set         (make <cel-set>
 			  :names                  cel-names
 			  :n-names                n-cels
 			  :default-offsets        default-offsets
@@ -547,25 +548,25 @@
        [timings         (durations->timings (make-list n-numbers one-tick))]
        [alphas          (if (null? alphas) (make-list n-numbers 1.0) alphas)])
     (make <animation>
-      :title         title
+      :title       title
       :cels        cel-set
       :n-cels      n-numbers
       :cel-numbers cel-numbers
-      :timings       timings
-      :alphas        alphas
-      :depth         (random-real)
-      :offset        offset
-      :x-random      x-random
-      :y-random      y-random
-      :bottom-half   bottom-half
-      :from-jump?    from-jump?
-      :can-jump?     can-jump?
-      :jumps-at      (* jumps-at one-tick) ; [sec]
-      :jumps-to      jumps-to
-      :jumped-from   jumped-from
-      :jump-offset   jump-offset
-      :forking?      forking?
-      :options       options)))
+      :timings     timings
+      :alphas      alphas
+      :depth       (random-real)
+      :offset      offset
+      :x-random    x-random
+      :y-random    y-random
+      :bottom-half bottom-half
+      :from-jump?  from-jump?
+      :can-jump?   can-jump?
+      :jumps-at    (* jumps-at one-tick) ; [sec]
+      :jumps-to    jumps-to
+      :jumped-from jumped-from
+      :jump-offset jump-offset
+      :forking?    forking?
+      :options     options)))
 
 ;;;
 ;;; animation->animation-with-fade-out
@@ -574,9 +575,9 @@
 (define (animation->animation animation)  ; copy constructor
   (let
       ([title         (ref animation 'title)]
-       [cels        (ref animation 'cels)]
-       [n-cels      (ref animation 'n-cels)]
-       [cel-numbers (ref animation 'cel-numbers)]
+       [cels          (ref animation 'cels)]
+       [n-cels        (ref animation 'n-cels)]
+       [cel-numbers   (ref animation 'cel-numbers)]
        [timings       (ref animation 'timings)]
        [alphas        (ref animation 'alphas)]
        [offset        (ref animation 'offset)]
@@ -597,9 +598,9 @@
        [options       (ref animation 'options)])
     (make <animation>
      :title         title
-     :cels        cels
-     :n-cels      n-cels
-     :cel-numbers cel-numbers
+     :cels          cels
+     :n-cels        n-cels
+     :cel-numbers   cel-numbers
      :timings       timings
      :alphas        alphas
      :offset        offset
@@ -622,9 +623,9 @@
 (define (animation->animation-with-fade-out animation)
   (let
       ([title         (ref animation 'title)]
-       [cels        (ref animation 'cels)]
-       [n-cels      (ref animation 'n-cels)]
-       [cel-numbers (ref animation 'cel-numbers)]
+       [cels          (ref animation 'cels)]
+       [n-cels        (ref animation 'n-cels)]
+       [cel-numbers   (ref animation 'cel-numbers)]
        [timings       (ref animation 'timings)]
        [alphas        (let1 alphas-original (ref animation 'alphas)
 			    (append
@@ -647,71 +648,71 @@
        [forking?      (ref animation 'forking?)]
        [options       (ref animation 'options)])
     (make <animation>
-     :title         title
+     :title       title
      :cels        cels
      :n-cels      n-cels
      :cel-numbers cel-numbers
-     :timings       timings
-     :alphas        alphas
-     :offset        offset
-     :size          size
-     :depth         depth
-     :matrix        matrix
-     :animating     animating
-     :time-offset   time-offset
-     :x-random      x-random
-     :y-random      y-random
-     :from-jump?    from-jump?
-     :can-jump?     can-jump?
-     :jumps-at      jumps-at
-     :jumps-to      jumps-to
-     :jumped-from   jumped-from
-     :jump-offset   jump-offset
-     :forking?      forking?
-     :options       options)))
+     :timings     timings
+     :alphas      alphas
+     :offset      offset
+     :size        size
+     :depth       depth
+     :matrix      matrix
+     :animating   animating
+     :time-offset time-offset
+     :x-random    x-random
+     :y-random    y-random
+     :from-jump?  from-jump?
+     :can-jump?   can-jump?
+     :jumps-at    jumps-at
+     :jumps-to    jumps-to
+     :jumped-from jumped-from
+     :jump-offset jump-offset
+     :forking?    forking?
+     :options     options)))
 
 
 (define
   (make-simple-animation
    :key
-   [title             'untitled]
+   [title           'untitled]
    [cel-name-prefix "{prefix}/"]
    [n-cels          0]
    [cel-offsets     '()]
-   [canvas-size       point-zero]
-   [offset            point-zero]
-   [x-random          #f]
-   [y-random          #f]
-   [from-jump?        #f]
-   [can-jump?         #f]
-   [jumps-at          0] ; [tick]
-   [jumps-to          'none]
-   [jumped-from       'none]
-   [jump-offset       point-zero]
-   [forking?          #f]
-   [sounds           '()]
-   [options          '()])
+   [canvas-size     point-zero]
+   [offset          point-zero]
+   [x-random        #f]
+   [y-random        #f]
+   [from-jump?      #f]
+   [can-jump?       #f]
+   [jumps-at        0] ; [tick]
+   [jumps-to        'none]
+   [jumped-from     'none]
+   [jump-offset     point-zero]
+   [forking?        #f]
+   [sounds          ()]
+   [options         ()])
   (make-animation-primitive ; make-animation-with-fade-in/out
-   :title         title
+   :title       title
    :cel-names   (map
-		   (cut string-append cel-name-prefix <>)
-		   (map number->string (iota n-cels 1)))
+		 (cut string-append cel-name-prefix <>)
+		 (map number->string (iota n-cels 1)))
    :cel-numbers (iota n-cels)
    :cel-offsets cel-offsets
-   :canvas-size   canvas-size
-   :offset        offset
-   :x-random      x-random
-   :y-random      y-random
-   :from-jump?    from-jump?
-   :can-jump?     can-jump?
-   :jumps-at      jumps-at
-   :jumps-to      jumps-to
-   :jumped-from   jumped-from
-   :jump-offset   jump-offset
-   :forking?      forking?
-   :sounds        sounds
-   ; :alphas      (make-list n-cels 0.3)  ; TEST TEST TEST
-   :options       options))
+   :canvas-size canvas-size
+   :offset      offset
+   :x-random    x-random
+   :y-random    y-random
+   :from-jump?  from-jump?
+   :can-jump?   can-jump?
+   :jumps-at    jumps-at
+   :jumps-to    jumps-to
+   :jumped-from jumped-from
+   :jump-offset jump-offset
+   :forking?    forking?
+   :sounds      sounds
+   ; :alphas    (make-list n-cels 0.3)  ; TEST TEST TEST
+   :options     options))
 
 (define
   (make-birds-animation
@@ -722,39 +723,39 @@
   (let1
    cel-name-primitive '(1 2 3 4 1 2 3 4 1 2 3 4 5 6 5 6 7 8 7)
    (make-animation-primitive ; make-animation-with-fade-in/out
-    :title         title
+    :title       title
     :cel-names   (map
-		    (cut string-append prefix <>)
-		    (map number->string cel-name-primitive))
+		  (cut string-append prefix <>)
+		  (map number->string cel-name-primitive))
     :cel-offsets `(,point-zero              ; 1
-		     ,point-zero              ; 2
-		     ,point-zero              ; 3
-		     ,point-zero              ; 4
-		     (,birds-step . 0)        ; 1'
-		     (,birds-step . 0)        ; 2'
-		     (,birds-step . 0)        ; 3'
-		     (,birds-step . 0)        ; 4'
-		     (,(* birds-step 2) . 0)  ; 1''
-		     (,(* birds-step 2) . 0)  ; 2''
-		     (,(* birds-step 2) . 0)  ; 3''
-		     (,(* birds-step 2) . 0)  ; 4''
-		     (,(* birds-step 2) . 0)  ; 5
-		     (,(* birds-step 2) . 0)  ; 6
-		     (,(* birds-step 2) . 0)  ; 5
-		     (,(* birds-step 2) . 0)  ; 6
-		     (,(* birds-step 2) . 0)  ; 7
-		     (,(* birds-step 2) . 0)  ; 8
-		     (,(* birds-step 2) . 0)) ; 7
+		   ,point-zero              ; 2
+		   ,point-zero              ; 3
+		   ,point-zero              ; 4
+		   (,birds-step . 0)        ; 1'
+		   (,birds-step . 0)        ; 2'
+		   (,birds-step . 0)        ; 3'
+		   (,birds-step . 0)        ; 4'
+		   (,(* birds-step 2) . 0)  ; 1''
+		   (,(* birds-step 2) . 0)  ; 2''
+		   (,(* birds-step 2) . 0)  ; 3''
+		   (,(* birds-step 2) . 0)  ; 4''
+		   (,(* birds-step 2) . 0)  ; 5
+		   (,(* birds-step 2) . 0)  ; 6
+		   (,(* birds-step 2) . 0)  ; 5
+		   (,(* birds-step 2) . 0)  ; 6
+		   (,(* birds-step 2) . 0)  ; 7
+		   (,(* birds-step 2) . 0)  ; 8
+		   (,(* birds-step 2) . 0)) ; 7
     :cel-numbers (iota (length cel-name-primitive))
-    :canvas-size   '(585 . 425)
-    :offset        point-zero
-    :x-random      #t
-    :y-random      #t
-    :bottom-half   #t
-    :can-jump?     #t
-    :jumps-to      jumps-to
-    :sounds        (make-list (length cel-name-primitive) 'none)
-    :options       '())))
+    :canvas-size '(585 . 425)
+    :offset      point-zero
+    :x-random    #t
+    :y-random    #t
+    :bottom-half #t
+    :can-jump?   #t
+    :jumps-to    jumps-to
+    :sounds      (make-list (length cel-name-primitive) 'none)
+    :options     '())))
 
 (define
   (make-birds-take-off-animation
@@ -764,80 +765,80 @@
    [prefix2     "{prefix}/"]
    [jumped-from 'birds-white])
   (let1 cel-names (append 
-		     (map
-		      (cut string-append prefix1 <>)
-		      (map number->string '(9 10 11 12 13)))
-		     (map
-		      (cut string-append prefix2 <>)
-		      (map number->string (iota 8 1)))
-		     (map 
-		      (cut string-append prefix2 <>)
-		      (map number->string (iota 8 1))))
+		   (map
+		    (cut string-append prefix1 <>)
+		    (map number->string '(9 10 11 12 13)))
+		   (map
+		    (cut string-append prefix2 <>)
+		    (map number->string (iota 8 1)))
+		   (map 
+		    (cut string-append prefix2 <>)
+		    (map number->string (iota 8 1))))
 	(make-animation-primitive
-	 :title         title
+	 :title       title
 	 :cel-names   cel-names
 	 :cel-offsets (append
-			 (make-list (+ 5 8) point-zero)
-			 (make-list 8 '(-210 . 0)))
+		       (make-list (+ 5 8) point-zero)
+		       (make-list 8 '(-210 . 0)))
 	 :cel-numbers (iota (length cel-names))
-	 :canvas-size   '(585 . 425)
-	 :from-jump?    #t
-	 :jumped-from   jumped-from
-	 :sounds        (append
-			 (make-list 5 'none)
-			 '(birds-flying)
-			 (make-list 7 'none)
-			 '(birds-flying)
-			 (make-list 7 'none))
-	 :options       '())))
+	 :canvas-size '(585 . 425)
+	 :from-jump?  #t
+	 :jumped-from jumped-from
+	 :sounds      (append
+		       (make-list 5 'none)
+		       '(birds-flying)
+		       (make-list 7 'none)
+		       '(birds-flying)
+		       (make-list 7 'none))
+	 :options     '())))
 
 (define (make-papilionidae-animation :key [title 'papilionidae-white] [prefix "{prefix}/"] [jumps-to 'papilionidae-white-touch-down])
   (let1 cel-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
 	(make-animation-primitive
-	 :title         title
+	 :title       title
 	 :cel-names   cel-names
 	 :cel-offsets (append
-			 (make-list 11 point-zero)
-			 (make-list 11 (cons papilionidae-stride 0))
-			 (make-list 11 (cons (* papilionidae-stride 2) 0)))
+		       (make-list 11 point-zero)
+		       (make-list 11 (cons papilionidae-stride 0))
+		       (make-list 11 (cons (* papilionidae-stride 2) 0)))
 	 :cel-numbers (iota (length cel-names))
-	 :canvas-size   '(585 . 425)
-	 :offset        point-zero
-	 :x-random      #t
-	 :y-random      #t
-	 :can-jump?     #t
-	 :jumps-at      22                 ; [tick]
-	 :jumps-to      jumps-to
-	 :jump-offset   `(,(* papilionidae-stride 2) . 0)
-	 :sounds        (append
-			 '(butterfly) (make-list 10 'none)
-			 '(butterfly) (make-list 10 'none)
-			 '(butterfly) (make-list 10 'none))
-	 :options       '())))
+	 :canvas-size '(585 . 425)
+	 :offset      point-zero
+	 :x-random    #t
+	 :y-random    #t
+	 :can-jump?   #t
+	 :jumps-at    22                 ; [tick]
+	 :jumps-to    jumps-to
+	 :jump-offset `(,(* papilionidae-stride 2) . 0)
+	 :sounds      (append
+		       '(butterfly) (make-list 10 'none)
+		       '(butterfly) (make-list 10 'none)
+		       '(butterfly) (make-list 10 'none))
+	 :options     '())))
 
 (define (make-papilionidae-rev-animation :key [title 'papilionidae-white] [prefix "{prefix}/"] [jumps-to 'papilionidae-white-touch-down])
   (let1 cel-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
 	(make-animation-primitive
-	 :title         title
+	 :title       title
 	 :cel-names   cel-names
 	 :cel-offsets (append
-			 (make-list 11 point-zero)
-			 (make-list 11 (cons papilionidae-rev-stride 0))
-			 (make-list 11 (cons (* papilionidae-rev-stride 2) 0)))
+		       (make-list 11 point-zero)
+		       (make-list 11 (cons papilionidae-rev-stride 0))
+		       (make-list 11 (cons (* papilionidae-rev-stride 2) 0)))
 	 :cel-numbers (iota (length cel-names))
-	 :canvas-size   '(585 . 425)
-	 :offset        point-zero
-	 :x-random      #t
-	 :y-random      #t
-	 :can-jump?     #t
-	 :jumps-at      22                 ; [tick]
-	 :jumps-to      jumps-to
-	 :jump-offset   `(,(* papilionidae-stride 2) . 0)
-	 :sounds        (append
-			 '(butterfly) (make-list 10 'none)
-			 '(butterfly) (make-list 10 'none)
-			 '(butterfly) (make-list 10 'none))
-	 :options       '())))
+	 :canvas-size '(585 . 425)
+	 :offset      point-zero
+	 :x-random    #t
+	 :y-random    #t
+	 :can-jump?   #t
+	 :jumps-at    22                 ; [tick]
+	 :jumps-to    jumps-to
+	 :jump-offset `(,(* papilionidae-stride 2) . 0)
+	 :sounds      (append
+		       '(butterfly) (make-list 10 'none)
+		       '(butterfly) (make-list 10 'none)
+		       '(butterfly) (make-list 10 'none))
+	 :options     '())))
 
 (define
   (make-papilionidae-touch-down-animation
@@ -846,46 +847,46 @@
    [prefix      "{prefix}/"]
    [jumped-from 'papilionidae-white])
   (let1 cel-names (map
-		     (cut string-append prefix <>)
-		     (map number->string (iota 4 1)))
+		   (cut string-append prefix <>)
+		   (map number->string (iota 4 1)))
 	(make-animation-primitive
-	 :title         title
+	 :title       title
 	 :cel-names   cel-names
 	 :cel-offsets (make-list (length cel-names) point-zero)
 	 :cel-numbers (iota (length cel-names))
-	 :canvas-size   '(585 . 425)
-	 :from-jump?    #t
-	 :jumped-from   jumped-from
-	 :sounds        (make-list (length cel-names) 'none)
-	 :options       '())))
+	 :canvas-size '(585 . 425)
+	 :from-jump?  #t
+	 :jumped-from jumped-from
+	 :sounds      (make-list (length cel-names) 'none)
+	 :options     '())))
 
 (define (make-rapae-animation :key [title 'rapae-white] [prefix "{prefix}/"] [jumps-to 'rapae-white-touch-down]) 
   (make-simple-animation 
-   :title             title
+   :title           title
    :cel-name-prefix prefix
    :n-cels          11
-   :canvas-size       '(585 . 425)
-   :x-random          #t
-   :y-random          #t
-   :can-jump?         #t
-   :jumps-at          9
-   :jumps-to          jumps-to
-   :sounds            (append '(butterfly) (make-list 10 'none))
-   :options           '()))
+   :canvas-size     '(585 . 425)
+   :x-random        #t
+   :y-random        #t
+   :can-jump?       #t
+   :jumps-at        9
+   :jumps-to        jumps-to
+   :sounds          (append '(butterfly) (make-list 10 'none))
+   :options         '()))
 
 (define (make-rapae-rev-animation :key [title 'rapae-rev-white] [prefix "{prefix}/"] [jumps-to 'rapae-white-touch-down])
   (make-simple-animation
-   :title             title
+   :title           title
    :cel-name-prefix prefix
    :n-cels          11
-   :canvas-size       '(585 . 425)
-   :x-random          #t
-   :y-random          #t
-   :can-jump?         #t
-   :jumps-at          9
-   :jumps-to          jumps-to
-   :sounds            (append '(butterfly) (make-list 10 'none))
-   :options           '()))
+   :canvas-size     '(585 . 425)
+   :x-random        #t
+   :y-random        #t
+   :can-jump?       #t
+   :jumps-at        9
+   :jumps-to        jumps-to
+   :sounds          (append '(butterfly) (make-list 10 'none))
+   :options         '()))
 
 (define
   (make-rapae-touch-down-animation
@@ -894,23 +895,33 @@
    [prefix      "{prefix}/"]
    [jumped-from 'rapae-white]) ;; ???
   (let1 cel-names (map
-		     (cut string-append prefix <>)
-		     (map number->string (iota 4 1)))
+		   (cut string-append prefix <>)
+		   (map number->string (iota 4 1)))
 	(make-animation-primitive
-	 :title         title
+	 :title       title
 	 :cel-names   cel-names
 	 :cel-offsets (make-list (length cel-names) point-zero)
 	 :cel-numbers (iota (length cel-names))
-	 :canvas-size   '(585 . 425)
-	 :from-jump?    #t
-	 :jumped-from   jumped-from
-	 :sounds        (make-list (length cel-names) 'none)
-	 :options       '())))
+	 :canvas-size '(585 . 425)
+	 :from-jump?  #t
+	 :jumped-from jumped-from
+	 :sounds      (make-list (length cel-names) 'none)
+	 :options     '())))
 
 
 (define *the-animation-collection*
   (let
       (
+       ;; Mazak Birds
+       ;; Simple animation
+       [mazak-birds                    (make-simple-animation
+					:title 'mazak-birds
+					:cel-name-prefix "Mazak/"
+					:n-cels 106
+					:offset '(4000 . 500) ; tentative
+					:canvas-size '(2313 . 1040) ; tentative
+					:from-jump? #t
+					:sounds (make-list 106 'none))]
        ;; Apple
        ;; Simple animation
        [apple                          (make-simple-animation
@@ -1185,6 +1196,7 @@
 					:offset '(1000 . 0) ; *** CHANGE ***
 					:sounds (make-list 50 'none))])
     (let1 hash-table (make-hash-table 'eqv?)
+	  (hash-table-put! hash-table 'mazak-birds                    mazak-birds)
 	  (hash-table-put! hash-table 'apple                          (animation->animation-with-fade-out apple))
 	  (hash-table-put! hash-table 'baboon-weeing                  baboon-weeing)
 	  ;; (hash-table-put! hash-table 'baboon-wee baboon-wee)
