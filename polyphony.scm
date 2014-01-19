@@ -967,7 +967,7 @@
 					:title 'mazak-birds
 					:cel-name-prefix "Mazak/"
 					:n-cels 106
-					:offset '(4000 . 500) ; tentative
+					:offset '(4000 . 0) ; tentative
 					:canvas-size '(2313 . 1040) ; tentative
 					:from-jump? #t
 					:sounds (make-list 106 'none))]
