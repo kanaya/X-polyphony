@@ -1,3 +1,9 @@
+2014-01-19  Ichi Kanaya  <kanaya@pineapple.cc>
+
+	* polyphony.scm (baboon-weeing): now "mazak-birds" follows "baboon-weeing".
+
+	* polyphony.scm (mazak-birds): new animation clip "mazak-birds" was added.
+
 2014-01-07  Ichi Kanaya  <kanaya@pineapple.cc>
 
 	* polyphony.scm (all): frame-set -> cel-set. frame -> cel.
