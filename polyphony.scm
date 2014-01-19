@@ -114,17 +114,17 @@
    [default-color-matrix :init-keyword :default-color-matrix :init-value id-matrix-3x3]
    [default-sound        :init-keyword :default-sound        :init-value 'none]))
 
-(define-method ref ([fs <cel-set>] [i <integer>]) ; returns <cel>
+(define-method ref ([cs <cel-set>] [i <integer>]) ; returns <cel>
   (let*
-      ([n-names (ref fs 'n-names)]
+      ([n-names (ref cs 'n-names)]
        [j       (if (< i n-names) i 0)])      ; boundary check
     (make <cel>
-      :name                 (ref (ref fs 'names) j)
-      :default-offset       (ref (ref fs 'default-offsets) j)
-      :default-size         (ref (ref fs 'default-sizes) j)
-      :default-matrix       (ref (ref fs 'default-matrices) j)
-      :default-color-matrix (ref (ref fs 'default-color-matrices) j)
-      :default-sound        (ref (ref fs 'default-sounds) j))))
+      :name                 (ref (ref cs 'names) j)
+      :default-offset       (ref (ref cs 'default-offsets) j)
+      :default-size         (ref (ref cs 'default-sizes) j)
+      :default-matrix       (ref (ref cs 'default-matrices) j)
+      :default-color-matrix (ref (ref cs 'default-color-matrices) j)
+      :default-sound        (ref (ref cs 'default-sounds) j))))
 
 ;;;
 ;;; <animation> class
@@ -568,6 +568,56 @@
       :options     options)))
 
 ;;;
+;;; animation-append
+;;;
+
+(define (animation-append animation1 animation2)
+  (let
+      ([new-title       (ref animation1 'title)]
+       [cels1           (ref animation1 'cels)]
+       [cels2           (ref animation2 'cels)]
+       [new-n-cels      (+ (ref animation1 'n-cels) (ref animation2 'n-cels))]
+       [new-cel-numbers (append
+			 (ref animation1 'cel-numbers)
+			 (map (cut + (last (ref animation1 'cel-numbers)) <>) (ref animation2 'cel-numbers)))]
+       [new-timings     (append
+			 (ref animation1 'timings)
+			 (map (cut + (last (ref animation1 'timings)) <>) (ref animation2 'timings)))]
+       [new-alphas      (append (ref animation1 'alphas) (ref animation2 'alphas))]
+       [new-offset      (ref animation1 'offset)]
+       [new-size        (ref animation1 'size)] ; not used?
+       [new-depth       (ref animation1 'depth)]
+       [new-matrix      (ref animation1 'matrix)]
+       [new-animating   #f]
+       [new-time-offset (ref animation1 'time-offset)]
+       [new-x-random    (ref animation1 'x-random)]
+       [new-y-random    (ref animation1 'y-random)]
+       [new-bottom-half (ref animation1 'bottom-half)]
+       [new-from-jump?  (ref animation1 'from-jump?)]
+       [new-can-jump?   (ref animation1 'can-jump?)]
+       [new-jumps-at    (ref animation1 'jumps-at)]
+       [new-jumps-to    (ref animation1 'jumps-to)]
+       [new-jumped-from (ref animation1 'jumped-from)]
+       [new-jump-offset (ref animation1 'jump-offset)]
+       [new-to-jump     (ref animation1 'to-jump)]
+       [new-forking?    (ref animation1 'forking?)]
+       [new-options     (ref animation1 'options)])
+    (let1 new-cels (make <cel-set>
+		     :names                  (append (ref cels1 'names)                  (ref cels2 'names))
+		     :n-names                (+      (ref cels1 'n-names)                (ref cels2 'n-names))
+		     :default-offsets        (append (ref cels1 'default-offsets)        (ref cels2 'default-offsets))
+		     :default-sizes          (append (ref cels1 'default-sizes)          (ref cels2 'default-sizes))
+		     :default-matrices       (append (ref cels1 'default-matrices)       (ref cels2 'default-matrices))
+		     :default-alphas         (append (ref cels1 'default-alphas)         (ref cels2 'default-alphas))
+		     :default-color-matrices (append (ref cels1 'default-color-matrices) (ref cels2 'default-color-matrices))
+		     :default-depths         (append (ref cels1 'default-depths)         (ref cels2 'default-depths))
+		     :default-sounds         (append (ref cels1 'default-sounds)         (ref cels2 'default-sounds)))
+	  (make <animation> :title new-title :cels new-cels :n-cels new-n-cels :cel-numbers new-cel-numbers :timings new-timings :alphas new-alphas
+		:depth new-depth :offset new-offset :x-random new-x-random :y-random new-y-random :bottom-half new-bottom-half
+		:from-jump? new-from-jump? :can-jump? new-can-jump? :jumps-at new-jumps-at :jumps-to new-jumps-to :jumped-from new-jumped-from
+		:jump-offset new-jump-offset :forking? new-forking? :options new-options))))
+
+;;;
 ;;; animation->animation-with-fade-out
 ;;;
 
@@ -913,7 +963,7 @@
       (
        ;; Mazak Birds
        ;; Simple animation
-       #;[mazak-birds                    (make-simple-animation
+       [mazak-birds                    (make-simple-animation
 					:title 'mazak-birds
 					:cel-name-prefix "Mazak/"
 					:n-cels 106
@@ -936,17 +986,14 @@
        ;; Baboon-weeing
        [baboon-weeing                  (make-animation-primitive 
 					:title 'baboon-weeing
-					:cel-names (append
-						    (map (cut string-append "Baboon2/" <>) (map number->string (iota 66 1)))
-						    ; PLEASE CUT THE FOLLOWING S-EXPRESSION IF YOU DON'T NEED MAZAK-BIRD ANIMATION
-						    (map (cut string-append "Mazak/" <>) (map number->string (iota 106 1))))
-					:cel-numbers (iota (+ 66 106)) ; PLEASE USE (iota 66) IF YOU DON'T NEED MAZAK-BIRD ANIMATION
+					:cel-names (map (cut string-append "Baboon2/" <>) (map number->string (iota 66 1)))
+					:cel-numbers (iota 66)
 					:offset '(4500 . 0)
 					:canvas-size `(,(* 585 4) . ,(* 637 4))
 					:from-jump? #t
 					:sounds (append (make-list 23 'none)
 							'(wee)
-							(make-list (+ 43 106) 'none)) ; PLEASE USE 43 INSTEAD OF (+ 43 106) IF YOU DON'T NEED MAZAK-BIRD ANIMATION
+							(make-list 43 'none))
 					:options '())]
        ;; Birds Blue
        ;; Bird animation
@@ -1195,8 +1242,9 @@
 					:offset '(1000 . 0) ; *** CHANGE ***
 					:sounds (make-list 50 'none))])
     (let1 hash-table (make-hash-table 'eqv?)
+	  #;(hash-table-put! hash-table 'mazak-birds                    mazak-birds)
 	  (hash-table-put! hash-table 'apple                          (animation->animation-with-fade-out apple))
-	  (hash-table-put! hash-table 'baboon-weeing                  baboon-weeing)
+	  (hash-table-put! hash-table 'baboon-weeing                  (animation-append baboon-weeing mazak-birds))  ; REALLY NEW!!!
 	  (hash-table-put! hash-table 'birds-blue                     (animation->animation-with-fade-out birds-blue))
 	  (hash-table-put! hash-table 'birds-orange                   (animation->animation-with-fade-out birds-orange))
 	  (hash-table-put! hash-table 'birds-blue-take-off            birds-blue-take-off)
