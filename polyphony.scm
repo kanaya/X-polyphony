@@ -938,14 +938,15 @@
 					:title 'baboon-weeing
 					:cel-names (append
 						    (map (cut string-append "Baboon2/" <>) (map number->string (iota 66 1)))
+						    ; PLEASE CUT THE FOLLOWING S-EXPRESSION IF YOU DON'T NEED MAZAK-BIRD ANIMATION
 						    (map (cut string-append "Mazak/" <>) (map number->string (iota 106 1))))
-					:cel-numbers (iota (+ 66 106))
-					:offset '(4500 . 0) ; baboon
-					:canvas-size `(,(* 585 4) . ,(* 637 4)) ; baboon
+					:cel-numbers (iota (+ 66 106)) ; PLEASE USE (iota 66) IF YOU DON'T NEED MAZAK-BIRD ANIMATION
+					:offset '(4500 . 0)
+					:canvas-size `(,(* 585 4) . ,(* 637 4))
 					:from-jump? #t
 					:sounds (append (make-list 23 'none)
 							'(wee)
-							(make-list (+ 43 106) 'none))
+							(make-list (+ 43 106) 'none)) ; PLEASE USE 43 INSTEAD OF (+ 43 106) IF YOU DON'T NEED MAZAK-BIRD ANIMATION
 					:options '())]
        ;; Birds Blue
        ;; Bird animation
