@@ -466,7 +466,6 @@
 	(print "jump")
 	(set! *the-current-person* (string->number person))
 	;; !!
-	(animation-kick-starter! *the-animation-collection* 'mazak-birds)
 	(animation-kick-starter! *the-animation-collection* 'apple)
 	(animation-kick-starter! *the-animation-collection* 'elephant)
 	(animation-kick-starter! *the-animation-collection* 'tanuki)
@@ -914,7 +913,7 @@
       (
        ;; Mazak Birds
        ;; Simple animation
-       [mazak-birds                    (make-simple-animation
+       #;[mazak-birds                    (make-simple-animation
 					:title 'mazak-birds
 					:cel-name-prefix "Mazak/"
 					:n-cels 106
@@ -938,16 +937,15 @@
        [baboon-weeing                  (make-animation-primitive 
 					:title 'baboon-weeing
 					:cel-names (append
-						      (map
-						       (cut string-append "Baboon2/" <>)
-						       (map number->string (iota 66 1))))
-					:cel-numbers (iota 66)
-					:offset '(4500 . 0)
-					:canvas-size `(,(* 585 4) . ,(* 637 4))
+						    (map (cut string-append "Baboon2/" <>) (map number->string (iota 66 1)))
+						    (map (cut string-append "Mazak/" <>) (map number->string (iota 106 1))))
+					:cel-numbers (iota (+ 66 106))
+					:offset '(4500 . 0) ; baboon
+					:canvas-size `(,(* 585 4) . ,(* 637 4)) ; baboon
 					:from-jump? #t
 					:sounds (append (make-list 23 'none)
 							'(wee)
-							(make-list 43 'none))
+							(make-list (+ 43 106) 'none))
 					:options '())]
        ;; Birds Blue
        ;; Bird animation
@@ -1196,10 +1194,8 @@
 					:offset '(1000 . 0) ; *** CHANGE ***
 					:sounds (make-list 50 'none))])
     (let1 hash-table (make-hash-table 'eqv?)
-	  (hash-table-put! hash-table 'mazak-birds                    mazak-birds)
 	  (hash-table-put! hash-table 'apple                          (animation->animation-with-fade-out apple))
 	  (hash-table-put! hash-table 'baboon-weeing                  baboon-weeing)
-	  ;; (hash-table-put! hash-table 'baboon-wee baboon-wee)
 	  (hash-table-put! hash-table 'birds-blue                     (animation->animation-with-fade-out birds-blue))
 	  (hash-table-put! hash-table 'birds-orange                   (animation->animation-with-fade-out birds-orange))
 	  (hash-table-put! hash-table 'birds-blue-take-off            birds-blue-take-off)
