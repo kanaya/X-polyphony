@@ -98,7 +98,7 @@
 (define-class <cel-set> ()
   ([names                  :init-keyword :names                  :init-value '()]
    [n-names                :init-keyword :n-names                :init-value 0]
-   [default-offsets        :init-keyword :default-offsets        :init-value '()]
+   [default-offsets        :init-keyword :default-offsets        :init-value '()]  ; used?
    [default-sizes          :init-keyword :default-sizes          :init-value '()]
    [default-matrices       :init-keyword :default-matrices       :init-value '()]
    [default-alphas         :init-keyword :default-alphas         :init-value '()]
@@ -343,7 +343,7 @@
     (receive [cel alpha] (ref animation time)
 	     (let* 
 		 ([name             (ref cel 'name)]
-		  [default-offset   (ref cel 'default-offset)]
+		  [default-offset   (ref cel 'default-offset)] ; cel.default-offset
 		  [default-offset-x (get-width default-offset)]
 		  [default-offset-y (get-height default-offset)]
 		  [default-size     (ref cel 'default-size)]
@@ -351,14 +351,14 @@
 		  [default-size-y   (get-height default-size)]
 		  [depth            (ref animation 'depth)]  ; ignoring default-depth of each cels
 		  [sound            (car (hash-table-get *the-sound-collection* (ref cel 'default-sound)))]
-		  [offset           (ref animation 'offset)]
+		  [offset           (ref animation 'offset)] ; animation.offset
 		  [offset-x         (get-width offset)]
 		  [offset-y         (get-height offset)])
 	       `(image
 		 (@
 		  (source ,(name->url name))
 		  (id ,name)
-		  (position_x ,(+ default-offset-x offset-x))
+		  (position_x ,(+ default-offset-x offset-x)) ; animation.offset + cel.default-offset
 		  (position_y ,(+ default-offset-y offset-y))
 		  (position_z ,depth)
 		  (size_x ,default-size-x)
@@ -534,7 +534,7 @@
       ([n-cels          (length cel-names)]
        [n-numbers       (length cel-numbers)]
        [default-offsets (if (null? cel-offsets)
-			    (make-list n-numbers point-zero)
+			    (make-list n-numbers offset) ; fixed.
 			    cel-offsets)]
        [cel-set         (make <cel-set>
 			  :names                  cel-names
@@ -584,7 +584,7 @@
 			 (ref animation1 'timings)
 			 (map (cut + (last (ref animation1 'timings)) <>) (ref animation2 'timings)))]
        [new-alphas      (append (ref animation1 'alphas) (ref animation2 'alphas))]
-       [new-offset      (ref animation1 'offset)]
+       [new-offset      (ref animation1 'offset)] ; be careful
        [new-size        (ref animation1 'size)] ; not used?
        [new-depth       (ref animation1 'depth)]
        [new-matrix      (ref animation1 'matrix)]
@@ -967,8 +967,8 @@
 					:title 'mazak-birds
 					:cel-name-prefix "Mazak/"
 					:n-cels 106
-					:offset '(4000 . 0) ; tentative
-					:canvas-size '(2313 . 1040) ; tentative
+					:offset '(2200 . 1000) ; cel.offset
+					:canvas-size '(2313 . 1040)
 					:from-jump? #t
 					:sounds (make-list 106 'none))]
        ;; Apple
@@ -977,7 +977,7 @@
 					:title 'apple
 					:cel-name-prefix "Apple2/"
 					:n-cels 31
-					:offset '(4000 . 500)
+					:offset '(2200 . 500)
 					:canvas-size '(2313 . 1040)
 					:from-jump? #t
 					:sounds (append (make-list 15 'none)
@@ -988,7 +988,7 @@
 					:title 'baboon-weeing
 					:cel-names (map (cut string-append "Baboon2/" <>) (map number->string (iota 66 1)))
 					:cel-numbers (iota 66)
-					:offset '(4500 . 0)
+					:offset '(2200 . 0) ; cel.offset
 					:canvas-size `(,(* 585 4) . ,(* 637 4))
 					:from-jump? #t
 					:sounds (append (make-list 23 'none)

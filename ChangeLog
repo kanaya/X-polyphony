@@ -1,3 +1,7 @@
+2014-01-22  Ichi Kanaya  <kanaya@pineapple.cc>
+
+	* polyphony.scm (make-animation-primitive): now properly set offset array.
+
 2014-01-19  Ichi Kanaya  <kanaya@pineapple.cc>
 
 	* polyphony.scm (baboon-weeing): now "mazak-birds" follows "baboon-weeing".
