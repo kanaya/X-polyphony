@@ -1,3 +1,7 @@
+2014-01-23  Ichi Kanaya  <kanaya@pineapple.cc>
+
+	* polyphony.scm (all): code clean-up.
+
 2014-01-22  Ichi Kanaya  <kanaya@pineapple.cc>
 
 	* polyphony.scm (make-animation-primitive): now properly set offset array.
