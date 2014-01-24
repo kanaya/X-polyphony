@@ -1,6 +1,24 @@
+2014-01-23  Ichi Kanaya  <kanaya@pineapple.cc>
+
+	* polyphony.scm (all): code clean-up.
+
+2014-01-22  Ichi Kanaya  <kanaya@pineapple.cc>
+
+	* polyphony.scm (make-animation-primitive): now properly set offset array.
+
+2014-01-19  Ichi Kanaya  <kanaya@pineapple.cc>
+
+	* polyphony.scm (baboon-weeing): now "mazak-birds" follows "baboon-weeing".
+
+	* polyphony.scm (mazak-birds): new animation clip "mazak-birds" was added.
+
+2014-01-07  Ichi Kanaya  <kanaya@pineapple.cc>
+
+	* polyphony.scm (all): frame-set -> cel-set. frame -> cel.
+
 2014-01-04  Ichi Kanaya  <kanaya@pineapple.cc>
 
-	* polyphoni.scm (all): swallowtail of reverse direction.
+	* polyphony.scm (all): swallowtail of reverse direction.
 	
 	* polyphony.scm (all): rapae of reverse direction.
 	
