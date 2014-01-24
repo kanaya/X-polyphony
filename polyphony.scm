@@ -965,7 +965,7 @@
 					:title 'mazak-birds
 					:cel-name-prefix "Mazak/"
 					:n-cels 106
-					:offset '(2200 . 1000) ; cel.offset
+					:offset '(2200 . 1400) ; cel.offset
 					:canvas-size '(2313 . 1040)
 					:from-jump? #t
 					:sounds (make-list 106 'none))]
@@ -1128,7 +1128,7 @@
 					      :cel-numbers (iota (length cel-names))
 					      :alphas (make-list (length cel-names) 1.0)
 					      :canvas-size `(,(* 984 10) . ,(* 289 10))  ; 8
-					      :offset '(1000 . -600)
+					      :offset '(1000 . -300)
 					      :from-jump? #t
 					      :sounds (make-list (length cel-names) 'none)
 					      :options '()))]
@@ -1140,7 +1140,7 @@
 					:n-cels 116
 					:from-jump? #t
 					:canvas-size `(,(* 1188 8) . ,(* 213 8))
-					:offset '(500 . 0)
+					:offset '(500 . 100)
 					:sounds (make-list 116 'none))]
        ;; Fox
        ;; Simple animation
