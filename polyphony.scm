@@ -98,7 +98,7 @@
 (define-class <cel-set> ()
   ([names                  :init-keyword :names                  :init-value '()]
    [n-names                :init-keyword :n-names                :init-value 0]
-   [default-offsets        :init-keyword :default-offsets        :init-value '()]  ; used?
+   [default-offsets        :init-keyword :default-offsets        :init-value '()]
    [default-sizes          :init-keyword :default-sizes          :init-value '()]
    [default-matrices       :init-keyword :default-matrices       :init-value '()]
    [default-alphas         :init-keyword :default-alphas         :init-value '()]
@@ -343,22 +343,22 @@
     (receive [cel alpha] (ref animation time)
 	     (let* 
 		 ([name             (ref cel 'name)]
-		  [default-offset   (ref cel 'default-offset)] ; cel.default-offset
+		  [default-offset   (ref cel 'default-offset)]
 		  [default-offset-x (get-width default-offset)]
 		  [default-offset-y (get-height default-offset)]
 		  [default-size     (ref cel 'default-size)]
 		  [default-size-x   (get-width default-size)]
 		  [default-size-y   (get-height default-size)]
-		  [depth            (ref animation 'depth)]  ; ignoring default-depth of each cels
+		  [depth            (ref animation 'depth)]
 		  [sound            (car (hash-table-get *the-sound-collection* (ref cel 'default-sound)))]
-		  [offset           (ref animation 'offset)] ; animation.offset
+		  [offset           (ref animation 'offset)]
 		  [offset-x         (get-width offset)]
 		  [offset-y         (get-height offset)])
 	       `(image
 		 (@
 		  (source ,(name->url name))
 		  (id ,name)
-		  (position_x ,(+ default-offset-x offset-x)) ; animation.offset + cel.default-offset
+		  (position_x ,(+ default-offset-x offset-x))
 		  (position_y ,(+ default-offset-y offset-y))
 		  (position_z ,depth)
 		  (size_x ,default-size-x)
@@ -367,8 +367,6 @@
 		  (sound ,sound))
 		 ,name))))
   (define (animating-animations animations)
-					; animations is a hash table
-					; of <animations>
     (hash-table-fold
      animations
      (lambda [_ animation lst]
@@ -485,20 +483,20 @@
 		animations
 		(lambda [_ animation]
 		  (let1 can-jump? (ref animation 'can-jump?)
-		   (when can-jump?
-			 (let*
-			     ([next-animation-key    (ref animation 'jumps-to)]
-			      [next-animation        (hash-table-get animations next-animation-key)]
-			      [animation-offset      (ref animation 'offset)]
-			      [animation-jump-offset (ref animation 'jump-offset)]
-			      [the-offset            (pair-plus animation-offset animation-jump-offset)])
-			   (if
-			    (not 
-			     (or
-			      (eq? (ref animation 'title) 'baboon)
-			      (eq? (ref animation 'title) 'baboon-weeing)))
-			    (set! (ref next-animation 'offset) the-offset))
-			   (set! (ref animation 'to-jump) #t))))))))))  ; to be removed
+			(when can-jump?
+			      (let*
+				  ([next-animation-key    (ref animation 'jumps-to)]
+				   [next-animation        (hash-table-get animations next-animation-key)]
+				   [animation-offset      (ref animation 'offset)]
+				   [animation-jump-offset (ref animation 'jump-offset)]
+				   [the-offset            (pair-plus animation-offset animation-jump-offset)])
+				(if
+				 (not 
+				  (or
+				   (eq? (ref animation 'title) 'baboon)
+				   (eq? (ref animation 'title) 'baboon-weeing)))
+				 (set! (ref next-animation 'offset) the-offset))
+				(set! (ref animation 'to-jump) #t))))))))))  ; to be removed
 
 ;;;
 ;;; Animations
@@ -534,7 +532,7 @@
       ([n-cels          (length cel-names)]
        [n-numbers       (length cel-numbers)]
        [default-offsets (if (null? cel-offsets)
-			    (make-list n-numbers offset) ; fixed.
+			    (make-list n-numbers offset)
 			    cel-offsets)]
        [cel-set         (make <cel-set>
 			  :names                  cel-names
@@ -741,7 +739,7 @@
    [forking?        #f]
    [sounds          ()]
    [options         ()])
-  (make-animation-primitive ; make-animation-with-fade-in/out
+  (make-animation-primitive
    :title       title
    :cel-names   (map
 		 (cut string-append cel-name-prefix <>)
@@ -967,7 +965,7 @@
 					:title 'mazak-birds
 					:cel-name-prefix "Mazak/"
 					:n-cels 106
-					:offset '(2200 . 1000) ; cel.offset
+					:offset '(2200 . 1400) ; cel.offset
 					:canvas-size '(2313 . 1040)
 					:from-jump? #t
 					:sounds (make-list 106 'none))]
@@ -1130,7 +1128,7 @@
 					      :cel-numbers (iota (length cel-names))
 					      :alphas (make-list (length cel-names) 1.0)
 					      :canvas-size `(,(* 984 10) . ,(* 289 10))  ; 8
-					      :offset '(1000 . -600)
+					      :offset '(1000 . -300)
 					      :from-jump? #t
 					      :sounds (make-list (length cel-names) 'none)
 					      :options '()))]
@@ -1142,7 +1140,7 @@
 					:n-cels 116
 					:from-jump? #t
 					:canvas-size `(,(* 1188 8) . ,(* 213 8))
-					:offset '(500 . 0)
+					:offset '(500 . 100)
 					:sounds (make-list 116 'none))]
        ;; Fox
        ;; Simple animation
@@ -1239,12 +1237,11 @@
 					:n-cels 50
 					:from-jump? #t
 					:canvas-size `(,(* 883 8) . ,(* 213 8)) ; test
-					:offset '(1000 . 0) ; *** CHANGE ***
+					:offset '(1000 . 0)
 					:sounds (make-list 50 'none))])
     (let1 hash-table (make-hash-table 'eqv?)
-	  #;(hash-table-put! hash-table 'mazak-birds                    mazak-birds)
 	  (hash-table-put! hash-table 'apple                          (animation->animation-with-fade-out apple))
-	  (hash-table-put! hash-table 'baboon-weeing                  (animation-append baboon-weeing mazak-birds))  ; REALLY NEW!!!
+	  (hash-table-put! hash-table 'baboon-weeing                  (animation-append baboon-weeing mazak-birds))
 	  (hash-table-put! hash-table 'birds-blue                     (animation->animation-with-fade-out birds-blue))
 	  (hash-table-put! hash-table 'birds-orange                   (animation->animation-with-fade-out birds-orange))
 	  (hash-table-put! hash-table 'birds-blue-take-off            birds-blue-take-off)
