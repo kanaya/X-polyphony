@@ -49,15 +49,15 @@
 (define *t-ambient-sound-started* 0)    ; [s]
 
 (define birds-step -60)
-(define elephant-step (* -150 4))
-(define rabbit-to-right-step (* 160 2))
-(define rabbit-to-left-step-x (* -140 2))
-(define rabbit-to-left-step-y (* 30 2))
-(define owl-step (* 50 2))
-(define tanuki-stride (* -200 2))
+(define elephant-step -600)
+(define rabbit-to-right-step 320)
+(define rabbit-to-left-step-x -180)
+(define rabbit-to-left-step-y 60)
+(define owl-step 100)
+(define tanuki-stride -400)
 (define papilionidae-stride -475)
 (define papilionidae-rev-stride 475)
-(define fox-stride (* -250 4))
+(define fox-stride -1000)
 
 (define *t-last-event* 0)
 (define *the-last-content* '())
@@ -85,7 +85,7 @@
 ;;;
 ;;; <cel-set> class and <cel> class
 ;;;
-;;;   The <cel-set> class defines a set of elements for a block of animation.
+;;;   The <cel-set> class defines a set of elements for a block of clip.
 ;;;   It can have each cels and the associated values including offset, size,
 ;;;   transformation matrix, and color matrix.
 ;;;
@@ -127,16 +127,16 @@
       :default-sound        (ref (ref cs 'default-sounds) j))))
 
 ;;;
-;;; <animation> class
+;;; <clip> class
 ;;;
-;;;   The <animation> class is designed to hold a building block of
-;;;   animation.  The class will have cels (<cel-set> class),
+;;;   The <clip> class is designed to hold a building block of
+;;;   clip.  The class will have cels (<cel-set> class),
 ;;;   cel numbers (integer array), timings (real number array),
 ;;;   offsets (point array), sizez (point array), and transformation
 ;;;   matrices.
 ;;;
 ;;;   The procedure (ref a t) returns the cel of timing t out of
-;;;   animation a.
+;;;   clip a.
 ;;;
 ;;;   A utility procedure (durations->timings durations) returns
 ;;;   timing array from given duration array; e.g. passing '(1 1 1) to
@@ -145,7 +145,7 @@
 ;;;   Multiple instances are arrowed.
 ;;;
 
-(define-class <animation> ()
+(define-class <clip> ()
   ([title       :init-keyword :title       :init-value 'untitled]     ; symbol
    [cels        :init-keyword :cels        :init-value #f]            ; <cel-set>
    [n-cels      :init-keyword :n-cels      :init-value 0]             ; cardinal
@@ -172,20 +172,20 @@
    [options     :init-keyword :options     :init-value '()]))
 
 ;;;
-;;; Randomize offset of animation
+;;; Randomize offset of clip
 ;;;
 
-(define-method randomize-offset! ([animation <animation>])
-  (define (random-offset animation)
+(define-method randomize-offset! ([clip <clip>])
+  (define (random-offset clip)
     (let
 	([rx       (* (random-real) (get-width screen-size))]
 	 [ry       (* (random-real) (get-height screen-size))]
 	 [rybh     (* (random-real) (* (get-height screen-size) 0.5))]
-	 [x        (get-width (ref animation 'offset))]
-	 [y        (get-height (ref animation 'offset))]
-	 [x-random (ref animation 'x-random)]
-	 [y-random (ref animation 'y-random)]
-	 [bh       (ref animation 'bottom-half)])
+	 [x        (get-width (ref clip 'offset))]
+	 [y        (get-height (ref clip 'offset))]
+	 [x-random (ref clip 'x-random)]
+	 [y-random (ref clip 'y-random)]
+	 [bh       (ref clip 'bottom-half)])
       (if (not bh)
 	  (cond
 	   [(and x-random y-random) (cons rx ry)]
@@ -197,41 +197,41 @@
 	   [x-random                (cons rx y)]
 	   [y-random                (cons x rybh)]
 	   [else                    (cons x y)]))))
-  (when (not (ref animation 'animating))
-	(set! (ref animation 'offset) (random-offset animation))))
+  (when (not (ref clip 'animating))
+	(set! (ref clip 'offset) (random-offset clip))))
 
 ;;;
-;;; Start animation
+;;; Start clip
 ;;;
 
-(define-method start! ([animation <animation>])
-  (randomize-offset! animation)
-  (set! (ref animation 'animating) #t)
-  (set! (ref animation 'time-offset) (current-time)))
+(define-method start! ([clip <clip>])
+  (randomize-offset! clip)
+  (set! (ref clip 'animating) #t)
+  (set! (ref clip 'time-offset) (current-time)))
 
 ;;;
-;;; Stop animation
+;;; Stop clip
 ;;;
 
-(define-method stop! ([animation <animation>])
-  (set! (ref animation 'animating) #f)
-  (set! (ref animation 'time-offset) 0))
+(define-method stop! ([clip <clip>])
+  (set! (ref clip 'animating) #f)
+  (set! (ref clip 'time-offset) 0))
 
 ;;;
-;;; Ref for animation
+;;; Ref for clip
 ;;;
 
-(define-method animation-ref-primitive ([animation <animation>] [n <number>]) ; returns <cel> and <number>
-  (let1 n-cels (ref animation 'n-cels)
+(define-method clip-ref-primitive ([clip <clip>] [n <number>]) ; returns <cel> and <number>
+  (let1 n-cels (ref clip 'n-cels)
 	(if (and (< n n-cels) (>= n 0))
 	    (values
-	     (ref (ref animation 'cels) n)
-	     (ref (ref animation 'alphas) n))
+	     (ref (ref clip 'cels) n)
+	     (ref (ref clip 'alphas) n))
 	    (values
-	     (ref (ref animation 'cels) (- n-cels 1))  ;; out of bound error?
-	     0.5 #;(ref (ref animation 'alphas) (- n-cels 1))))))
+	     (ref (ref clip 'cels) (- n-cels 1))  ;; out of bound error?
+	     0.5 #;(ref (ref clip 'alphas) (- n-cels 1))))))
 
-(define-method ref ([animation <animation>] [time <number>]) ; returns <cel> and <number>
+(define-method ref ([clip <clip>] [time <number>]) ; returns <cel> and <number>
   (define (index-of-nearest-time timings t)
     (let1 less-than-time (partition (cut > t <>) timings)
 	  (length less-than-time)))
@@ -240,21 +240,21 @@
 	t
 	(real-modulo (- t d) d)))
   (let*
-      ([time-offset   (ref animation 'time-offset)]
+      ([time-offset   (ref clip 'time-offset)]
        [relative-time (- time time-offset)]
-       [modulo-time   (real-modulo relative-time (duration-of animation))]
-       [timings       (ref animation 'timings)]
-       [cel-numbers   (ref animation 'cel-numbers)]
+       [modulo-time   (real-modulo relative-time (duration-of clip))]
+       [timings       (ref clip 'timings)]
+       [cel-numbers   (ref clip 'cel-numbers)]
        [cel-index     (index-of-nearest-time timings modulo-time)]
        [cel-number    (ref cel-numbers cel-index)])
-    (animation-ref-primitive animation cel-number)))
+    (clip-ref-primitive clip cel-number)))
 
 ;;;
-;;; Utilities for animation
+;;; Utilities for clip
 ;;;
 
-(define-method duration-of ([animation <animation>])
-  (last (ref animation 'timings)))
+(define-method duration-of ([clip <clip>])
+  (last (ref clip 'timings)))
 
 (define (durations->timings durations)
   (define (d->t durations)
@@ -306,9 +306,9 @@
   (let1 server-sock (make-server-socket 'inet 8080 :reuse-addr? #t)
 	(guard (e [else (socket-close server-sock) (raise e)])
 	       (let loop ([client (socket-accept server-sock)])
-		 ;; animation
-		 (animation-terminator! *the-animation-collection*)
-		 (animation-random-starter! *the-animation-collection*)
+		 ;; clip
+		 (clip-terminator! *the-clip-collection*)
+		 (clip-random-starter! *the-clip-collection*)
 		 ;; network
 		 (guard (e [else (socket-close client) (raise e)])
 			(handle-request
@@ -338,9 +338,9 @@
    cgi-params))
 
 (define (render-content _ params now)   ; parameter path is not used
-  ;; animation -> tag
-  (define (animation->tag animation time)
-    (receive [cel alpha] (ref animation time)
+  ;; clip -> tag
+  (define (clip->tag clip time)
+    (receive [cel alpha] (ref clip time)
 	     (let* 
 		 ([name             (ref cel 'name)]
 		  [default-offset   (ref cel 'default-offset)]
@@ -349,9 +349,9 @@
 		  [default-size     (ref cel 'default-size)]
 		  [default-size-x   (get-width default-size)]
 		  [default-size-y   (get-height default-size)]
-		  [depth            (ref animation 'depth)]
+		  [depth            (ref clip 'depth)]
 		  [sound            (car (hash-table-get *the-sound-collection* (ref cel 'default-sound)))]
-		  [offset           (ref animation 'offset)]
+		  [offset           (ref clip 'offset)]
 		  [offset-x         (get-width offset)]
 		  [offset-y         (get-height offset)])
 	       `(image
@@ -366,25 +366,25 @@
 		  (alpha ,alpha)
 		  (sound ,sound))
 		 ,name))))
-  (define (animating-animations animations)
+  (define (animating-clips clips)
     (hash-table-fold
-     animations
-     (lambda [_ animation lst]
-       (if (ref animation 'animating)
-	   (cons animation lst)
+     clips
+     (lambda [_ clip lst]
+       (if (ref clip 'animating)
+	   (cons clip lst)
 	   lst))
      '()))
-  (define (cel-tag-list animations time)
+  (define (cel-tag-list clips time)
     (map
-     (lambda [animation] (animation->tag animation time))
-     (animating-animations animations)))
+     (lambda [clip] (clip->tag clip time))
+     (animating-clips clips)))
   (let-keywords
    (cgi-parameters->keyword-style-parameters params)
    ([time "now"] [person "none"] . unknown-parameters)
-   (animation-event-catcher! *the-animation-collection* person)
+   (clip-event-catcher! *the-clip-collection* person)
    (let 
-       ([the-cel-tag-list (cond [(string=? time "now") (cel-tag-list *the-animation-collection* now)]
-				[else                  (cel-tag-list *the-animation-collection* (string->number time))])]
+       ([the-cel-tag-list (cond [(string=? time "now") (cel-tag-list *the-clip-collection* now)]
+				[else                  (cel-tag-list *the-clip-collection* (string->number time))])]
 	[stop-sound       (not (string=? person "none"))])
      (srl:sxml->xml
       (list
@@ -411,50 +411,50 @@
 	  ,@the-cel-tag-list)))))))
 
 ;;;
-;;; Animation random starter
+;;; Clip random starter
 ;;;
 
-(define (animation-random-starter! animations)
-  (define (start-animation-randomly! _ animation)
+(define (clip-random-starter! clips)
+  (define (start-clip-randomly! _ clip)
     (when (< (random-real) p-appearance)
-	  (when (and (not (ref animation 'animating)) 
-		     (not (ref animation 'from-jump?)))
-		(start! animation)
-		#;(print "starting " (symbol->string (ref animation 'title))) )))
-  (hash-table-for-each animations start-animation-randomly!))
+	  (when (and (not (ref clip 'animating)) 
+		     (not (ref clip 'from-jump?)))
+		(start! clip)
+		#;(print "starting " (symbol->string (ref clip 'title))) )))
+  (hash-table-for-each clips start-clip-randomly!))
 
 ;;;
-;;; Animation kick starter
+;;; Clip kick starter
 ;;;
 
-(define (animation-kick-starter! animations key)
-  (when (not (ref (hash-table-get animations key) 'animating))
-	(set! (ref (hash-table-get animations key) 'animating) #t)
-	(set! (ref (hash-table-get animations key) 'time-offset) (current-time))))
+(define (clip-kick-starter! clips key)
+  (when (not (ref (hash-table-get clips key) 'animating))
+	(set! (ref (hash-table-get clips key) 'animating) #t)
+	(set! (ref (hash-table-get clips key) 'time-offset) (current-time))))
 
 ;;;
-;;; Animation terminator
+;;; Clip terminator
 ;;;
 
-(define (animation-terminator! animations)
-  (define (terminate-animation-if-time-is-out! _ animation)
+(define (clip-terminator! clips)
+  (define (terminate-clip-if-time-is-out! _ clip)
     (let 
-	([animating (ref animation 'animating)]
-	 [beginning (ref animation 'time-offset)])
+	([animating (ref clip 'animating)]
+	 [beginning (ref clip 'time-offset)])
       (when (and animating
 		 (>
 		  (current-time)
-		  (+ beginning (duration-of animation))))
-					; Do I skip jumped animations???
-	    (stop! animation)
-	    #;(print "terminating " (symbol->string (ref animation 'title))) )))
-  (hash-table-for-each animations terminate-animation-if-time-is-out!))
+		  (+ beginning (duration-of clip))))
+					; Do I skip jumped clips???
+	    (stop! clip)
+	    #;(print "terminating " (symbol->string (ref clip 'title))) )))
+  (hash-table-for-each clips terminate-clip-if-time-is-out!))
 
 ;;;
-;;; Animation event catcher
+;;; Clip event catcher
 ;;;
 
-(define (animation-event-catcher! animations person)
+(define (clip-event-catcher! clips person)
 					; person is a string
   (define (pair-plus x y)
     (cons 
@@ -464,15 +464,15 @@
 	(print "jump")
 	(set! *the-current-person* (string->number person))
 	;; !!
-	(animation-kick-starter! *the-animation-collection* 'apple)
-	(animation-kick-starter! *the-animation-collection* 'elephant)
-	(animation-kick-starter! *the-animation-collection* 'tanuki)
-	(animation-kick-starter! *the-animation-collection* 'rabbit)
-	(animation-kick-starter! *the-animation-collection* 'fawn)
-	(animation-kick-starter! *the-animation-collection* 'fox)
-	(animation-kick-starter! *the-animation-collection* 'squirrel)
-	(animation-kick-starter! *the-animation-collection* 'baboon-weeing)
-	(animation-kick-starter! *the-animation-collection* 'meercat)	
+	(clip-kick-starter! *the-clip-collection* 'apple)
+	(clip-kick-starter! *the-clip-collection* 'elephant)
+	(clip-kick-starter! *the-clip-collection* 'tanuki)
+	(clip-kick-starter! *the-clip-collection* 'rabbit)
+	(clip-kick-starter! *the-clip-collection* 'fawn)
+	(clip-kick-starter! *the-clip-collection* 'fox)
+	(clip-kick-starter! *the-clip-collection* 'squirrel)
+	(clip-kick-starter! *the-clip-collection* 'baboon-weeing)
+	(clip-kick-starter! *the-clip-collection* 'meercat)	
 	;; !!
 	(let1 now (current-time)
 	 (when (> (- now *t-last-event*) event-gate)
@@ -480,34 +480,34 @@
 	       #;(set! *freezing?* #t)
 	       #;(set! *loss-time* (+ *loss-time* freezing-duration))
 	       (hash-table-for-each
-		animations
-		(lambda [_ animation]
-		  (let1 can-jump? (ref animation 'can-jump?)
+		clips
+		(lambda [_ clip]
+		  (let1 can-jump? (ref clip 'can-jump?)
 			(when can-jump?
 			      (let*
-				  ([next-animation-key    (ref animation 'jumps-to)]
-				   [next-animation        (hash-table-get animations next-animation-key)]
-				   [animation-offset      (ref animation 'offset)]
-				   [animation-jump-offset (ref animation 'jump-offset)]
-				   [the-offset            (pair-plus animation-offset animation-jump-offset)])
+				  ([next-clip-key    (ref clip 'jumps-to)]
+				   [next-clip        (hash-table-get clips next-clip-key)]
+				   [clip-offset      (ref clip 'offset)]
+				   [clip-jump-offset (ref clip 'jump-offset)]
+				   [the-offset            (pair-plus clip-offset clip-jump-offset)])
 				(if
 				 (not 
 				  (or
-				   (eq? (ref animation 'title) 'baboon)
-				   (eq? (ref animation 'title) 'baboon-weeing)))
-				 (set! (ref next-animation 'offset) the-offset))
-				(set! (ref animation 'to-jump) #t))))))))))  ; to be removed
+				   (eq? (ref clip 'title) 'baboon)
+				   (eq? (ref clip 'title) 'baboon-weeing)))
+				 (set! (ref next-clip 'offset) the-offset))
+				(set! (ref clip 'to-jump) #t))))))))))  ; to be removed
 
 ;;;
-;;; Animations
+;;; Clips
 ;;;
 
 ;;
-;; Primitive animation setter
+;; Primitive clip setter
 ;;
 
 (define
-  (make-animation-primitive
+  (make-clip-primitive
    :key 
    [title       'untitled]
    [cel-names   '()]
@@ -544,7 +544,7 @@
 			  :default-sounds         sounds)]
        [timings         (durations->timings (make-list n-numbers one-tick))]
        [alphas          (if (null? alphas) (make-list n-numbers 1.0) alphas)])
-    (make <animation>
+    (make <clip>
       :title       title
       :cels        cel-set
       :n-cels      n-numbers
@@ -566,40 +566,40 @@
       :options     options)))
 
 ;;;
-;;; animation-append
+;;; clip-append
 ;;;
 
-(define (animation-append animation1 animation2)
+(define (clip-append clip1 clip2)
   (let
-      ([new-title       (ref animation1 'title)]
-       [cels1           (ref animation1 'cels)]
-       [cels2           (ref animation2 'cels)]
-       [new-n-cels      (+ (ref animation1 'n-cels) (ref animation2 'n-cels))]
+      ([new-title       (ref clip1 'title)]
+       [cels1           (ref clip1 'cels)]
+       [cels2           (ref clip2 'cels)]
+       [new-n-cels      (+ (ref clip1 'n-cels) (ref clip2 'n-cels))]
        [new-cel-numbers (append
-			 (ref animation1 'cel-numbers)
-			 (map (cut + (last (ref animation1 'cel-numbers)) <>) (ref animation2 'cel-numbers)))]
+			 (ref clip1 'cel-numbers)
+			 (map (cut + (last (ref clip1 'cel-numbers)) <>) (ref clip2 'cel-numbers)))]
        [new-timings     (append
-			 (ref animation1 'timings)
-			 (map (cut + (last (ref animation1 'timings)) <>) (ref animation2 'timings)))]
-       [new-alphas      (append (ref animation1 'alphas) (ref animation2 'alphas))]
-       [new-offset      (ref animation1 'offset)] ; be careful
-       [new-size        (ref animation1 'size)] ; not used?
-       [new-depth       (ref animation1 'depth)]
-       [new-matrix      (ref animation1 'matrix)]
+			 (ref clip1 'timings)
+			 (map (cut + (last (ref clip1 'timings)) <>) (ref clip2 'timings)))]
+       [new-alphas      (append (ref clip1 'alphas) (ref clip2 'alphas))]
+       [new-offset      (ref clip1 'offset)] ; be careful
+       [new-size        (ref clip1 'size)] ; not used?
+       [new-depth       (ref clip1 'depth)]
+       [new-matrix      (ref clip1 'matrix)]
        [new-animating   #f]
-       [new-time-offset (ref animation1 'time-offset)]
-       [new-x-random    (ref animation1 'x-random)]
-       [new-y-random    (ref animation1 'y-random)]
-       [new-bottom-half (ref animation1 'bottom-half)]
-       [new-from-jump?  (ref animation1 'from-jump?)]
-       [new-can-jump?   (ref animation1 'can-jump?)]
-       [new-jumps-at    (ref animation1 'jumps-at)]
-       [new-jumps-to    (ref animation1 'jumps-to)]
-       [new-jumped-from (ref animation1 'jumped-from)]
-       [new-jump-offset (ref animation1 'jump-offset)]
-       [new-to-jump     (ref animation1 'to-jump)]
-       [new-forking?    (ref animation1 'forking?)]
-       [new-options     (ref animation1 'options)])
+       [new-time-offset (ref clip1 'time-offset)]
+       [new-x-random    (ref clip1 'x-random)]
+       [new-y-random    (ref clip1 'y-random)]
+       [new-bottom-half (ref clip1 'bottom-half)]
+       [new-from-jump?  (ref clip1 'from-jump?)]
+       [new-can-jump?   (ref clip1 'can-jump?)]
+       [new-jumps-at    (ref clip1 'jumps-at)]
+       [new-jumps-to    (ref clip1 'jumps-to)]
+       [new-jumped-from (ref clip1 'jumped-from)]
+       [new-jump-offset (ref clip1 'jump-offset)]
+       [new-to-jump     (ref clip1 'to-jump)]
+       [new-forking?    (ref clip1 'forking?)]
+       [new-options     (ref clip1 'options)])
     (let1 new-cels (make <cel-set>
 		     :names                  (append (ref cels1 'names)                  (ref cels2 'names))
 		     :n-names                (+      (ref cels1 'n-names)                (ref cels2 'n-names))
@@ -610,40 +610,40 @@
 		     :default-color-matrices (append (ref cels1 'default-color-matrices) (ref cels2 'default-color-matrices))
 		     :default-depths         (append (ref cels1 'default-depths)         (ref cels2 'default-depths))
 		     :default-sounds         (append (ref cels1 'default-sounds)         (ref cels2 'default-sounds)))
-	  (make <animation> :title new-title :cels new-cels :n-cels new-n-cels :cel-numbers new-cel-numbers :timings new-timings :alphas new-alphas
+	  (make <clip> :title new-title :cels new-cels :n-cels new-n-cels :cel-numbers new-cel-numbers :timings new-timings :alphas new-alphas
 		:depth new-depth :offset new-offset :x-random new-x-random :y-random new-y-random :bottom-half new-bottom-half
 		:from-jump? new-from-jump? :can-jump? new-can-jump? :jumps-at new-jumps-at :jumps-to new-jumps-to :jumped-from new-jumped-from
 		:jump-offset new-jump-offset :forking? new-forking? :options new-options))))
 
 ;;;
-;;; animation->animation-with-fade-out
+;;; clip->clip-with-fade-out
 ;;;
 
-(define (animation->animation animation)  ; copy constructor
+(define (clip->clip clip)  ; copy constructor
   (let
-      ([title         (ref animation 'title)]
-       [cels          (ref animation 'cels)]
-       [n-cels        (ref animation 'n-cels)]
-       [cel-numbers   (ref animation 'cel-numbers)]
-       [timings       (ref animation 'timings)]
-       [alphas        (ref animation 'alphas)]
-       [offset        (ref animation 'offset)]
-       [size          (ref animation 'size)]
-       [depth         (ref animation 'depth)]
-       [matrix        (ref animation 'matrix)]
-       [animating     (ref animation 'animating)]
-       [time-offset   (ref animation 'time-offset)]
-       [x-random      (ref animation 'x-random)]
-       [y-random      (ref animation 'y-random)]
-       [from-jump?    (ref animation 'from-jump?)]
-       [can-jump?     (ref animation 'can-jump?)]
-       [jumps-at      (ref animation 'jumps-at)]
-       [jumps-to      (ref animation 'jumps-to)]
-       [jumped-from   (ref animation 'jumped-from)]
-       [jump-offset   (ref animation 'jump-offset)]
-       [forking?      (ref animation 'forking?)]
-       [options       (ref animation 'options)])
-    (make <animation>
+      ([title         (ref clip 'title)]
+       [cels          (ref clip 'cels)]
+       [n-cels        (ref clip 'n-cels)]
+       [cel-numbers   (ref clip 'cel-numbers)]
+       [timings       (ref clip 'timings)]
+       [alphas        (ref clip 'alphas)]
+       [offset        (ref clip 'offset)]
+       [size          (ref clip 'size)]
+       [depth         (ref clip 'depth)]
+       [matrix        (ref clip 'matrix)]
+       [animating     (ref clip 'animating)]
+       [time-offset   (ref clip 'time-offset)]
+       [x-random      (ref clip 'x-random)]
+       [y-random      (ref clip 'y-random)]
+       [from-jump?    (ref clip 'from-jump?)]
+       [can-jump?     (ref clip 'can-jump?)]
+       [jumps-at      (ref clip 'jumps-at)]
+       [jumps-to      (ref clip 'jumps-to)]
+       [jumped-from   (ref clip 'jumped-from)]
+       [jump-offset   (ref clip 'jump-offset)]
+       [forking?      (ref clip 'forking?)]
+       [options       (ref clip 'options)])
+    (make <clip>
      :title         title
      :cels          cels
      :n-cels        n-cels
@@ -667,34 +667,34 @@
      :forking?      forking?
      :options       options)))
 
-(define (animation->animation-with-fade-out animation)
+(define (clip->clip-with-fade-out clip)
   (let
-      ([title         (ref animation 'title)]
-       [cels          (ref animation 'cels)]
-       [n-cels        (ref animation 'n-cels)]
-       [cel-numbers   (ref animation 'cel-numbers)]
-       [timings       (ref animation 'timings)]
-       [alphas        (let1 alphas-original (ref animation 'alphas)
+      ([title         (ref clip 'title)]
+       [cels          (ref clip 'cels)]
+       [n-cels        (ref clip 'n-cels)]
+       [cel-numbers   (ref clip 'cel-numbers)]
+       [timings       (ref clip 'timings)]
+       [alphas        (let1 alphas-original (ref clip 'alphas)
 			    (append
 			     (make-list (- (length alphas-original) 10) 1.0)
 			     '(1.0 0.9 0.8 0.7 0.6 0.5 0.4 0.3 0.2 0.1)))]
-       [offset        (ref animation 'offset)]
-       [size          (ref animation 'size)]
-       [depth         (ref animation 'depth)]
-       [matrix        (ref animation 'matrix)]
-       [animating     (ref animation 'animating)]
-       [time-offset   (ref animation 'time-offset)]
-       [x-random      (ref animation 'x-random)]
-       [y-random      (ref animation 'y-random)]
-       [from-jump?    (ref animation 'from-jump?)]
-       [can-jump?     (ref animation 'can-jump?)]
-       [jumps-at      (ref animation 'jumps-at)]
-       [jumps-to      (ref animation 'jumps-to)]
-       [jumped-from   (ref animation 'jumped-from)]
-       [jump-offset   (ref animation 'jump-offset)]
-       [forking?      (ref animation 'forking?)]
-       [options       (ref animation 'options)])
-    (make <animation>
+       [offset        (ref clip 'offset)]
+       [size          (ref clip 'size)]
+       [depth         (ref clip 'depth)]
+       [matrix        (ref clip 'matrix)]
+       [animating     (ref clip 'animating)]
+       [time-offset   (ref clip 'time-offset)]
+       [x-random      (ref clip 'x-random)]
+       [y-random      (ref clip 'y-random)]
+       [from-jump?    (ref clip 'from-jump?)]
+       [can-jump?     (ref clip 'can-jump?)]
+       [jumps-at      (ref clip 'jumps-at)]
+       [jumps-to      (ref clip 'jumps-to)]
+       [jumped-from   (ref clip 'jumped-from)]
+       [jump-offset   (ref clip 'jump-offset)]
+       [forking?      (ref clip 'forking?)]
+       [options       (ref clip 'options)])
+    (make <clip>
      :title       title
      :cels        cels
      :n-cels      n-cels
@@ -720,7 +720,7 @@
 
 
 (define
-  (make-simple-animation
+  (make-simple-clip
    :key
    [title           'untitled]
    [cel-name-prefix "{prefix}/"]
@@ -739,7 +739,7 @@
    [forking?        #f]
    [sounds          ()]
    [options         ()])
-  (make-animation-primitive
+  (make-clip-primitive
    :title       title
    :cel-names   (map
 		 (cut string-append cel-name-prefix <>)
@@ -762,14 +762,14 @@
    :options     options))
 
 (define
-  (make-birds-animation
+  (make-birds-clip
    :key
    [title    'birds-white]
    [prefix   "{prefix}/"]
    [jumps-to 'birds-white-take-off])
   (let1
    cel-name-primitive '(1 2 3 4 1 2 3 4 1 2 3 4 5 6 5 6 7 8 7)
-   (make-animation-primitive ; make-animation-with-fade-in/out
+   (make-clip-primitive ; make-clip-with-fade-in/out
     :title       title
     :cel-names   (map
 		  (cut string-append prefix <>)
@@ -805,7 +805,7 @@
     :options     '())))
 
 (define
-  (make-birds-take-off-animation
+  (make-birds-take-off-clip
    :key
    [title       'birds-white-take-off]
    [prefix1     "{prefix}/"]
@@ -821,7 +821,7 @@
 		   (map 
 		    (cut string-append prefix2 <>)
 		    (map number->string (iota 8 1))))
-	(make-animation-primitive
+	(make-clip-primitive
 	 :title       title
 	 :cel-names   cel-names
 	 :cel-offsets (append
@@ -839,9 +839,9 @@
 		       (make-list 7 'none))
 	 :options     '())))
 
-(define (make-papilionidae-animation :key [title 'papilionidae-white] [prefix "{prefix}/"] [jumps-to 'papilionidae-white-touch-down])
+(define (make-papilionidae-clip :key [title 'papilionidae-white] [prefix "{prefix}/"] [jumps-to 'papilionidae-white-touch-down])
   (let1 cel-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
-	(make-animation-primitive
+	(make-clip-primitive
 	 :title       title
 	 :cel-names   cel-names
 	 :cel-offsets (append
@@ -863,9 +863,9 @@
 		       '(butterfly) (make-list 10 'none))
 	 :options     '())))
 
-(define (make-papilionidae-rev-animation :key [title 'papilionidae-white] [prefix "{prefix}/"] [jumps-to 'papilionidae-white-touch-down])
+(define (make-papilionidae-rev-clip :key [title 'papilionidae-white] [prefix "{prefix}/"] [jumps-to 'papilionidae-white-touch-down])
   (let1 cel-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
-	(make-animation-primitive
+	(make-clip-primitive
 	 :title       title
 	 :cel-names   cel-names
 	 :cel-offsets (append
@@ -888,7 +888,7 @@
 	 :options     '())))
 
 (define
-  (make-papilionidae-touch-down-animation
+  (make-papilionidae-touch-down-clip
    :key
    [title       'papilionidae-white-touch-down]
    [prefix      "{prefix}/"]
@@ -896,7 +896,7 @@
   (let1 cel-names (map
 		   (cut string-append prefix <>)
 		   (map number->string (iota 4 1)))
-	(make-animation-primitive
+	(make-clip-primitive
 	 :title       title
 	 :cel-names   cel-names
 	 :cel-offsets (make-list (length cel-names) point-zero)
@@ -907,8 +907,8 @@
 	 :sounds      (make-list (length cel-names) 'none)
 	 :options     '())))
 
-(define (make-rapae-animation :key [title 'rapae-white] [prefix "{prefix}/"] [jumps-to 'rapae-white-touch-down]) 
-  (make-simple-animation 
+(define (make-rapae-clip :key [title 'rapae-white] [prefix "{prefix}/"] [jumps-to 'rapae-white-touch-down]) 
+  (make-simple-clip 
    :title           title
    :cel-name-prefix prefix
    :n-cels          11
@@ -921,8 +921,8 @@
    :sounds          (append '(butterfly) (make-list 10 'none))
    :options         '()))
 
-(define (make-rapae-rev-animation :key [title 'rapae-rev-white] [prefix "{prefix}/"] [jumps-to 'rapae-white-touch-down])
-  (make-simple-animation
+(define (make-rapae-rev-clip :key [title 'rapae-rev-white] [prefix "{prefix}/"] [jumps-to 'rapae-white-touch-down])
+  (make-simple-clip
    :title           title
    :cel-name-prefix prefix
    :n-cels          11
@@ -936,7 +936,7 @@
    :options         '()))
 
 (define
-  (make-rapae-touch-down-animation
+  (make-rapae-touch-down-clip
    :key
    [title       'rapae-white-touch-down]  ;; ???
    [prefix      "{prefix}/"]
@@ -944,7 +944,7 @@
   (let1 cel-names (map
 		   (cut string-append prefix <>)
 		   (map number->string (iota 4 1)))
-	(make-animation-primitive
+	(make-clip-primitive
 	 :title       title
 	 :cel-names   cel-names
 	 :cel-offsets (make-list (length cel-names) point-zero)
@@ -956,12 +956,12 @@
 	 :options     '())))
 
 
-(define *the-animation-collection*
+(define *the-clip-collection*
   (let
       (
        ;; Mazak Birds
-       ;; Simple animation
-       [mazak-birds                    (make-simple-animation
+       ;; Simple clip
+       [mazak-birds                    (make-simple-clip
 					:title 'mazak-birds
 					:cel-name-prefix "Mazak/"
 					:n-cels 106
@@ -970,8 +970,8 @@
 					:from-jump? #t
 					:sounds (make-list 106 'none))]
        ;; Apple
-       ;; Simple animation
-       [apple                          (make-simple-animation
+       ;; Simple clip
+       [apple                          (make-simple-clip
 					:title 'apple
 					:cel-name-prefix "Apple2/"
 					:n-cels 31
@@ -982,7 +982,7 @@
 							'(apple-touch-down)
 							(make-list 15 'none)))]
        ;; Baboon-weeing
-       [baboon-weeing                  (make-animation-primitive 
+       [baboon-weeing                  (make-clip-primitive 
 					:title 'baboon-weeing
 					:cel-names (map (cut string-append "Baboon2/" <>) (map number->string (iota 66 1)))
 					:cel-numbers (iota 66)
@@ -994,124 +994,124 @@
 							(make-list 43 'none))
 					:options '())]
        ;; Birds Blue
-       ;; Bird animation
-       [birds-blue                     (make-birds-animation
+       ;; Bird clip
+       [birds-blue                     (make-birds-clip
 					:title 'birds-blue
 					:prefix "Birds/Birds_Blue/"
 					:jumps-to 'birds-blue-take-off)]
        ;; Birds Orange
-       ;; Bird animation
-       [birds-orange                   (make-birds-animation
+       ;; Bird clip
+       [birds-orange                   (make-birds-clip
 					:title 'birds-orange
 					:prefix "Birds/Birds_Orange/"
 					:jumps-to 'birds-orange-take-off)]
        ;; Birds Blue Take-off
-       ;; Bird-take-off animation
-       [birds-blue-take-off            (make-birds-take-off-animation
+       ;; Bird-take-off clip
+       [birds-blue-take-off            (make-birds-take-off-clip
 					:title 'birds-blue-take-off
 					:prefix1 "Birds/Birds_Blue/"
 					:prefix2 "Birds/Birds_Blue/flying-"
 					:jumped-from 'birds-blue)]
        ;; Birds Orange Take-off
-       ;; Bird-take-off animation
-       [birds-orange-take-off          (make-birds-take-off-animation
+       ;; Bird-take-off clip
+       [birds-orange-take-off          (make-birds-take-off-clip
 					:title 'birds-orange-take-off
 					:prefix1 "Birds/Birds_Orange/"
 					:prefix2 "Birds/Birds_Orange/flying-"
 					:jumped-from 'birds-orange)]
        ;; Papilionidae Blue
-       ;; Papilionidae animation
-       [papilionidae-blue              (make-papilionidae-animation
+       ;; Papilionidae clip
+       [papilionidae-blue              (make-papilionidae-clip
 					:title 'papilionidae-blue
 					:prefix "Butterfly/Papilionidae_Blue/"
 					:jumps-to 'papilionidae-blue-touch-down)]
-       [papilionidae-blue-rev          (make-papilionidae-rev-animation
+       [papilionidae-blue-rev          (make-papilionidae-rev-clip
 					:title 'papilionidae-blue-rev
 					:prefix "Butterfly/Papilionidae_Blue_Rev/"
 					:jumps-to 'papilionidae-blue-touch-down)]
        ;; Papilionidae Purple
-       ;; Papilioniade animation
-       [papilionidae-purple            (make-papilionidae-animation
+       ;; Papilioniade clip
+       [papilionidae-purple            (make-papilionidae-clip
 					:title 'papilionidae-purple
 					:prefix "Butterfly/Papilionidae_Purple/"
 					:jumps-to 'papilionidae-purple-touch-down)]
-       [papilionidae-purple-rev        (make-papilionidae-rev-animation
+       [papilionidae-purple-rev        (make-papilionidae-rev-clip
 					:title 'papilionidae-purple-rev
 					:prefix "Butterfly/Papilionidae_Purple_Rev/"
 					:jumps-to 'papilionidae-purple-touch-down)]
        ;; Papilionidae White
-       ;; Papilionidae animation
-       [papilionidae-white             (make-papilionidae-animation
+       ;; Papilionidae clip
+       [papilionidae-white             (make-papilionidae-clip
 					:title 'papilionidae-white
 					:prefix "Butterfly/Papilionidae_White/"
 					:jumps-to 'papilionidae-white-touch-down)]
-       [papilionidae-white-rev         (make-papilionidae-rev-animation
+       [papilionidae-white-rev         (make-papilionidae-rev-clip
 					:title 'papilionidae-white-rev
 					:prefix "Butterfly/Papilionidae_White_Rev/"
 					:jumps-to 'papilionidae-white-touch-down)]
        ;; Papilionidae Yellow
-       ;; Papilionidae animation
-       [papilionidae-yellow            (make-papilionidae-animation
+       ;; Papilionidae clip
+       [papilionidae-yellow            (make-papilionidae-clip
 					:title 'papilionidae-yellow
 					:prefix "Butterfly/Papilionidae_Yellow/"
 					:jumps-to 'papilionidae-yellow-touch-down)]
-       [papilionidae-yellow-rev        (make-papilionidae-rev-animation
+       [papilionidae-yellow-rev        (make-papilionidae-rev-clip
 					:title 'papilionidae-yellow-rev
 					:prefix "Butterfly/Papilionidae_Yellow_Rev/"
 					:jumps-to 'papilionidae-yellow-touch-down)]
        ;; Papilionidae Blue Touch-down
-       ;; Papilionidae-touch-down animation
-       [papilionidae-blue-touch-down   (make-papilionidae-touch-down-animation
+       ;; Papilionidae-touch-down clip
+       [papilionidae-blue-touch-down   (make-papilionidae-touch-down-clip
 					:title 'papilionidae-blue-touch-down
 					:prefix "Butterfly/Papilionidae_Blue/touch_down/10_"
 					:jumped-from 'papilionidae-blue)]
        ;; Papilionidae White Touch-down
-       ;; Papilionidae-touch-down animation
-       [papilionidae-white-touch-down  (make-papilionidae-touch-down-animation
+       ;; Papilionidae-touch-down clip
+       [papilionidae-white-touch-down  (make-papilionidae-touch-down-clip
 					:title 'papilionidae-white-touch-down
 					:prefix "Butterfly/Papilionidae_White/touch_down/10_"
 					:jumped-from 'papilionidae-white)]
        ;; Papilionidae Yellow Touch-down
-       ;; Papilionidae-touch-down animation
-       [papilionidae-yellow-touch-down (make-papilionidae-touch-down-animation
+       ;; Papilionidae-touch-down clip
+       [papilionidae-yellow-touch-down (make-papilionidae-touch-down-clip
 					:title 'papilionidae-yellow-touch-down
 					:prefix "Butterfly/Papilionidae_Yellow/touch_down/10_"
 					:jumped-from 'papilionidae-yellow)]
        ;; Papilionidae Purpule Touch-down
-       ;; Papilionidae-touch-down animation
-       [papilionidae-purple-touch-down (make-papilionidae-touch-down-animation
+       ;; Papilionidae-touch-down clip
+       [papilionidae-purple-touch-down (make-papilionidae-touch-down-clip
 					:title 'papilionidae-purple-touch-down
 					:prefix "Butterfly/Papilionidae_Purple/touch_down/10_"
 					:jumped-from 'papilionidae-purple)]
        ;; Pieris-Rapae Pink
-       ;; Rapae animation
-       [pieris-rapae-pink              (make-rapae-animation
+       ;; Rapae clip
+       [pieris-rapae-pink              (make-rapae-clip
 					:title    'pieris-rapae-pink
 					:prefix   "Butterfly/Pieris_Rapae_Pink/" 
 					:jumps-to 'pieris-rapae-pink-touch-down)]
-       [pieris-rapae-pink-rev          (make-rapae-rev-animation
+       [pieris-rapae-pink-rev          (make-rapae-rev-clip
 					:title    'pieris-rapae-pink-rev
 					:prefix   "Butterfly/Pieris_Rapae_Pink_Rev/"
 					:jumps-to 'pieris-rapae-pink-touch-down)] ; dummy
        ;; Pieris-Rapae Yellow
-       ;; Rapae animation
-       [pieris-rapae-yellow            (make-rapae-animation
+       ;; Rapae clip
+       [pieris-rapae-yellow            (make-rapae-clip
 					:title    'pieris-rapae-yellow
 					:prefix   "Butterfly/Pieris_Rapae_Yellow/" 
 					:jumps-to 'pieris-rapae-yellow-touch-down)]
-       [pieris-rapae-yellow-rev        (make-rapae-rev-animation
+       [pieris-rapae-yellow-rev        (make-rapae-rev-clip
 					:title    'pieris-rapae-yellow-rev
 					:prefix   "Butterfly/Pieris_Rapae_Yellow_Rev/"
 					:jumps-to 'pieris-rapae-yellow-touch-down)] ; dummy
        ;; Pieris-Rapae Pink Touch-down
-       ;; Rapae-touch-douwn animation
-       [pieris-rapae-pink-touch-down   (make-rapae-touch-down-animation
+       ;; Rapae-touch-douwn clip
+       [pieris-rapae-pink-touch-down   (make-rapae-touch-down-clip
 					:title 'pieris-rapae-pink-touch-down 
 					:prefix "Butterfly/Pieris_Rapae_Pink/touch_down/10_"
 					:jumped-from 'pieris-rapae-pink)]
        ;; Pieris-Rapae Yellow Touch-down
-       ;; Rapae-touch-down animation
-       [pieris-rapae-yellow-touch-down (make-rapae-touch-down-animation
+       ;; Rapae-touch-down clip
+       [pieris-rapae-yellow-touch-down (make-rapae-touch-down-clip
 					:title 'pieris-rapae-yellow-touch-down 
 					:prefix "Butterfly/Pieris_Rapae_Yellow/touch_down/10_"
 					:jumped-from 'pieris-rapae-yellow)]
@@ -1121,7 +1121,7 @@
 							  (map
 							   number->string
 							   (append (iota 28 1) (iota (- 260 28) 30))))
-					     (make-animation-primitive
+					     (make-clip-primitive
 					      :title 'elephant
 					      :cel-names cel-names
 					      :cel-offsets (make-list (length cel-names) point-zero)
@@ -1133,8 +1133,8 @@
 					      :sounds (make-list (length cel-names) 'none)
 					      :options '()))]
        ;; Fawn
-       ;; Simple animation
-       [fawn                           (make-simple-animation
+       ;; Simple clip
+       [fawn                           (make-simple-clip
 					:title 'fawn
 					:cel-name-prefix "Fawn2/"
 					:n-cels 116
@@ -1143,8 +1143,8 @@
 					:offset '(500 . 100)
 					:sounds (make-list 116 'none))]
        ;; Fox
-       ;; Simple animation
-       [fox                            (make-simple-animation
+       ;; Simple clip
+       [fox                            (make-simple-clip
 					:title 'fox
 					:cel-name-prefix "Fox2/"
 					:n-cels 56
@@ -1153,8 +1153,8 @@
 					:offset '(0 . 0)
 					:sounds (make-list 56 'none))]
        ;; Meercat
-       ;; Simple animation
-       [meercat                        (make-simple-animation
+       ;; Simple clip
+       [meercat                        (make-simple-clip
 					:title 'meercat
 					:cel-name-prefix "Meercat2/"
 					:n-cels 171
@@ -1191,7 +1191,7 @@
 											      (make-list 5 'none)  ; 7-11
 											      '(owl-flying)        ; 12
 											      (make-list 5 'none)))]) ; 13-17
-					 (make <animation>
+					 (make <clip>
 					   :title         'owl
 					   :cels        owl-cel-set
 					   :cel-numbers (iota n-cels)
@@ -1210,8 +1210,8 @@
 					   :loops-for     1
 					   :options       '()))]
        ;; Rabbit
-       ;; Simple animation
-       [rabbit 	                       (make-simple-animation
+       ;; Simple clip
+       [rabbit 	                       (make-simple-clip
 					:title 'rabbit
 					:cel-name-prefix "Rabbit2/"
 					:n-cels 189
@@ -1220,8 +1220,8 @@
 					:offset '(500 . 0) ; test
 					:sounds (make-list 189 'none))]
        ;; Squirrel
-       ;; Simple animation
-       [squirrel                       (make-simple-animation
+       ;; Simple clip
+       [squirrel                       (make-simple-clip
 					:title 'squirrel
 					:cel-name-prefix "Squirrel2/"
 					:n-cels 23
@@ -1230,8 +1230,8 @@
 					:offset '(3000 . 0)
 					:sounds (make-list 23 'none))]
        ;; Tanuki
-       ;; Simple animation
-       [tanuki                         (make-simple-animation
+       ;; Simple clip
+       [tanuki                         (make-simple-clip
 					:title 'tanuki
 					:cel-name-prefix "Tanuki2/"
 					:n-cels 50
@@ -1240,40 +1240,40 @@
 					:offset '(1000 . 0)
 					:sounds (make-list 50 'none))])
     (let1 hash-table (make-hash-table 'eqv?)
-	  (hash-table-put! hash-table 'apple                          (animation->animation-with-fade-out apple))
-	  (hash-table-put! hash-table 'baboon-weeing                  (animation-append baboon-weeing mazak-birds))
-	  (hash-table-put! hash-table 'birds-blue                     (animation->animation-with-fade-out birds-blue))
-	  (hash-table-put! hash-table 'birds-orange                   (animation->animation-with-fade-out birds-orange))
+	  (hash-table-put! hash-table 'apple                          (clip->clip-with-fade-out apple))
+	  (hash-table-put! hash-table 'baboon-weeing                  (clip-append baboon-weeing mazak-birds))
+	  (hash-table-put! hash-table 'birds-blue                     (clip->clip-with-fade-out birds-blue))
+	  (hash-table-put! hash-table 'birds-orange                   (clip->clip-with-fade-out birds-orange))
 	  (hash-table-put! hash-table 'birds-blue-take-off            birds-blue-take-off)
 	  (hash-table-put! hash-table 'birds-orange-take-off          birds-orange-take-off)
-	  (hash-table-put! hash-table 'papilionidae-blue              (animation->animation-with-fade-out papilionidae-blue))
-	  (hash-table-put! hash-table 'papilionidae-purple            (animation->animation-with-fade-out papilionidae-purple))
-	  (hash-table-put! hash-table 'papilionidae-white             (animation->animation-with-fade-out papilionidae-white))
-	  (hash-table-put! hash-table 'papilionidae-yellow            (animation->animation-with-fade-out papilionidae-yellow))
-	  (hash-table-put! hash-table 'papilionidae-blue-rev          (animation->animation-with-fade-out papilionidae-blue-rev))
-	  (hash-table-put! hash-table 'papilionidae-purple-rev        (animation->animation-with-fade-out papilionidae-purple-rev))
-	  (hash-table-put! hash-table 'papilionidae-white-rev         (animation->animation-with-fade-out papilionidae-white-rev))
-	  (hash-table-put! hash-table 'papilionidae-yellow-rev        (animation->animation-with-fade-out papilionidae-yellow-rev))
+	  (hash-table-put! hash-table 'papilionidae-blue              (clip->clip-with-fade-out papilionidae-blue))
+	  (hash-table-put! hash-table 'papilionidae-purple            (clip->clip-with-fade-out papilionidae-purple))
+	  (hash-table-put! hash-table 'papilionidae-white             (clip->clip-with-fade-out papilionidae-white))
+	  (hash-table-put! hash-table 'papilionidae-yellow            (clip->clip-with-fade-out papilionidae-yellow))
+	  (hash-table-put! hash-table 'papilionidae-blue-rev          (clip->clip-with-fade-out papilionidae-blue-rev))
+	  (hash-table-put! hash-table 'papilionidae-purple-rev        (clip->clip-with-fade-out papilionidae-purple-rev))
+	  (hash-table-put! hash-table 'papilionidae-white-rev         (clip->clip-with-fade-out papilionidae-white-rev))
+	  (hash-table-put! hash-table 'papilionidae-yellow-rev        (clip->clip-with-fade-out papilionidae-yellow-rev))
 	  (hash-table-put! hash-table 'papilionidae-blue-touch-down   papilionidae-blue-touch-down)
 	  (hash-table-put! hash-table 'papilionidae-purple-touch-down papilionidae-purple-touch-down)
 	  (hash-table-put! hash-table 'papilionidae-white-touch-down  papilionidae-white-touch-down)
 	  (hash-table-put! hash-table 'papilionidae-yellow-touch-down papilionidae-yellow-touch-down)
-	  (hash-table-put! hash-table 'pieris-rapae-pink              (animation->animation-with-fade-out pieris-rapae-pink))
-	  (hash-table-put! hash-table 'pieris-rapae-yellow            (animation->animation-with-fade-out pieris-rapae-yellow))
-	  (hash-table-put! hash-table 'pieris-rapae-pink-rev          (animation->animation-with-fade-out pieris-rapae-pink-rev))
-	  (hash-table-put! hash-table 'pieris-rapae-yellow-rev        (animation->animation-with-fade-out pieris-rapae-yellow-rev))
+	  (hash-table-put! hash-table 'pieris-rapae-pink              (clip->clip-with-fade-out pieris-rapae-pink))
+	  (hash-table-put! hash-table 'pieris-rapae-yellow            (clip->clip-with-fade-out pieris-rapae-yellow))
+	  (hash-table-put! hash-table 'pieris-rapae-pink-rev          (clip->clip-with-fade-out pieris-rapae-pink-rev))
+	  (hash-table-put! hash-table 'pieris-rapae-yellow-rev        (clip->clip-with-fade-out pieris-rapae-yellow-rev))
 	  (hash-table-put! hash-table 'pieris-rapae-pink-touch-down   pieris-rapae-pink-touch-down)
 	  (hash-table-put! hash-table 'pieris-rapae-yellow-touch-down pieris-rapae-yellow-touch-down)
-	  (hash-table-put! hash-table 'elephant                       (animation->animation-with-fade-out elephant))
-	  (hash-table-put! hash-table 'fawn                           (animation->animation-with-fade-out fawn))
-	  (hash-table-put! hash-table 'fox                            (animation->animation-with-fade-out fox))
-	  (hash-table-put! hash-table 'meercat                        (animation->animation-with-fade-out meercat))
+	  (hash-table-put! hash-table 'elephant                       (clip->clip-with-fade-out elephant))
+	  (hash-table-put! hash-table 'fawn                           (clip->clip-with-fade-out fawn))
+	  (hash-table-put! hash-table 'fox                            (clip->clip-with-fade-out fox))
+	  (hash-table-put! hash-table 'meercat                        (clip->clip-with-fade-out meercat))
 	  ;; (hash-table-put! hash-table 'owl owl)
-	  (hash-table-put! hash-table 'rabbit                         (animation->animation-with-fade-out rabbit))
+	  (hash-table-put! hash-table 'rabbit                         (clip->clip-with-fade-out rabbit))
 	  ;; (hash-table-put! hash-table 'rabbit-to-left rabbit-to-left)
 	  ;; (hash-table-put! hash-table 'rabbit-to-right rabbit-to-right)
 	  (hash-table-put! hash-table 'squirrel                       squirrel)
-	  (hash-table-put! hash-table 'tanuki                         (animation->animation-with-fade-out tanuki))
+	  (hash-table-put! hash-table 'tanuki                         (clip->clip-with-fade-out tanuki))
 	  ;; (hash-table-put! hash-table 'tanuki-turn-back tanuki-turn-back)
 	  hash-table)))
 
