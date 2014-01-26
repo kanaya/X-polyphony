@@ -98,21 +98,22 @@
 (define-class <cel-set> ()
   ([names                  :init-keyword :names                  :init-value '()]
    [n-names                :init-keyword :n-names                :init-value 0]
-   [default-offsets        :init-keyword :default-offsets        :init-value '()]
-   [default-sizes          :init-keyword :default-sizes          :init-value '()]
-   [default-matrices       :init-keyword :default-matrices       :init-value '()]
-   [default-alphas         :init-keyword :default-alphas         :init-value '()]
-   [default-color-matrices :init-keyword :default-color-matrices :init-value '()]
-   [default-depths         :init-keyword :default-depths         :init-value '()]
-   [default-sounds         :init-keyword :default-sounds         :init-value '()]))
+   [default-offsets        :init-keyword :default-offsets        :init-value '()]   ; remove?
+   [default-sizes          :init-keyword :default-sizes          :init-value '()]   ; remove?
+   [default-matrices       :init-keyword :default-matrices       :init-value '()]   ; remove?
+   [default-alphas         :init-keyword :default-alphas         :init-value '()]   ; remove?
+   [default-color-matrices :init-keyword :default-color-matrices :init-value '()]   ; remove?
+   [default-depths         :init-keyword :default-depths         :init-value '()]   ; remove?
+   [default-sounds         :init-keyword :default-sounds         :init-value '()])) ; remove?
 
 (define-class <cel> ()
   ([name                 :init-keyword :name                 :init-value "unnamed"]
-   [default-offset       :init-keyword :default-offset       :init-value point-zero]
+   [default-offset       :init-keyword :default-offset       :init-value point-zero] ; default... -> local...
    [default-size         :init-keyword :default-size         :init-value point-hundred]
    [default-matrix       :init-keyword :default-matrix       :init-value id-matrix-2x2]
    [default-color-matrix :init-keyword :default-color-matrix :init-value id-matrix-3x3]
    [default-sound        :init-keyword :default-sound        :init-value 'none]))
+					; local-depth
 
 (define-method ref ([cs <cel-set>] [i <integer>]) ; returns <cel>
   (let*
@@ -120,7 +121,7 @@
        [j       (if (< i n-names) i 0)])      ; boundary check
     (make <cel>
       :name                 (ref (ref cs 'names) j)
-      :default-offset       (ref (ref cs 'default-offsets) j)
+      :default-offset       (ref (ref cs 'default-offsets) j) ; no, these default... should be relpaced with local...
       :default-size         (ref (ref cs 'default-sizes) j)
       :default-matrix       (ref (ref cs 'default-matrices) j)
       :default-color-matrix (ref (ref cs 'default-color-matrices) j)
@@ -161,14 +162,14 @@
    [x-random    :init-keyword :x-random    :init-value #f]            ; boolean
    [y-random    :init-keyword :y-random    :init-value #f]            ; boolean
    [bottom-half :init-keyword :bottom-half :init-value #f]            ; boolean
-   [from-jump?  :init-keyword :from-jump?  :init-value #f]            ; boolean
-   [can-jump?   :init-keyword :can-jump?   :init-value #f]            ; boolean
-   [jumps-at    :init-keyword :jumps-at    :init-value 0]             ; cardinal
-   [jumps-to    :init-keyword :jumps-to    :init-value 'none]         ; cardinal
-   [jumped-from :init-keyword :jumped-from :init-value 'none]         ; cardinal
-   [jump-offset :init-keyword :jump-offset :init-value point-zero]    ; pair of real
-   [to-jump     :init-keyword :to-jump     :init-value #f]            ; (to be removed)
-   [forking?    :init-keyword :forking?    :init-value #f]            ; boolean
+   [from-jump?  :init-keyword :from-jump?  :init-value #f]            ; boolean ; remove?
+   [can-jump?   :init-keyword :can-jump?   :init-value #f]            ; boolean ; remove?
+   [jumps-at    :init-keyword :jumps-at    :init-value 0]             ; cardinal ; remove?
+   [jumps-to    :init-keyword :jumps-to    :init-value 'none]         ; cardinal ; remove?
+   [jumped-from :init-keyword :jumped-from :init-value 'none]         ; cardinal ; remove?
+   [jump-offset :init-keyword :jump-offset :init-value point-zero]    ; pair of real ; remove?
+   [to-jump     :init-keyword :to-jump     :init-value #f]            ; (to be removed) ; remove?
+   [forking?    :init-keyword :forking?    :init-value #f]            ; boolean ; remove?
    [options     :init-keyword :options     :init-value '()]))
 
 ;;;
@@ -229,7 +230,7 @@
 	     (ref (ref clip 'alphas) n))
 	    (values
 	     (ref (ref clip 'cels) (- n-cels 1))  ;; out of bound error?
-	     0.5 #;(ref (ref clip 'alphas) (- n-cels 1))))))
+	     0.5 #;(ref (ref clip 'alphas) (- n-cels 1))))))  ; ok?
 
 (define-method ref ([clip <clip>] [time <number>]) ; returns <cel> and <number>
   (define (index-of-nearest-time timings t)
@@ -474,29 +475,28 @@
 	(clip-kick-starter! *the-clip-collection* 'baboon-weeing)
 	(clip-kick-starter! *the-clip-collection* 'meercat)	
 	;; !!
-	(let1 now (current-time)
+	#;(let1 now (current-time)
 	 (when (> (- now *t-last-event*) event-gate)
 	       (set! *t-last-event* now)
 	       #;(set! *freezing?* #t)
 	       #;(set! *loss-time* (+ *loss-time* freezing-duration))
-	       (hash-table-for-each
-		clips
-		(lambda [_ clip]
-		  (let1 can-jump? (ref clip 'can-jump?)
-			(when can-jump?
-			      (let*
-				  ([next-clip-key    (ref clip 'jumps-to)]
-				   [next-clip        (hash-table-get clips next-clip-key)]
-				   [clip-offset      (ref clip 'offset)]
-				   [clip-jump-offset (ref clip 'jump-offset)]
-				   [the-offset            (pair-plus clip-offset clip-jump-offset)])
-				(if
-				 (not 
-				  (or
-				   (eq? (ref clip 'title) 'baboon)
-				   (eq? (ref clip 'title) 'baboon-weeing)))
-				 (set! (ref next-clip 'offset) the-offset))
-				(set! (ref clip 'to-jump) #t))))))))))  ; to be removed
+	       (hash-table-for-each clips
+				    (lambda [_ clip]
+				      (let1 can-jump? (ref clip 'can-jump?) ; remove?
+					    (when can-jump?
+						  (let*
+						      ([next-clip-key    (ref clip 'jumps-to)]
+						       [next-clip        (hash-table-get clips next-clip-key)]
+						       [clip-offset      (ref clip 'offset)]
+						       [clip-jump-offset (ref clip 'jump-offset)]
+						       [the-offset            (pair-plus clip-offset clip-jump-offset)])
+						    (if
+						     (not 
+						      (or
+						       (eq? (ref clip 'title) 'baboon)
+						       (eq? (ref clip 'title) 'baboon-weeing)))
+						     (set! (ref next-clip 'offset) the-offset))
+						    (set! (ref clip 'to-jump) #t))))))))))  ; to be removed
 
 ;;;
 ;;; Clips
