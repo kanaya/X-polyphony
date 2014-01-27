@@ -98,22 +98,22 @@
 (define-class <cel-set> ()
   ([names                  :init-keyword :names                  :init-value '()]
    [n-names                :init-keyword :n-names                :init-value 0]
-   [default-offsets        :init-keyword :default-offsets        :init-value '()]   ; remove?
-   [default-sizes          :init-keyword :default-sizes          :init-value '()]   ; remove?
-   [default-matrices       :init-keyword :default-matrices       :init-value '()]   ; remove?
-   [default-alphas         :init-keyword :default-alphas         :init-value '()]   ; remove?
-   [default-color-matrices :init-keyword :default-color-matrices :init-value '()]   ; remove?
-   [default-depths         :init-keyword :default-depths         :init-value '()]   ; remove?
-   [default-sounds         :init-keyword :default-sounds         :init-value '()])) ; remove?
+   [default-offsets        :init-keyword :default-offsets        :init-value '()]  ; default -> local
+   [default-sizes          :init-keyword :default-sizes          :init-value '()]
+   [default-matrices       :init-keyword :default-matrices       :init-value '()]
+   [default-alphas         :init-keyword :default-alphas         :init-value '()]
+   [default-color-matrices :init-keyword :default-color-matrices :init-value '()]
+   [default-depths         :init-keyword :default-depths         :init-value '()]
+   [default-sounds         :init-keyword :default-sounds         :init-value '()]))
 
 (define-class <cel> ()
   ([name                 :init-keyword :name                 :init-value "unnamed"]
-   [default-offset       :init-keyword :default-offset       :init-value point-zero] ; default... -> local...
+   [default-offset       :init-keyword :default-offset       :init-value point-zero]
    [default-size         :init-keyword :default-size         :init-value point-hundred]
    [default-matrix       :init-keyword :default-matrix       :init-value id-matrix-2x2]
    [default-color-matrix :init-keyword :default-color-matrix :init-value id-matrix-3x3]
+   [default-depth        :init-keyword :defalut-depth        :init-value 0]
    [default-sound        :init-keyword :default-sound        :init-value 'none]))
-					; local-depth
 
 (define-method ref ([cs <cel-set>] [i <integer>]) ; returns <cel>
   (let*
@@ -125,6 +125,7 @@
       :default-size         (ref (ref cs 'default-sizes) j)
       :default-matrix       (ref (ref cs 'default-matrices) j)
       :default-color-matrix (ref (ref cs 'default-color-matrices) j)
+      ; :default-depth        (ref (ref cs 'default-depths) j)
       :default-sound        (ref (ref cs 'default-sounds) j))))
 
 ;;;
