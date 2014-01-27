@@ -162,7 +162,7 @@
    [x-random    :init-keyword :x-random    :init-value #f]            ; boolean
    [y-random    :init-keyword :y-random    :init-value #f]            ; boolean
    [bottom-half :init-keyword :bottom-half :init-value #f]            ; boolean
-   [reactive?   :init-keyword :reactive?   :init-value #f]            ; boolean ; should change the name
+   [reactive?   :init-keyword :reactive?   :init-value #f]            ; boolean
    [options     :init-keyword :options     :init-value '()]))
 
 ;;;
