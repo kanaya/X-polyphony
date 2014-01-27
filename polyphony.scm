@@ -162,14 +162,14 @@
    [x-random    :init-keyword :x-random    :init-value #f]            ; boolean
    [y-random    :init-keyword :y-random    :init-value #f]            ; boolean
    [bottom-half :init-keyword :bottom-half :init-value #f]            ; boolean
-   [from-jump?  :init-keyword :from-jump?  :init-value #f]            ; boolean ; remove?
-   [can-jump?   :init-keyword :can-jump?   :init-value #f]            ; boolean ; remove?
-   [jumps-at    :init-keyword :jumps-at    :init-value 0]             ; cardinal ; remove?
-   [jumps-to    :init-keyword :jumps-to    :init-value 'none]         ; cardinal ; remove?
-   [jumped-from :init-keyword :jumped-from :init-value 'none]         ; cardinal ; remove?
-   [jump-offset :init-keyword :jump-offset :init-value point-zero]    ; pair of real ; remove?
-   [to-jump     :init-keyword :to-jump     :init-value #f]            ; (to be removed) ; remove?
-   [forking?    :init-keyword :forking?    :init-value #f]            ; boolean ; remove?
+   [from-jump?  :init-keyword :from-jump?  :init-value #f]            ; boolean ; should change the name
+   #;[can-jump?   :init-keyword :can-jump?   :init-value #f]            ; boolean ; remove?
+   #;[jumps-at    :init-keyword :jumps-at    :init-value 0]             ; cardinal ; remove?
+   #;[jumps-to    :init-keyword :jumps-to    :init-value 'none]         ; cardinal ; remove?
+   #;[jumped-from :init-keyword :jumped-from :init-value 'none]         ; cardinal ; remove?
+   #;[jump-offset :init-keyword :jump-offset :init-value point-zero]    ; pair of real ; remove?
+   #;[to-jump     :init-keyword :to-jump     :init-value #f]            ; (to be removed) ; remove?
+   #;[forking?    :init-keyword :forking?    :init-value #f]            ; boolean ; remove?
    [options     :init-keyword :options     :init-value '()]))
 
 ;;;
@@ -520,12 +520,12 @@
    [y-random    #f]
    [bottom-half #f]
    [from-jump?  #f]
-   [can-jump?   #f]
-   [jumps-at    0] ; [tick]                ; to be removed
-   [jumps-to    'none]
-   [jumped-from 'none]
-   [jump-offset point-zero]
-   [forking?    #f]
+   #;[can-jump?   #f]
+   #;[jumps-at    0] ; [tick]                ; to be removed
+   #;[jumps-to    'none]
+   #;[jumped-from 'none]
+   #;[jump-offset point-zero]
+   #;[forking?    #f]
    [sounds      ()]
    [options     ()])
   (let*
@@ -557,12 +557,12 @@
       :y-random    y-random
       :bottom-half bottom-half
       :from-jump?  from-jump?
-      :can-jump?   can-jump?
-      :jumps-at    (* jumps-at one-tick) ; [sec]
-      :jumps-to    jumps-to
-      :jumped-from jumped-from
-      :jump-offset jump-offset
-      :forking?    forking?
+      ; :can-jump?   can-jump?
+      ; :jumps-at    (* jumps-at one-tick) ; [sec]
+      ; :jumps-to    jumps-to
+      ; :jumped-from jumped-from
+      ; :jump-offset jump-offset
+      ; :forking?    forking?
       :options     options)))
 
 ;;;
@@ -592,13 +592,13 @@
        [new-y-random    (ref clip1 'y-random)]
        [new-bottom-half (ref clip1 'bottom-half)]
        [new-from-jump?  (ref clip1 'from-jump?)]
-       [new-can-jump?   (ref clip1 'can-jump?)]
-       [new-jumps-at    (ref clip1 'jumps-at)]
-       [new-jumps-to    (ref clip1 'jumps-to)]
-       [new-jumped-from (ref clip1 'jumped-from)]
-       [new-jump-offset (ref clip1 'jump-offset)]
-       [new-to-jump     (ref clip1 'to-jump)]
-       [new-forking?    (ref clip1 'forking?)]
+       #;[new-can-jump?   (ref clip1 'can-jump?)]
+       #;[new-jumps-at    (ref clip1 'jumps-at)]
+       #;[new-jumps-to    (ref clip1 'jumps-to)]
+       #;[new-jumped-from (ref clip1 'jumped-from)]
+       #;[new-jump-offset (ref clip1 'jump-offset)]
+       #;[new-to-jump     (ref clip1 'to-jump)]
+       #;[new-forking?    (ref clip1 'forking?)]
        [new-options     (ref clip1 'options)])
     (let1 new-cels (make <cel-set>
 		     :names                  (append (ref cels1 'names)                  (ref cels2 'names))
@@ -610,10 +610,26 @@
 		     :default-color-matrices (append (ref cels1 'default-color-matrices) (ref cels2 'default-color-matrices))
 		     :default-depths         (append (ref cels1 'default-depths)         (ref cels2 'default-depths))
 		     :default-sounds         (append (ref cels1 'default-sounds)         (ref cels2 'default-sounds)))
-	  (make <clip> :title new-title :cels new-cels :n-cels new-n-cels :cel-numbers new-cel-numbers :timings new-timings :alphas new-alphas
-		:depth new-depth :offset new-offset :x-random new-x-random :y-random new-y-random :bottom-half new-bottom-half
-		:from-jump? new-from-jump? :can-jump? new-can-jump? :jumps-at new-jumps-at :jumps-to new-jumps-to :jumped-from new-jumped-from
-		:jump-offset new-jump-offset :forking? new-forking? :options new-options))))
+	  (make <clip> 
+	    :title new-title
+	    :cels new-cels
+	    :n-cels new-n-cels
+	    :cel-numbers new-cel-numbers
+	    :timings new-timings
+	    :alphas new-alphas
+	    :depth new-depth
+	    :offset new-offset
+	    :x-random new-x-random
+	    :y-random new-y-random 
+	    :bottom-half new-bottom-half
+	    :from-jump? new-from-jump?
+	    ; :can-jump? new-can-jump? 
+	    ; :jumps-at new-jumps-at 
+	    ; :jumps-to new-jumps-to 
+	    ; :jumped-from new-jumped-from
+	    ; :jump-offset new-jump-offset 
+	    ; :forking? new-forking? 
+	    :options new-options))))
 
 ;;;
 ;;; clip->clip-with-fade-out
@@ -636,12 +652,12 @@
        [x-random      (ref clip 'x-random)]
        [y-random      (ref clip 'y-random)]
        [from-jump?    (ref clip 'from-jump?)]
-       [can-jump?     (ref clip 'can-jump?)]
-       [jumps-at      (ref clip 'jumps-at)]
-       [jumps-to      (ref clip 'jumps-to)]
-       [jumped-from   (ref clip 'jumped-from)]
-       [jump-offset   (ref clip 'jump-offset)]
-       [forking?      (ref clip 'forking?)]
+       #;[can-jump?     (ref clip 'can-jump?)]
+       #;[jumps-at      (ref clip 'jumps-at)]
+       #;[jumps-to      (ref clip 'jumps-to)]
+       #;[jumped-from   (ref clip 'jumped-from)]
+       #;[jump-offset   (ref clip 'jump-offset)]
+       #;[forking?      (ref clip 'forking?)]
        [options       (ref clip 'options)])
     (make <clip>
      :title         title
@@ -659,12 +675,12 @@
      :x-random      x-random
      :y-random      y-random
      :from-jump?    from-jump?
-     :can-jump?     can-jump?
-     :jumps-at      jumps-at
-     :jumps-to      jumps-to
-     :jumped-from   jumped-from
-     :jump-offset   jump-offset
-     :forking?      forking?
+     ; :can-jump?     can-jump?
+     ; :jumps-at      jumps-at
+     ; :jumps-to      jumps-to
+     ; :jumped-from   jumped-from
+     ; :jump-offset   jump-offset
+     ; :forking?      forking?
      :options       options)))
 
 (define (clip->clip-with-fade-out clip)
@@ -687,12 +703,12 @@
        [x-random      (ref clip 'x-random)]
        [y-random      (ref clip 'y-random)]
        [from-jump?    (ref clip 'from-jump?)]
-       [can-jump?     (ref clip 'can-jump?)]
-       [jumps-at      (ref clip 'jumps-at)]
-       [jumps-to      (ref clip 'jumps-to)]
-       [jumped-from   (ref clip 'jumped-from)]
-       [jump-offset   (ref clip 'jump-offset)]
-       [forking?      (ref clip 'forking?)]
+       #;[can-jump?     (ref clip 'can-jump?)]
+       #;[jumps-at      (ref clip 'jumps-at)]
+       #;[jumps-to      (ref clip 'jumps-to)]
+       #;[jumped-from   (ref clip 'jumped-from)]
+       #;[jump-offset   (ref clip 'jump-offset)]
+       #;[forking?      (ref clip 'forking?)]
        [options       (ref clip 'options)])
     (make <clip>
      :title       title
@@ -710,12 +726,12 @@
      :x-random    x-random
      :y-random    y-random
      :from-jump?  from-jump?
-     :can-jump?   can-jump?
-     :jumps-at    jumps-at
-     :jumps-to    jumps-to
-     :jumped-from jumped-from
-     :jump-offset jump-offset
-     :forking?    forking?
+     ; :can-jump?   can-jump?
+     ; :jumps-at    jumps-at
+     ; :jumps-to    jumps-to
+     ; :jumped-from jumped-from
+     ; :jump-offset jump-offset
+     ; :forking?    forking?
      :options     options)))
 
 
@@ -731,12 +747,12 @@
    [x-random        #f]
    [y-random        #f]
    [from-jump?      #f]
-   [can-jump?       #f]
-   [jumps-at        0] ; [tick]
-   [jumps-to        'none]
-   [jumped-from     'none]
-   [jump-offset     point-zero]
-   [forking?        #f]
+   #;[can-jump?       #f]
+   #;[jumps-at        0] ; [tick]
+   #;[jumps-to        'none]
+   #;[jumped-from     'none]
+   #;[jump-offset     point-zero]
+   #;[forking?        #f]
    [sounds          ()]
    [options         ()])
   (make-clip-primitive
@@ -751,12 +767,12 @@
    :x-random    x-random
    :y-random    y-random
    :from-jump?  from-jump?
-   :can-jump?   can-jump?
-   :jumps-at    jumps-at
-   :jumps-to    jumps-to
-   :jumped-from jumped-from
-   :jump-offset jump-offset
-   :forking?    forking?
+   ; :can-jump?   can-jump?
+   ; :jumps-at    jumps-at
+   ; :jumps-to    jumps-to
+   ; :jumped-from jumped-from
+   ; :jump-offset jump-offset
+   ; :forking?    forking?
    :sounds      sounds
    ; :alphas    (make-list n-cels 0.3)  ; TEST TEST TEST
    :options     options))
@@ -799,8 +815,8 @@
     :x-random    #t
     :y-random    #t
     :bottom-half #t
-    :can-jump?   #t
-    :jumps-to    jumps-to
+    ; :can-jump?   #t
+    ; :jumps-to    jumps-to
     :sounds      (make-list (length cel-name-primitive) 'none)
     :options     '())))
 
@@ -830,7 +846,7 @@
 	 :cel-numbers (iota (length cel-names))
 	 :canvas-size '(585 . 425)
 	 :from-jump?  #t
-	 :jumped-from jumped-from
+	 ; :jumped-from jumped-from
 	 :sounds      (append
 		       (make-list 5 'none)
 		       '(birds-flying)
@@ -853,10 +869,10 @@
 	 :offset      point-zero
 	 :x-random    #t
 	 :y-random    #t
-	 :can-jump?   #t
-	 :jumps-at    22                 ; [tick]
-	 :jumps-to    jumps-to
-	 :jump-offset `(,(* papilionidae-stride 2) . 0)
+	 ; :can-jump?   #t
+	 ; :jumps-at    22                 ; [tick]
+	 ; :jumps-to    jumps-to
+	 ; :jump-offset `(,(* papilionidae-stride 2) . 0)
 	 :sounds      (append
 		       '(butterfly) (make-list 10 'none)
 		       '(butterfly) (make-list 10 'none)
@@ -877,10 +893,10 @@
 	 :offset      point-zero
 	 :x-random    #t
 	 :y-random    #t
-	 :can-jump?   #t
-	 :jumps-at    22                 ; [tick]
-	 :jumps-to    jumps-to
-	 :jump-offset `(,(* papilionidae-stride 2) . 0)
+	 ; :can-jump?   #t
+	 ; :jumps-at    22                 ; [tick]
+	 ; :jumps-to    jumps-to
+	 ; :jump-offset `(,(* papilionidae-stride 2) . 0)
 	 :sounds      (append
 		       '(butterfly) (make-list 10 'none)
 		       '(butterfly) (make-list 10 'none)
@@ -903,7 +919,7 @@
 	 :cel-numbers (iota (length cel-names))
 	 :canvas-size '(585 . 425)
 	 :from-jump?  #t
-	 :jumped-from jumped-from
+	 ; :jumped-from jumped-from
 	 :sounds      (make-list (length cel-names) 'none)
 	 :options     '())))
 
@@ -915,9 +931,9 @@
    :canvas-size     '(585 . 425)
    :x-random        #t
    :y-random        #t
-   :can-jump?       #t
-   :jumps-at        9
-   :jumps-to        jumps-to
+   ; :can-jump?       #t
+   ; :jumps-at        9
+   ; :jumps-to        jumps-to
    :sounds          (append '(butterfly) (make-list 10 'none))
    :options         '()))
 
@@ -929,9 +945,9 @@
    :canvas-size     '(585 . 425)
    :x-random        #t
    :y-random        #t
-   :can-jump?       #t
-   :jumps-at        9
-   :jumps-to        jumps-to
+   ; :can-jump?       #t
+   ; :jumps-at        9
+   ; :jumps-to        jumps-to
    :sounds          (append '(butterfly) (make-list 10 'none))
    :options         '()))
 
@@ -951,7 +967,7 @@
 	 :cel-numbers (iota (length cel-names))
 	 :canvas-size '(585 . 425)
 	 :from-jump?  #t
-	 :jumped-from jumped-from
+	 ; :jumped-from jumped-from
 	 :sounds      (make-list (length cel-names) 'none)
 	 :options     '())))
 
@@ -998,123 +1014,167 @@
        [birds-blue                     (make-birds-clip
 					:title 'birds-blue
 					:prefix "Birds/Birds_Blue/"
-					:jumps-to 'birds-blue-take-off)]
+					; :jumps-to 'birds-blue-take-off
+					)
+				       ]
        ;; Birds Orange
        ;; Bird clip
        [birds-orange                   (make-birds-clip
 					:title 'birds-orange
 					:prefix "Birds/Birds_Orange/"
-					:jumps-to 'birds-orange-take-off)]
+					; :jumps-to 'birds-orange-take-off
+					)
+					]
        ;; Birds Blue Take-off
        ;; Bird-take-off clip
        [birds-blue-take-off            (make-birds-take-off-clip
 					:title 'birds-blue-take-off
 					:prefix1 "Birds/Birds_Blue/"
 					:prefix2 "Birds/Birds_Blue/flying-"
-					:jumped-from 'birds-blue)]
+					; :jumped-from 'birds-blue
+					)
+					]
        ;; Birds Orange Take-off
        ;; Bird-take-off clip
        [birds-orange-take-off          (make-birds-take-off-clip
 					:title 'birds-orange-take-off
 					:prefix1 "Birds/Birds_Orange/"
 					:prefix2 "Birds/Birds_Orange/flying-"
-					:jumped-from 'birds-orange)]
+					; :jumped-from 'birds-orange
+					)
+					]
        ;; Papilionidae Blue
        ;; Papilionidae clip
        [papilionidae-blue              (make-papilionidae-clip
 					:title 'papilionidae-blue
 					:prefix "Butterfly/Papilionidae_Blue/"
-					:jumps-to 'papilionidae-blue-touch-down)]
+					; :jumps-to 'papilionidae-blue-touch-down
+					)
+					]
        [papilionidae-blue-rev          (make-papilionidae-rev-clip
 					:title 'papilionidae-blue-rev
 					:prefix "Butterfly/Papilionidae_Blue_Rev/"
-					:jumps-to 'papilionidae-blue-touch-down)]
+					; :jumps-to 'papilionidae-blue-touch-down
+					)
+					]
        ;; Papilionidae Purple
        ;; Papilioniade clip
        [papilionidae-purple            (make-papilionidae-clip
 					:title 'papilionidae-purple
 					:prefix "Butterfly/Papilionidae_Purple/"
-					:jumps-to 'papilionidae-purple-touch-down)]
+					; :jumps-to 'papilionidae-purple-touch-down
+					)
+					]
        [papilionidae-purple-rev        (make-papilionidae-rev-clip
 					:title 'papilionidae-purple-rev
 					:prefix "Butterfly/Papilionidae_Purple_Rev/"
-					:jumps-to 'papilionidae-purple-touch-down)]
+					; :jumps-to 'papilionidae-purple-touch-down
+					)
+					]
        ;; Papilionidae White
        ;; Papilionidae clip
        [papilionidae-white             (make-papilionidae-clip
 					:title 'papilionidae-white
 					:prefix "Butterfly/Papilionidae_White/"
-					:jumps-to 'papilionidae-white-touch-down)]
+					; :jumps-to 'papilionidae-white-touch-down
+					)
+					]
        [papilionidae-white-rev         (make-papilionidae-rev-clip
 					:title 'papilionidae-white-rev
 					:prefix "Butterfly/Papilionidae_White_Rev/"
-					:jumps-to 'papilionidae-white-touch-down)]
+					; :jumps-to 'papilionidae-white-touch-down
+					)
+					]
        ;; Papilionidae Yellow
        ;; Papilionidae clip
        [papilionidae-yellow            (make-papilionidae-clip
 					:title 'papilionidae-yellow
 					:prefix "Butterfly/Papilionidae_Yellow/"
-					:jumps-to 'papilionidae-yellow-touch-down)]
+					; :jumps-to 'papilionidae-yellow-touch-down
+					)
+					]
        [papilionidae-yellow-rev        (make-papilionidae-rev-clip
 					:title 'papilionidae-yellow-rev
 					:prefix "Butterfly/Papilionidae_Yellow_Rev/"
-					:jumps-to 'papilionidae-yellow-touch-down)]
+					; :jumps-to 'papilionidae-yellow-touch-down
+					)
+					]
        ;; Papilionidae Blue Touch-down
        ;; Papilionidae-touch-down clip
        [papilionidae-blue-touch-down   (make-papilionidae-touch-down-clip
 					:title 'papilionidae-blue-touch-down
 					:prefix "Butterfly/Papilionidae_Blue/touch_down/10_"
-					:jumped-from 'papilionidae-blue)]
+					; :jumped-from 'papilionidae-blue
+					)
+					]
        ;; Papilionidae White Touch-down
        ;; Papilionidae-touch-down clip
        [papilionidae-white-touch-down  (make-papilionidae-touch-down-clip
 					:title 'papilionidae-white-touch-down
 					:prefix "Butterfly/Papilionidae_White/touch_down/10_"
-					:jumped-from 'papilionidae-white)]
+					; :jumped-from 'papilionidae-white
+					)
+					]
        ;; Papilionidae Yellow Touch-down
        ;; Papilionidae-touch-down clip
        [papilionidae-yellow-touch-down (make-papilionidae-touch-down-clip
 					:title 'papilionidae-yellow-touch-down
 					:prefix "Butterfly/Papilionidae_Yellow/touch_down/10_"
-					:jumped-from 'papilionidae-yellow)]
+					; :jumped-from 'papilionidae-yellow
+					)
+					]
        ;; Papilionidae Purpule Touch-down
        ;; Papilionidae-touch-down clip
        [papilionidae-purple-touch-down (make-papilionidae-touch-down-clip
 					:title 'papilionidae-purple-touch-down
 					:prefix "Butterfly/Papilionidae_Purple/touch_down/10_"
-					:jumped-from 'papilionidae-purple)]
+					; :jumped-from 'papilionidae-purple
+					)
+					]
        ;; Pieris-Rapae Pink
        ;; Rapae clip
        [pieris-rapae-pink              (make-rapae-clip
 					:title    'pieris-rapae-pink
 					:prefix   "Butterfly/Pieris_Rapae_Pink/" 
-					:jumps-to 'pieris-rapae-pink-touch-down)]
+					; :jumps-to 'pieris-rapae-pink-touch-down
+					)
+					]
        [pieris-rapae-pink-rev          (make-rapae-rev-clip
 					:title    'pieris-rapae-pink-rev
 					:prefix   "Butterfly/Pieris_Rapae_Pink_Rev/"
-					:jumps-to 'pieris-rapae-pink-touch-down)] ; dummy
+					; :jumps-to 'pieris-rapae-pink-touch-down
+					)
+					] ; dummy
        ;; Pieris-Rapae Yellow
        ;; Rapae clip
        [pieris-rapae-yellow            (make-rapae-clip
 					:title    'pieris-rapae-yellow
 					:prefix   "Butterfly/Pieris_Rapae_Yellow/" 
-					:jumps-to 'pieris-rapae-yellow-touch-down)]
+					; :jumps-to 'pieris-rapae-yellow-touch-down
+					)
+					]
        [pieris-rapae-yellow-rev        (make-rapae-rev-clip
 					:title    'pieris-rapae-yellow-rev
 					:prefix   "Butterfly/Pieris_Rapae_Yellow_Rev/"
-					:jumps-to 'pieris-rapae-yellow-touch-down)] ; dummy
+					; :jumps-to 'pieris-rapae-yellow-touch-down
+					)
+					] ; dummy
        ;; Pieris-Rapae Pink Touch-down
        ;; Rapae-touch-douwn clip
        [pieris-rapae-pink-touch-down   (make-rapae-touch-down-clip
 					:title 'pieris-rapae-pink-touch-down 
 					:prefix "Butterfly/Pieris_Rapae_Pink/touch_down/10_"
-					:jumped-from 'pieris-rapae-pink)]
+					; :jumped-from 'pieris-rapae-pink
+					)
+					]
        ;; Pieris-Rapae Yellow Touch-down
        ;; Rapae-touch-down clip
        [pieris-rapae-yellow-touch-down (make-rapae-touch-down-clip
 					:title 'pieris-rapae-yellow-touch-down 
 					:prefix "Butterfly/Pieris_Rapae_Yellow/touch_down/10_"
-					:jumped-from 'pieris-rapae-yellow)]
+					; :jumped-from 'pieris-rapae-yellow
+					)
+					]
        ;; Elephant
        [elephant                       (let1 cel-names (map
 							  (cut string-append "Elephant2/ex/ex" <>)
@@ -1202,11 +1262,11 @@
 					   :x-random      #t
 					   :y-random      #f
 					   :from-jump?    #f
-					   :can-jump?     #f
-					   :jumps-at      0
-					   :jumps-to      'none
-					   :jump-offset   point-zero
-					   :forking?      #f
+					   ; :can-jump?     #f
+					   ; :jumps-at      0
+					   ; :jumps-to      'none
+					   ; :jump-offset   point-zero
+					   ; :forking?      #f
 					   :loops-for     1
 					   :options       '()))]
        ;; Rabbit
