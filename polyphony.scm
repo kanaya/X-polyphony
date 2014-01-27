@@ -162,7 +162,7 @@
    [x-random    :init-keyword :x-random    :init-value #f]            ; boolean
    [y-random    :init-keyword :y-random    :init-value #f]            ; boolean
    [bottom-half :init-keyword :bottom-half :init-value #f]            ; boolean
-   [from-jump?  :init-keyword :from-jump?  :init-value #f]            ; boolean ; should change the name
+   [reactive?   :init-keyword :reactive?   :init-value #f]            ; boolean ; should change the name
    [options     :init-keyword :options     :init-value '()]))
 
 ;;;
@@ -412,7 +412,7 @@
   (define (start-clip-randomly! _ clip)
     (when (< (random-real) p-appearance)
 	  (when (and (not (ref clip 'animating)) 
-		     (not (ref clip 'from-jump?)))
+		     (not (ref clip 'reactive?)))
 		(start! clip)
 		#;(print "starting " (symbol->string (ref clip 'title))) )))
   (hash-table-for-each clips start-clip-randomly!))
@@ -466,30 +466,7 @@
 	(clip-kick-starter! *the-clip-collection* 'fox)
 	(clip-kick-starter! *the-clip-collection* 'squirrel)
 	(clip-kick-starter! *the-clip-collection* 'baboon-weeing)
-	(clip-kick-starter! *the-clip-collection* 'meercat)	
-	;; !!
-	#;(let1 now (current-time)
-	 (when (> (- now *t-last-event*) event-gate)
-	       (set! *t-last-event* now)
-	       #;(set! *freezing?* #t)
-	       #;(set! *loss-time* (+ *loss-time* freezing-duration))
-	       (hash-table-for-each clips
-				    (lambda [_ clip]
-				      (let1 can-jump? (ref clip 'can-jump?) ; remove?
-					    (when can-jump?
-						  (let*
-						      ([next-clip-key    (ref clip 'jumps-to)]
-						       [next-clip        (hash-table-get clips next-clip-key)]
-						       [clip-offset      (ref clip 'offset)]
-						       [clip-jump-offset (ref clip 'jump-offset)]
-						       [the-offset            (pair-plus clip-offset clip-jump-offset)])
-						    (if
-						     (not 
-						      (or
-						       (eq? (ref clip 'title) 'baboon)
-						       (eq? (ref clip 'title) 'baboon-weeing)))
-						     (set! (ref next-clip 'offset) the-offset))
-						    (set! (ref clip 'to-jump) #t))))))))))  ; to be removed
+	(clip-kick-starter! *the-clip-collection* 'meercat)))
 
 ;;;
 ;;; Clips
@@ -512,7 +489,7 @@
    [x-random    #f]
    [y-random    #f]
    [bottom-half #f]
-   [from-jump?  #f]
+   [reactive?  #f]
    [sounds      ()]
    [options     ()])
   (let*
@@ -543,7 +520,7 @@
       :x-random    x-random
       :y-random    y-random
       :bottom-half bottom-half
-      :from-jump?  from-jump?
+      :reactive?   reactive?
       :options     options)))
 
 ;;;
@@ -572,7 +549,7 @@
        [new-x-random    (ref clip1 'x-random)]
        [new-y-random    (ref clip1 'y-random)]
        [new-bottom-half (ref clip1 'bottom-half)]
-       [new-from-jump?  (ref clip1 'from-jump?)]
+       [new-reactive?   (ref clip1 'reactive?)]
        [new-options     (ref clip1 'options)])
     (let1 new-cels (make <cel-set>
 		     :names                  (append (ref cels1 'names)                  (ref cels2 'names))
@@ -596,7 +573,7 @@
 	    :x-random new-x-random
 	    :y-random new-y-random 
 	    :bottom-half new-bottom-half
-	    :from-jump? new-from-jump?
+	    :reactive? new-reactive?
 	    :options new-options))))
 
 ;;;
@@ -619,7 +596,7 @@
        [time-offset   (ref clip 'time-offset)]
        [x-random      (ref clip 'x-random)]
        [y-random      (ref clip 'y-random)]
-       [from-jump?    (ref clip 'from-jump?)]
+       [reactive?     (ref clip 'reactive?)]
        [options       (ref clip 'options)])
     (make <clip>
      :title         title
@@ -636,7 +613,7 @@
      :time-offset   time-offset
      :x-random      x-random
      :y-random      y-random
-     :from-jump?    from-jump?
+     :reactive?     reactive?
      :options       options)))
 
 (define (clip->clip-with-fade-out clip)
@@ -658,7 +635,7 @@
        [time-offset   (ref clip 'time-offset)]
        [x-random      (ref clip 'x-random)]
        [y-random      (ref clip 'y-random)]
-       [from-jump?    (ref clip 'from-jump?)]
+       [reactive?     (ref clip 'reactive?)]
        [options       (ref clip 'options)])
     (make <clip>
      :title       title
@@ -675,7 +652,7 @@
      :time-offset time-offset
      :x-random    x-random
      :y-random    y-random
-     :from-jump?  from-jump?
+     :reactive?   reactive?
      :options     options)))
 
 
@@ -690,7 +667,7 @@
    [offset          point-zero]
    [x-random        #f]
    [y-random        #f]
-   [from-jump?      #f]
+   [reactive?       #f]
    [sounds          ()]
    [options         ()])
   (make-clip-primitive
@@ -704,7 +681,7 @@
    :offset      offset
    :x-random    x-random
    :y-random    y-random
-   :from-jump?  from-jump?
+   :reactive?   reactive?
    :sounds      sounds
    :options     options))
 
@@ -774,7 +751,7 @@
 		       (make-list 8 '(-210 . 0)))
 	 :cel-numbers (iota (length cel-names))
 	 :canvas-size '(585 . 425)
-	 :from-jump?  #t
+	 :reactive?   #t
 	 :sounds      (append
 		       (make-list 5 'none)
 		       '(birds-flying)
@@ -838,7 +815,7 @@
 	 :cel-offsets (make-list (length cel-names) point-zero)
 	 :cel-numbers (iota (length cel-names))
 	 :canvas-size '(585 . 425)
-	 :from-jump?  #t
+	 :reactive?   #t
 	 :sounds      (make-list (length cel-names) 'none)
 	 :options     '())))
 
@@ -879,7 +856,7 @@
 	 :cel-offsets (make-list (length cel-names) point-zero)
 	 :cel-numbers (iota (length cel-names))
 	 :canvas-size '(585 . 425)
-	 :from-jump?  #t
+	 :reactive?   #t
 	 :sounds      (make-list (length cel-names) 'none)
 	 :options     '())))
 
@@ -895,7 +872,7 @@
 					:n-cels 106
 					:offset '(2200 . 1400) ; cel.offset
 					:canvas-size '(2313 . 1040)
-					:from-jump? #t
+					:reactive? #t
 					:sounds (make-list 106 'none))]
        ;; Apple
        ;; Simple clip
@@ -905,7 +882,7 @@
 					:n-cels 31
 					:offset '(2200 . 500)
 					:canvas-size '(2313 . 1040)
-					:from-jump? #t
+					:reactive? #t
 					:sounds (append (make-list 15 'none)
 							'(apple-touch-down)
 							(make-list 15 'none)))]
@@ -916,7 +893,7 @@
 					:cel-numbers (iota 66)
 					:offset '(2200 . 0) ; cel.offset
 					:canvas-size `(,(* 585 4) . ,(* 637 4))
-					:from-jump? #t
+					:reactive? #t
 					:sounds (append (make-list 23 'none)
 							'(wee)
 							(make-list 43 'none))
@@ -989,7 +966,7 @@
 					      :alphas (make-list (length cel-names) 1.0)
 					      :canvas-size `(,(* 984 10) . ,(* 289 10))  ; 8
 					      :offset '(1000 . -300)
-					      :from-jump? #t
+					      :reactive? #t
 					      :sounds (make-list (length cel-names) 'none)
 					      :options '()))]
        ;; Fawn
@@ -998,7 +975,7 @@
 					:title 'fawn
 					:cel-name-prefix "Fawn2/"
 					:n-cels 116
-					:from-jump? #t
+					:reactive? #t
 					:canvas-size `(,(* 1188 8) . ,(* 213 8))
 					:offset '(500 . 100)
 					:sounds (make-list 116 'none))]
@@ -1008,7 +985,7 @@
 					:title 'fox
 					:cel-name-prefix "Fox2/"
 					:n-cels 56
-					:from-jump? #t
+					:reactive? #t
 					:canvas-size `(,(* 1188 4) . ,(* 213 4))
 					:offset '(0 . 0)
 					:sounds (make-list 56 'none))]
@@ -1018,7 +995,7 @@
 					:title 'meercat
 					:cel-name-prefix "Meercat2/"
 					:n-cels 171
-					:from-jump? #t
+					:reactive? #t
 					:canvas-size `(,(* 1041 8) . ,(* 213 8))
 					:offset '(0 . 200)
 					:sounds (make-list 171 'none))]
@@ -1061,7 +1038,7 @@
 					   :offset        point-zero
 					   :x-random      #t
 					   :y-random      #f
-					   :from-jump?    #f
+					   :reactive?     #f
 					   :loops-for     1
 					   :options       '()))]
        ;; Rabbit
@@ -1070,7 +1047,7 @@
 					:title 'rabbit
 					:cel-name-prefix "Rabbit2/"
 					:n-cels 189
-					:from-jump? #t
+					:reactive? #t
 					:canvas-size `(,(* 1188 6) . ,(* 213 6))
 					:offset '(500 . 0) ; test
 					:sounds (make-list 189 'none))]
@@ -1080,7 +1057,7 @@
 					:title 'squirrel
 					:cel-name-prefix "Squirrel2/"
 					:n-cels 23
-					:from-jump? #t
+					:reactive? #t
 					:canvas-size `(,(* 421 1.5) . ,(* 306 1.5))
 					:offset '(3000 . 0)
 					:sounds (make-list 23 'none))]
@@ -1090,7 +1067,7 @@
 					:title 'tanuki
 					:cel-name-prefix "Tanuki2/"
 					:n-cels 50
-					:from-jump? #t
+					:reactive? #t
 					:canvas-size `(,(* 883 8) . ,(* 213 8)) ; test
 					:offset '(1000 . 0)
 					:sounds (make-list 50 'none))])
