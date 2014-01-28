@@ -96,37 +96,37 @@
 ;;;
 
 (define-class <cel-set> ()
-  ([names                  :init-keyword :names                  :init-value '()]
-   [n-names                :init-keyword :n-names                :init-value 0]
-   [default-offsets        :init-keyword :default-offsets        :init-value '()]  ; default -> local
-   [default-sizes          :init-keyword :default-sizes          :init-value '()]
-   [default-matrices       :init-keyword :default-matrices       :init-value '()]
-   [default-alphas         :init-keyword :default-alphas         :init-value '()]
-   [default-color-matrices :init-keyword :default-color-matrices :init-value '()]
-   [default-depths         :init-keyword :default-depths         :init-value '()]
-   [default-sounds         :init-keyword :default-sounds         :init-value '()]))
+  ([names                :init-keyword :names                :init-value '()]
+   [n-names              :init-keyword :n-names              :init-value 0]
+   [local-offsets        :init-keyword :local-offsets        :init-value '()]
+   [local-sizes          :init-keyword :local-sizes          :init-value '()]
+   [local-matrices       :init-keyword :local-matrices       :init-value '()]
+   [local-alphas         :init-keyword :local-alphas         :init-value '()]
+   [local-color-matrices :init-keyword :local-color-matrices :init-value '()]
+   [local-depths         :init-keyword :local-depths         :init-value '()]
+   [local-sounds         :init-keyword :local-sounds         :init-value '()]))
 
 (define-class <cel> ()
-  ([name                 :init-keyword :name                 :init-value "unnamed"]
-   [default-offset       :init-keyword :default-offset       :init-value point-zero]
-   [default-size         :init-keyword :default-size         :init-value point-hundred]
-   [default-matrix       :init-keyword :default-matrix       :init-value id-matrix-2x2]
-   [default-color-matrix :init-keyword :default-color-matrix :init-value id-matrix-3x3]
-   [default-depth        :init-keyword :defalut-depth        :init-value 0]
-   [default-sound        :init-keyword :default-sound        :init-value 'none]))
+  ([name               :init-keyword :name               :init-value "unnamed"]
+   [local-offset       :init-keyword :local-offset       :init-value point-zero]
+   [local-size         :init-keyword :local-size         :init-value point-hundred]
+   [local-matrix       :init-keyword :local-matrix       :init-value id-matrix-2x2]
+   [local-color-matrix :init-keyword :local-color-matrix :init-value id-matrix-3x3]
+   [local-depth        :init-keyword :local-depth        :init-value 0]
+   [local-sound        :init-keyword :local-sound        :init-value 'none]))
 
 (define-method ref ([cs <cel-set>] [i <integer>]) ; returns <cel>
   (let*
       ([n-names (ref cs 'n-names)]
        [j       (if (< i n-names) i 0)])      ; boundary check
     (make <cel>
-      :name                 (ref (ref cs 'names) j)
-      :default-offset       (ref (ref cs 'default-offsets) j) ; no, these default... should be relpaced with local...
-      :default-size         (ref (ref cs 'default-sizes) j)
-      :default-matrix       (ref (ref cs 'default-matrices) j)
-      :default-color-matrix (ref (ref cs 'default-color-matrices) j)
-      ; :default-depth        (ref (ref cs 'default-depths) j)
-      :default-sound        (ref (ref cs 'default-sounds) j))))
+      :name               (ref (ref cs 'names) j)
+      :local-offset       (ref (ref cs 'local-offsets) j)
+      :local-size         (ref (ref cs 'local-sizes) j)
+      :local-matrix       (ref (ref cs 'local-matrices) j)
+      :local-color-matrix (ref (ref cs 'local-color-matrices) j)
+      ; :local-depth        (ref (ref cs 'local-depths) j)
+      :local-sound        (ref (ref cs 'local-sounds) j))))
 
 ;;;
 ;;; <clip> class
@@ -337,27 +337,27 @@
   (define (clip->tag clip time)
     (receive [cel alpha] (ref clip time)
 	     (let* 
-		 ([name             (ref cel 'name)]
-		  [default-offset   (ref cel 'default-offset)]
-		  [default-offset-x (get-width default-offset)]
-		  [default-offset-y (get-height default-offset)]
-		  [default-size     (ref cel 'default-size)]
-		  [default-size-x   (get-width default-size)]
-		  [default-size-y   (get-height default-size)]
-		  [depth            (ref clip 'depth)]
-		  [sound            (car (hash-table-get *the-sound-collection* (ref cel 'default-sound)))]
-		  [offset           (ref clip 'offset)]
-		  [offset-x         (get-width offset)]
-		  [offset-y         (get-height offset)])
+		 ([name           (ref cel 'name)]
+		  [local-offset   (ref cel 'local-offset)]
+		  [local-offset-x (get-width local-offset)]
+		  [local-offset-y (get-height local-offset)]
+		  [local-size     (ref cel 'local-size)]
+		  [local-size-x   (get-width local-size)]
+		  [local-size-y   (get-height local-size)]
+		  [depth          (ref clip 'depth)]
+		  [sound          (car (hash-table-get *the-sound-collection* (ref cel 'local-sound)))]
+		  [offset         (ref clip 'offset)]
+		  [offset-x       (get-width offset)]
+		  [offset-y       (get-height offset)])
 	       `(image
 		 (@
 		  (source ,(name->url name))
 		  (id ,name)
-		  (position_x ,(+ default-offset-x offset-x))
-		  (position_y ,(+ default-offset-y offset-y))
+		  (position_x ,(+ local-offset-x offset-x))
+		  (position_y ,(+ local-offset-y offset-y))
 		  (position_z ,depth)
-		  (size_x ,default-size-x)
-		  (size_y ,default-size-y)
+		  (size_x ,local-size-x)
+		  (size_y ,local-size-y)
 		  (alpha ,alpha)
 		  (sound ,sound))
 		 ,name))))
@@ -494,21 +494,21 @@
    [sounds      ()]
    [options     ()])
   (let*
-      ([n-cels          (length cel-names)]
-       [n-numbers       (length cel-numbers)]
-       [default-offsets (if (null? cel-offsets)
-			    (make-list n-numbers offset)
-			    cel-offsets)]
-       [cel-set         (make <cel-set>
-			  :names                  cel-names
-			  :n-names                n-cels
-			  :default-offsets        default-offsets
-			  :default-sizes          (make-list n-cels canvas-size)
-			  :default-matrices       (make-list n-cels id-matrix-2x2)
-			  :default-color-matrices (make-list n-cels id-matrix-3x3)
-			  :default-sounds         sounds)]
-       [timings         (durations->timings (make-list n-numbers one-tick))]
-       [alphas          (if (null? alphas) (make-list n-numbers 1.0) alphas)])
+      ([n-cels        (length cel-names)]
+       [n-numbers     (length cel-numbers)]
+       [local-offsets (if (null? cel-offsets)
+			  (make-list n-numbers offset)
+			  cel-offsets)]
+       [cel-set       (make <cel-set>
+			:names                cel-names
+			:n-names              n-cels
+			:local-offsets        local-offsets
+			:local-sizes          (make-list n-cels canvas-size)
+			:local-matrices       (make-list n-cels id-matrix-2x2)
+			:local-color-matrices (make-list n-cels id-matrix-3x3)
+			:local-sounds         sounds)]
+       [timings       (durations->timings (make-list n-numbers one-tick))]
+       [alphas        (if (null? alphas) (make-list n-numbers 1.0) alphas)])
     (make <clip>
       :title       title
       :cels        cel-set
@@ -553,15 +553,15 @@
        [new-reactive?   (ref clip1 'reactive?)]
        [new-options     (ref clip1 'options)])
     (let1 new-cels (make <cel-set>
-		     :names                  (append (ref cels1 'names)                  (ref cels2 'names))
-		     :n-names                (+      (ref cels1 'n-names)                (ref cels2 'n-names))
-		     :default-offsets        (append (ref cels1 'default-offsets)        (ref cels2 'default-offsets))
-		     :default-sizes          (append (ref cels1 'default-sizes)          (ref cels2 'default-sizes))
-		     :default-matrices       (append (ref cels1 'default-matrices)       (ref cels2 'default-matrices))
-		     :default-alphas         (append (ref cels1 'default-alphas)         (ref cels2 'default-alphas))
-		     :default-color-matrices (append (ref cels1 'default-color-matrices) (ref cels2 'default-color-matrices))
-		     :default-depths         (append (ref cels1 'default-depths)         (ref cels2 'default-depths))
-		     :default-sounds         (append (ref cels1 'default-sounds)         (ref cels2 'default-sounds)))
+		     :names                (append (ref cels1 'names)                (ref cels2 'names))
+		     :n-names              (+      (ref cels1 'n-names)              (ref cels2 'n-names))
+		     :local-offsets        (append (ref cels1 'local-offsets)        (ref cels2 'local-offsets))
+		     :local-sizes          (append (ref cels1 'local-sizes)          (ref cels2 'local-sizes))
+		     :local-matrices       (append (ref cels1 'local-matrices)       (ref cels2 'local-matrices))
+		     :local-alphas         (append (ref cels1 'local-alphas)         (ref cels2 'local-alphas))
+		     :local-color-matrices (append (ref cels1 'local-color-matrices) (ref cels2 'local-color-matrices))
+		     :local-depths         (append (ref cels1 'local-depths)         (ref cels2 'local-depths))
+		     :local-sounds         (append (ref cels1 'local-sounds)         (ref cels2 'local-sounds)))
 	  (make <clip> 
 	    :title new-title
 	    :cels new-cels
@@ -1006,19 +1006,19 @@
 					    [cel-names           (map (cut string-append "Owl/" <>) (map number->string cel-names-primitive))]
 					    [n-cels              (length cel-names-primitive)]
 					    [canvas-size           `(,(* 585 2) . ,(* 425 2))]
-					    [default-offsets       (append
+					    [local-offsets       (append
 								    (make-list 7 point-zero)  ; 1 2 3 3 3 4 5
 								    (map (cut cons <> 0) (durations->timings (make-list owl-step 28))))]
 					    [owl-cel-set         (make <cel-set>
-								     :names                  cel-names
-								     :n-names                n-cels
-								     :default-offsets        default-offsets
-								     :default-sizes          (make-list n-cels canvas-size)
-								     :default-matrices       (make-list n-cels id-matrix-2x2)
-								     :default-alphas         (make-list n-cels 1.0)
-								     :default-color-matrices (make-list n-cels id-matrix-3x3)
-								     :default-depths         (make-list n-cels 0)
-								     :default-sounds         (append
+								     :names                cel-names
+								     :n-names              n-cels
+								     :local-offsets        local-offsets
+								     :local-sizes          (make-list n-cels canvas-size)
+								     :local-matrices       (make-list n-cels id-matrix-2x2)
+								     :local-alphas         (make-list n-cels 1.0)
+								     :local-color-matrices (make-list n-cels id-matrix-3x3)
+								     :local-depths         (make-list n-cels 0)
+								     :local-sounds         (append
 											      '(owl-coming)        ; 1
 											      (make-list 6 'none)  ; 2 3 3 3 4 5
 											      '(owl-flying)        ; 6
@@ -1030,18 +1030,18 @@
 											      '(owl-flying)        ; 12
 											      (make-list 5 'none)))]) ; 13-17
 					 (make <clip>
-					   :title         'owl
+					   :title       'owl
 					   :cels        owl-cel-set
 					   :cel-numbers (iota n-cels)
-					   :timings       (durations->timings (make-list n-cels one-tick))
-					   :alphas        (make-list (* n-cels 10) 1.0)
-					   :depth         (random-real)
-					   :offset        point-zero
-					   :x-random      #t
-					   :y-random      #f
-					   :reactive?     #f
-					   :loops-for     1
-					   :options       '()))]
+					   :timings     (durations->timings (make-list n-cels one-tick))
+					   :alphas      (make-list (* n-cels 10) 1.0)
+					   :depth       (random-real)
+					   :offset      point-zero
+					   :x-random    #t
+					   :y-random    #f
+					   :reactive?   #f
+					   :loops-for   1
+					   :options     '()))]
        ;; Rabbit
        ;; Simple clip
        [rabbit 	                       (make-simple-clip
