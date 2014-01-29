@@ -92,28 +92,28 @@
 ;;;   For easiness of setting up the <cel-set> class has arrays of
 ;;;   each elements of <cel> but not array of <cel> itself.
 ;;;
-;;;   The procedure (ref fs i) returns i-th cel out of cel set fs.
+;;;   The procedure (ref cs i) returns i-th cel out of cel set cs.
 ;;;
 
-(define-class <cel-set> ()
-  ([names                :init-keyword :names                :init-value '()]
-   [n-names              :init-keyword :n-names              :init-value 0]
-   [local-offsets        :init-keyword :local-offsets        :init-value '()]
-   [local-sizes          :init-keyword :local-sizes          :init-value '()]
-   [local-matrices       :init-keyword :local-matrices       :init-value '()]
-   [local-alphas         :init-keyword :local-alphas         :init-value '()]
-   [local-color-matrices :init-keyword :local-color-matrices :init-value '()]
-   [local-depths         :init-keyword :local-depths         :init-value '()]
-   [local-sounds         :init-keyword :local-sounds         :init-value '()]))
+(define-class <cel-set> ()  
+  ([names                :init-keyword :names                :init-value '()]    ; list of strings
+   [n-names              :init-keyword :n-names              :init-value 0]      ; cardinal
+   [local-offsets        :init-keyword :local-offsets        :init-value '()]    ; list of points
+   [local-sizes          :init-keyword :local-sizes          :init-value '()]    ; list of sizes
+   [local-matrices       :init-keyword :local-matrices       :init-value '()]    ; list of matrices
+   [local-alphas         :init-keyword :local-alphas         :init-value '()]    ; list of reals
+   [local-color-matrices :init-keyword :local-color-matrices :init-value '()]    ; list of matrices
+   [local-depths         :init-keyword :local-depths         :init-value '()]    ; list of reals
+   [local-sounds         :init-keyword :local-sounds         :init-value '()]))  ; list of strings
 
 (define-class <cel> ()
-  ([name               :init-keyword :name               :init-value "unnamed"]
-   [local-offset       :init-keyword :local-offset       :init-value point-zero]
-   [local-size         :init-keyword :local-size         :init-value point-hundred]
-   [local-matrix       :init-keyword :local-matrix       :init-value id-matrix-2x2]
-   [local-color-matrix :init-keyword :local-color-matrix :init-value id-matrix-3x3]
-   [local-depth        :init-keyword :local-depth        :init-value 0]
-   [local-sound        :init-keyword :local-sound        :init-value 'none]))
+  ([name               :init-keyword :name               :init-value "unnamed"]      ; string
+   [local-offset       :init-keyword :local-offset       :init-value point-zero]     ; point (pair of reals)
+   [local-size         :init-keyword :local-size         :init-value point-hundred]  ; size (pair of pair of reals)
+   [local-matrix       :init-keyword :local-matrix       :init-value id-matrix-2x2]  ; matrix (list of reals)
+   [local-color-matrix :init-keyword :local-color-matrix :init-value id-matrix-3x3]  ; matrix (list of reals)
+   [local-depth        :init-keyword :local-depth        :init-value 0]              ; real
+   [local-sound        :init-keyword :local-sound        :init-value 'none]))        ; string
 
 (define-method ref ([cs <cel-set>] [i <integer>]) ; returns <cel>
   (let*
