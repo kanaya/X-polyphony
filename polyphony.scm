@@ -39,8 +39,8 @@
 (define event-gate 5)                   ; [s]
 (define freezing-duration 5)            ; [s]
 
-(define id-matrix-2x2 '(1.0 0.0 0.0 1.0))
-(define id-matrix-3x3 '(1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0))
+; (define id-matrix-2x2 '(1.0 0.0 0.0 1.0))
+; (define id-matrix-3x3 '(1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0))
 
 (define image-prefix "file:///Users/kanaya/Documents/polyphony-animation-material/") ; the simulator accesses this address. (the rendering client ignores this prefix.)
 (define image-suffix ".png")
@@ -100,9 +100,7 @@
    [n-names              :init-keyword :n-names              :init-value 0]      ; cardinal
    [local-offsets        :init-keyword :local-offsets        :init-value '()]    ; list of points
    [local-sizes          :init-keyword :local-sizes          :init-value '()]    ; list of sizes
-   [local-matrices       :init-keyword :local-matrices       :init-value '()]    ; list of matrices
    [local-alphas         :init-keyword :local-alphas         :init-value '()]    ; list of reals
-   [local-color-matrices :init-keyword :local-color-matrices :init-value '()]    ; list of matrices
    [local-depths         :init-keyword :local-depths         :init-value '()]    ; list of reals
    [local-sounds         :init-keyword :local-sounds         :init-value '()]))  ; list of strings
 
@@ -110,8 +108,6 @@
   ([name               :init-keyword :name               :init-value "unnamed"]      ; string
    [local-offset       :init-keyword :local-offset       :init-value point-zero]     ; point (pair of reals)
    [local-size         :init-keyword :local-size         :init-value point-hundred]  ; size (pair of pair of reals)
-   [local-matrix       :init-keyword :local-matrix       :init-value id-matrix-2x2]  ; matrix (list of reals)
-   [local-color-matrix :init-keyword :local-color-matrix :init-value id-matrix-3x3]  ; matrix (list of reals)
    [local-depth        :init-keyword :local-depth        :init-value 0]              ; real
    [local-sound        :init-keyword :local-sound        :init-value 'none]))        ; string
 
@@ -123,8 +119,6 @@
       :name               (ref (ref cs 'names) j)
       :local-offset       (ref (ref cs 'local-offsets) j)
       :local-size         (ref (ref cs 'local-sizes) j)
-      :local-matrix       (ref (ref cs 'local-matrices) j)
-      :local-color-matrix (ref (ref cs 'local-color-matrices) j)
       ; :local-depth        (ref (ref cs 'local-depths) j)
       :local-sound        (ref (ref cs 'local-sounds) j))))
 
@@ -157,7 +151,7 @@
    [offset      :init-keyword :offset      :init-value point-zero]    ; array of pair of real
    [size        :init-keyword :size        :init-value point-one]     ; array of pair of real
    [depth       :init-keyword :depth       :init-value 0]             ; real
-   [matrix      :init-keyword :matrix      :init-value id-matrix-2x2] ; array of real
+   ; [matrix      :init-keyword :matrix      :init-value id-matrix-2x2] ; array of real
    [animating   :init-keyword :animating   :init-value #f]            ; boolean
    [time-offset :init-keyword :time-offset :init-value 0]             ; real
    [x-random    :init-keyword :x-random    :init-value #f]            ; boolean
@@ -504,8 +498,6 @@
 			:n-names              n-cels
 			:local-offsets        local-offsets
 			:local-sizes          (make-list n-cels canvas-size)
-			:local-matrices       (make-list n-cels id-matrix-2x2)
-			:local-color-matrices (make-list n-cels id-matrix-3x3)
 			:local-sounds         sounds)]
        [timings       (durations->timings (make-list n-numbers one-tick))]
        [alphas        (if (null? alphas) (make-list n-numbers 1.0) alphas)])
@@ -544,7 +536,6 @@
        [new-offset      (ref clip1 'offset)] ; be careful
        [new-size        (ref clip1 'size)] ; not used?
        [new-depth       (ref clip1 'depth)]
-       [new-matrix      (ref clip1 'matrix)]
        [new-animating   #f]
        [new-time-offset (ref clip1 'time-offset)]
        [new-x-random    (ref clip1 'x-random)]
@@ -557,9 +548,7 @@
 		     :n-names              (+      (ref cels1 'n-names)              (ref cels2 'n-names))
 		     :local-offsets        (append (ref cels1 'local-offsets)        (ref cels2 'local-offsets))
 		     :local-sizes          (append (ref cels1 'local-sizes)          (ref cels2 'local-sizes))
-		     :local-matrices       (append (ref cels1 'local-matrices)       (ref cels2 'local-matrices))
 		     :local-alphas         (append (ref cels1 'local-alphas)         (ref cels2 'local-alphas))
-		     :local-color-matrices (append (ref cels1 'local-color-matrices) (ref cels2 'local-color-matrices))
 		     :local-depths         (append (ref cels1 'local-depths)         (ref cels2 'local-depths))
 		     :local-sounds         (append (ref cels1 'local-sounds)         (ref cels2 'local-sounds)))
 	  (make <clip> 
@@ -592,7 +581,6 @@
        [offset        (ref clip 'offset)]
        [size          (ref clip 'size)]
        [depth         (ref clip 'depth)]
-       [matrix        (ref clip 'matrix)]
        [animating     (ref clip 'animating)]
        [time-offset   (ref clip 'time-offset)]
        [x-random      (ref clip 'x-random)]
@@ -609,7 +597,7 @@
      :offset        offset
      :size          size
      :depth         depth
-     :matrix        matrix
+     ; :matrix        matrix
      :animating     animating
      :time-offset   time-offset
      :x-random      x-random
@@ -631,7 +619,7 @@
        [offset        (ref clip 'offset)]
        [size          (ref clip 'size)]
        [depth         (ref clip 'depth)]
-       [matrix        (ref clip 'matrix)]
+       ; [matrix        (ref clip 'matrix)]
        [animating     (ref clip 'animating)]
        [time-offset   (ref clip 'time-offset)]
        [x-random      (ref clip 'x-random)]
@@ -648,7 +636,7 @@
      :offset      offset
      :size        size
      :depth       depth
-     :matrix      matrix
+     ; :matrix      matrix
      :animating   animating
      :time-offset time-offset
      :x-random    x-random
@@ -1014,9 +1002,7 @@
 								     :n-names              n-cels
 								     :local-offsets        local-offsets
 								     :local-sizes          (make-list n-cels canvas-size)
-								     :local-matrices       (make-list n-cels id-matrix-2x2)
 								     :local-alphas         (make-list n-cels 1.0)
-								     :local-color-matrices (make-list n-cels id-matrix-3x3)
 								     :local-depths         (make-list n-cels 0)
 								     :local-sounds         (append
 											      '(owl-coming)        ; 1
