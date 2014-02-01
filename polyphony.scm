@@ -1,3 +1,5 @@
+;;;------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
+;;;      1         2         3         4         5         6         7         8         9         0         1         2         3         4         5         6
 ;;;
 ;;; How to test
 ;;;
@@ -39,7 +41,8 @@
 (define event-gate 5)                   ; [s]
 (define freezing-duration 5)            ; [s]
 
-(define image-prefix "file:///Users/kanaya/Documents/polyphony-animation-material/") ; the simulator accesses this address. (the rendering client ignores this prefix.)
+(define image-prefix "file:///Users/kanaya/Documents/polyphony-animation-material/")
+					; the simulator accesses this address. (the rendering client ignores this prefix.)
 (define image-suffix ".png")
 
 (define duration-of-ambient-sound 6.4)  ; [s]
@@ -82,12 +85,10 @@
 ;;;
 ;;; <cel-set> class and <cel> class
 ;;;
-;;;   The <cel-set> class defines a set of elements for a block of clip.
-;;;   It can have each cels and the associated values including offset, size,
+;;;   The <cel-set> class defines a set of elements for a block of clip. It can have each cels and the associated values including offset, size,
 ;;;   transformation matrix, and color matrix.
 ;;;
-;;;   For easiness of setting up the <cel-set> class has arrays of
-;;;   each elements of <cel> but not array of <cel> itself.
+;;;   For easiness of setting up the <cel-set> class has arrays of each elements of <cel> but not array of <cel> itself.
 ;;;
 ;;;   The procedure (ref cs i) returns i-th cel out of cel set cs.
 ;;;
@@ -852,7 +853,7 @@
        [pieris-rapae-pink-rev   (make-rapae-rev-clip :title 'pieris-rapae-pink-rev :prefix "Butterfly/Pieris_Rapae_Pink_Rev/")] ; dummy
        [pieris-rapae-yellow     (make-rapae-clip :title 'pieris-rapae-yellow :prefix "Butterfly/Pieris_Rapae_Yellow/")]
        [pieris-rapae-yellow-rev (make-rapae-rev-clip :title 'pieris-rapae-yellow-rev :prefix  "Butterfly/Pieris_Rapae_Yellow_Rev/")] ; dummy
-       [elephant                (let1 cel-names (map (cut string-append "Elephant2/ex/ex" <>) (map number->string (append (iota 28 1) (iota (- 260 28) 30))))
+       [elephant                (let1 cel-names (map (cut string-append "Elephant2/ex/ex" <>) #;(map number->string (append (iota 28 1) (iota (- 260 28) 30))) (map number->string (iota 261 1)))
 				      (make-clip-primitive
 				       :title 'elephant
 				       :cel-names cel-names
@@ -860,7 +861,7 @@
 				       :cel-numbers (iota (length cel-names))
 				       :alphas (make-list (length cel-names) 1.0)
 				       :canvas-size `(,(* 984 10) . ,(* 289 10))  ; 8
-				       :offset '(1000 . -300)
+				       :offset '(1000 . -300)  ;; didn't work???
 				       :reactive? #t
 				       :sounds (make-list (length cel-names) 'none)
 				       :options '()))]
