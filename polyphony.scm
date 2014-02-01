@@ -752,7 +752,7 @@
 		       (make-list 7 'none))
 	 :options     '())))
 
-(define (make-papilionidae-clip :key [title 'papilionidae-white] [prefix "{prefix}/"] [jumps-to 'papilionidae-white-touch-down])
+(define (make-papilionidae-clip :key [title 'papilionidae-white] [prefix "{prefix}/"] #;[jumps-to 'papilionidae-white-touch-down])
   (let1 cel-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
 	(make-clip-primitive
 	 :title       title
@@ -772,7 +772,7 @@
 		       '(butterfly) (make-list 10 'none))
 	 :options     '())))
 
-(define (make-papilionidae-rev-clip :key [title 'papilionidae-white] [prefix "{prefix}/"] [jumps-to 'papilionidae-white-touch-down])
+(define (make-papilionidae-rev-clip :key [title 'papilionidae-white] [prefix "{prefix}/"] #;[jumps-to 'papilionidae-white-touch-down])
   (let1 cel-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
 	(make-clip-primitive
 	 :title       title
@@ -792,7 +792,7 @@
 		       '(butterfly) (make-list 10 'none))
 	 :options     '())))
 
-(define
+#;(define
   (make-papilionidae-touch-down-clip
    :key
    [title       'papilionidae-white-touch-down]
@@ -811,7 +811,7 @@
 	 :sounds      (make-list (length cel-names) 'none)
 	 :options     '())))
 
-(define (make-rapae-clip :key [title 'rapae-white] [prefix "{prefix}/"] [jumps-to 'rapae-white-touch-down]) 
+(define (make-rapae-clip :key [title 'rapae-white] [prefix "{prefix}/"] #;[jumps-to 'rapae-white-touch-down]) 
   (make-simple-clip 
    :title           title
    :cel-name-prefix prefix
@@ -822,7 +822,7 @@
    :sounds          (append '(butterfly) (make-list 10 'none))
    :options         '()))
 
-(define (make-rapae-rev-clip :key [title 'rapae-rev-white] [prefix "{prefix}/"] [jumps-to 'rapae-white-touch-down])
+(define (make-rapae-rev-clip :key [title 'rapae-rev-white] [prefix "{prefix}/"] #;[jumps-to 'rapae-white-touch-down])
   (make-simple-clip
    :title           title
    :cel-name-prefix prefix
@@ -833,7 +833,7 @@
    :sounds          (append '(butterfly) (make-list 10 'none))
    :options         '()))
 
-(define
+#;(define
   (make-rapae-touch-down-clip
    :key
    [title       'rapae-white-touch-down]  ;; ???
@@ -891,45 +891,32 @@
 							(make-list 43 'none))
 					:options '())]
        ;; Birds Blue
-       ;; Bird clip
        [birds-blue                     (make-birds-clip :title 'birds-blue :prefix "Birds/Birds_Blue/")]
        ;; Birds Orange
-       ;; Bird clip
        [birds-orange                   (make-birds-clip :title 'birds-orange :prefix "Birds/Birds_Orange/")]
-       ;; Birds Blue Take-off
-       ;; Bird-take-off clip
-       ;[birds-blue-take-off            (make-birds-take-off-clip :title 'birds-blue-take-off :prefix1 "Birds/Birds_Blue/" :prefix2 "Birds/Birds_Blue/flying-")]
-       ;; Birds Orange Take-off
-       ;; Bird-take-off clip
-       ; [birds-orange-take-off          (make-birds-take-off-clip :title 'birds-orange-take-off :prefix1 "Birds/Birds_Orange/" :prefix2 "Birds/Birds_Orange/flying-")]
        ;; Papilionidae Blue
-       ;; Papilionidae clip
        [papilionidae-blue              (make-papilionidae-clip :title 'papilionidae-blue :prefix "Butterfly/Papilionidae_Blue/")]
        [papilionidae-blue-rev          (make-papilionidae-rev-clip :title 'papilionidae-blue-rev :prefix "Butterfly/Papilionidae_Blue_Rev/")]
        ;; Papilionidae Purple
-       ;; Papilioniade clip
        [papilionidae-purple            (make-papilionidae-clip :title 'papilionidae-purple :prefix "Butterfly/Papilionidae_Purple/")]
        [papilionidae-purple-rev        (make-papilionidae-rev-clip :title 'papilionidae-purple-rev :prefix "Butterfly/Papilionidae_Purple_Rev/")]
        ;; Papilionidae White
-       ;; Papilionidae clip
        [papilionidae-white             (make-papilionidae-clip :title 'papilionidae-white :prefix "Butterfly/Papilionidae_White/")]
        [papilionidae-white-rev         (make-papilionidae-rev-clip :title 'papilionidae-white-rev :prefix "Butterfly/Papilionidae_White_Rev/")]
        ;; Papilionidae Yellow
-       ;; Papilionidae clip
        [papilionidae-yellow            (make-papilionidae-clip :title 'papilionidae-yellow :prefix "Butterfly/Papilionidae_Yellow/")]
        [papilionidae-yellow-rev        (make-papilionidae-rev-clip :title 'papilionidae-yellow-rev :prefix "Butterfly/Papilionidae_Yellow_Rev/")]
        ;; Papilionidae Blue Touch-down
-       ;; Papilionidae-touch-down clip
-       [papilionidae-blue-touch-down   (make-papilionidae-touch-down-clip :title 'papilionidae-blue-touch-down :prefix "Butterfly/Papilionidae_Blue/touch_down/10_")]
+       ; [papilionidae-blue-touch-down   (make-papilionidae-touch-down-clip :title 'papilionidae-blue-touch-down :prefix "Butterfly/Papilionidae_Blue/touch_down/10_")]
        ;; Papilionidae White Touch-down
        ;; Papilionidae-touch-down clip
-       [papilionidae-white-touch-down  (make-papilionidae-touch-down-clip :title 'papilionidae-white-touch-down :prefix "Butterfly/Papilionidae_White/touch_down/10_")]
+       ; [papilionidae-white-touch-down  (make-papilionidae-touch-down-clip :title 'papilionidae-white-touch-down :prefix "Butterfly/Papilionidae_White/touch_down/10_")]
        ;; Papilionidae Yellow Touch-down
        ;; Papilionidae-touch-down clip
-       [papilionidae-yellow-touch-down (make-papilionidae-touch-down-clip :title 'papilionidae-yellow-touch-down :prefix "Butterfly/Papilionidae_Yellow/touch_down/10_")]
+       ; [papilionidae-yellow-touch-down (make-papilionidae-touch-down-clip :title 'papilionidae-yellow-touch-down :prefix "Butterfly/Papilionidae_Yellow/touch_down/10_")]
        ;; Papilionidae Purpule Touch-down
        ;; Papilionidae-touch-down clip
-       [papilionidae-purple-touch-down (make-papilionidae-touch-down-clip :title 'papilionidae-purple-touch-down :prefix "Butterfly/Papilionidae_Purple/touch_down/10_")]
+       ; [papilionidae-purple-touch-down (make-papilionidae-touch-down-clip :title 'papilionidae-purple-touch-down :prefix "Butterfly/Papilionidae_Purple/touch_down/10_")]
        ;; Pieris-Rapae Pink
        ;; Rapae clip
        [pieris-rapae-pink              (make-rapae-clip :title 'pieris-rapae-pink :prefix "Butterfly/Pieris_Rapae_Pink/")]
@@ -940,10 +927,10 @@
        [pieris-rapae-yellow-rev        (make-rapae-rev-clip :title 'pieris-rapae-yellow-rev :prefix  "Butterfly/Pieris_Rapae_Yellow_Rev/")] ; dummy
        ;; Pieris-Rapae Pink Touch-down
        ;; Rapae-touch-douwn clip
-       [pieris-rapae-pink-touch-down   (make-rapae-touch-down-clip :title 'pieris-rapae-pink-touch-down :prefix "Butterfly/Pieris_Rapae_Pink/touch_down/10_")]
+       ; [pieris-rapae-pink-touch-down   (make-rapae-touch-down-clip :title 'pieris-rapae-pink-touch-down :prefix "Butterfly/Pieris_Rapae_Pink/touch_down/10_")]
        ;; Pieris-Rapae Yellow Touch-down
        ;; Rapae-touch-down clip
-       [pieris-rapae-yellow-touch-down (make-rapae-touch-down-clip :title 'pieris-rapae-yellow-touch-down :prefix "Butterfly/Pieris_Rapae_Yellow/touch_down/10_")]
+       ; [pieris-rapae-yellow-touch-down (make-rapae-touch-down-clip :title 'pieris-rapae-yellow-touch-down :prefix "Butterfly/Pieris_Rapae_Yellow/touch_down/10_")]
        ;; Elephant
        [elephant                       (let1 cel-names (map
 							  (cut string-append "Elephant2/ex/ex" <>)
@@ -1066,8 +1053,6 @@
 	  (hash-table-put! hash-table 'baboon-weeing                  (clip-append baboon-weeing mazak-birds))
 	  (hash-table-put! hash-table 'birds-blue                     (clip->clip-with-fade-out birds-blue))
 	  (hash-table-put! hash-table 'birds-orange                   (clip->clip-with-fade-out birds-orange))
-	  ; (hash-table-put! hash-table 'birds-blue-take-off            birds-blue-take-off)
-	  ; (hash-table-put! hash-table 'birds-orange-take-off          birds-orange-take-off)
 	  (hash-table-put! hash-table 'papilionidae-blue              (clip->clip-with-fade-out papilionidae-blue))
 	  (hash-table-put! hash-table 'papilionidae-purple            (clip->clip-with-fade-out papilionidae-purple))
 	  (hash-table-put! hash-table 'papilionidae-white             (clip->clip-with-fade-out papilionidae-white))
@@ -1076,16 +1061,16 @@
 	  (hash-table-put! hash-table 'papilionidae-purple-rev        (clip->clip-with-fade-out papilionidae-purple-rev))
 	  (hash-table-put! hash-table 'papilionidae-white-rev         (clip->clip-with-fade-out papilionidae-white-rev))
 	  (hash-table-put! hash-table 'papilionidae-yellow-rev        (clip->clip-with-fade-out papilionidae-yellow-rev))
-	  (hash-table-put! hash-table 'papilionidae-blue-touch-down   papilionidae-blue-touch-down)
-	  (hash-table-put! hash-table 'papilionidae-purple-touch-down papilionidae-purple-touch-down)
-	  (hash-table-put! hash-table 'papilionidae-white-touch-down  papilionidae-white-touch-down)
-	  (hash-table-put! hash-table 'papilionidae-yellow-touch-down papilionidae-yellow-touch-down)
+	  ; (hash-table-put! hash-table 'papilionidae-blue-touch-down   papilionidae-blue-touch-down)
+	  ; (hash-table-put! hash-table 'papilionidae-purple-touch-down papilionidae-purple-touch-down)
+	  ; (hash-table-put! hash-table 'papilionidae-white-touch-down  papilionidae-white-touch-down)
+	  ; (hash-table-put! hash-table 'papilionidae-yellow-touch-down papilionidae-yellow-touch-down)
 	  (hash-table-put! hash-table 'pieris-rapae-pink              (clip->clip-with-fade-out pieris-rapae-pink))
 	  (hash-table-put! hash-table 'pieris-rapae-yellow            (clip->clip-with-fade-out pieris-rapae-yellow))
 	  (hash-table-put! hash-table 'pieris-rapae-pink-rev          (clip->clip-with-fade-out pieris-rapae-pink-rev))
 	  (hash-table-put! hash-table 'pieris-rapae-yellow-rev        (clip->clip-with-fade-out pieris-rapae-yellow-rev))
-	  (hash-table-put! hash-table 'pieris-rapae-pink-touch-down   pieris-rapae-pink-touch-down)
-	  (hash-table-put! hash-table 'pieris-rapae-yellow-touch-down pieris-rapae-yellow-touch-down)
+	  ; (hash-table-put! hash-table 'pieris-rapae-pink-touch-down   pieris-rapae-pink-touch-down)
+	  ; (hash-table-put! hash-table 'pieris-rapae-yellow-touch-down pieris-rapae-yellow-touch-down)
 	  (hash-table-put! hash-table 'elephant                       (clip->clip-with-fade-out elephant))
 	  (hash-table-put! hash-table 'fawn                           (clip->clip-with-fade-out fawn))
 	  (hash-table-put! hash-table 'fox                            (clip->clip-with-fade-out fox))
@@ -1110,7 +1095,7 @@
 	(hash-table-put! hash-table 'apple-touch-down-2    '("apple_touch_down_2-1sec"    . 2))
 	(hash-table-put! hash-table 'baboon-voice          '("baboon_voice-4sec"          . 4))
 	(hash-table-put! hash-table 'birds-flying          '("birds_flying-3sec"          . 3))
-	(hash-table-put! hash-table 'birds-touch-down      '("birds_touch_down-1sec"      . 1))
+	; (hash-table-put! hash-table 'birds-touch-down      '("birds_touch_down-1sec"      . 1))
 	(hash-table-put! hash-table 'birds-twitter         '("birds_twitter-4sec"         . 4))
 	(hash-table-put! hash-table 'butterfly             '("butterfly-3sec"             . 3))
 	(hash-table-put! hash-table 'deer                  '("deer-1sec"                  . 1))
