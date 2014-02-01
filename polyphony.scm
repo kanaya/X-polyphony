@@ -224,7 +224,7 @@
   (define (index-of-nearest-time timings t)
     (let1 less-than-time (partition (cut > t <>) timings)
 	  (length less-than-time)))
-  (define (real-modulo t d) ;; needs faster argolithm!!!
+  (define (real-modulo t d)
     (if (< t d)
 	t
 	(real-modulo (- t d) d)))
