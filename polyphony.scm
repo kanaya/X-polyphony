@@ -467,7 +467,7 @@
 ;;;
 
 ;;
-;; Primitive clip setter
+;; make-clip-primitive
 ;;
 
 (define
@@ -566,7 +566,7 @@
 	    :options new-options))))
 
 ;;;
-;;; clip->clip-with-fade-out
+;;; clip->clip and clip->clip-with-fade-out
 ;;;
 
 (define (clip->clip clip)  ; copy constructor
@@ -640,6 +640,9 @@
      :reactive?   reactive?
      :options     options)))
 
+;;
+;; make-simple-clip
+;;
 
 (define
   (make-simple-clip
@@ -669,6 +672,10 @@
    :reactive?   reactive?
    :sounds      sounds
    :options     options))
+
+;;
+;; make-birds-clip
+;;
 
 (define
   (make-birds-clip
@@ -891,10 +898,10 @@
        [birds-orange                   (make-birds-clip :title 'birds-orange :prefix "Birds/Birds_Orange/")]
        ;; Birds Blue Take-off
        ;; Bird-take-off clip
-       [birds-blue-take-off            (make-birds-take-off-clip :title 'birds-blue-take-off :prefix1 "Birds/Birds_Blue/" :prefix2 "Birds/Birds_Blue/flying-")]
+       ;[birds-blue-take-off            (make-birds-take-off-clip :title 'birds-blue-take-off :prefix1 "Birds/Birds_Blue/" :prefix2 "Birds/Birds_Blue/flying-")]
        ;; Birds Orange Take-off
        ;; Bird-take-off clip
-       [birds-orange-take-off          (make-birds-take-off-clip :title 'birds-orange-take-off :prefix1 "Birds/Birds_Orange/" :prefix2 "Birds/Birds_Orange/flying-")]
+       ; [birds-orange-take-off          (make-birds-take-off-clip :title 'birds-orange-take-off :prefix1 "Birds/Birds_Orange/" :prefix2 "Birds/Birds_Orange/flying-")]
        ;; Papilionidae Blue
        ;; Papilionidae clip
        [papilionidae-blue              (make-papilionidae-clip :title 'papilionidae-blue :prefix "Butterfly/Papilionidae_Blue/")]
@@ -1059,8 +1066,8 @@
 	  (hash-table-put! hash-table 'baboon-weeing                  (clip-append baboon-weeing mazak-birds))
 	  (hash-table-put! hash-table 'birds-blue                     (clip->clip-with-fade-out birds-blue))
 	  (hash-table-put! hash-table 'birds-orange                   (clip->clip-with-fade-out birds-orange))
-	  (hash-table-put! hash-table 'birds-blue-take-off            birds-blue-take-off)
-	  (hash-table-put! hash-table 'birds-orange-take-off          birds-orange-take-off)
+	  ; (hash-table-put! hash-table 'birds-blue-take-off            birds-blue-take-off)
+	  ; (hash-table-put! hash-table 'birds-orange-take-off          birds-orange-take-off)
 	  (hash-table-put! hash-table 'papilionidae-blue              (clip->clip-with-fade-out papilionidae-blue))
 	  (hash-table-put! hash-table 'papilionidae-purple            (clip->clip-with-fade-out papilionidae-purple))
 	  (hash-table-put! hash-table 'papilionidae-white             (clip->clip-with-fade-out papilionidae-white))
