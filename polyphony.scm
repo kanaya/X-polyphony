@@ -39,9 +39,6 @@
 (define event-gate 5)                   ; [s]
 (define freezing-duration 5)            ; [s]
 
-; (define id-matrix-2x2 '(1.0 0.0 0.0 1.0))
-; (define id-matrix-3x3 '(1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0))
-
 (define image-prefix "file:///Users/kanaya/Documents/polyphony-animation-material/") ; the simulator accesses this address. (the rendering client ignores this prefix.)
 (define image-suffix ".png")
 
@@ -792,26 +789,7 @@
 		       '(butterfly) (make-list 10 'none))
 	 :options     '())))
 
-#;(define
-  (make-papilionidae-touch-down-clip
-   :key
-   [title       'papilionidae-white-touch-down]
-   [prefix      "{prefix}/"]
-   [jumped-from 'papilionidae-white])
-  (let1 cel-names (map
-		   (cut string-append prefix <>)
-		   (map number->string (iota 4 1)))
-	(make-clip-primitive
-	 :title       title
-	 :cel-names   cel-names
-	 :cel-offsets (make-list (length cel-names) point-zero)
-	 :cel-numbers (iota (length cel-names))
-	 :canvas-size '(585 . 425)
-	 :reactive?   #t
-	 :sounds      (make-list (length cel-names) 'none)
-	 :options     '())))
-
-(define (make-rapae-clip :key [title 'rapae-white] [prefix "{prefix}/"] #;[jumps-to 'rapae-white-touch-down]) 
+(define (make-rapae-clip :key [title 'rapae-white] [prefix "{prefix}/"]) 
   (make-simple-clip 
    :title           title
    :cel-name-prefix prefix
@@ -822,7 +800,7 @@
    :sounds          (append '(butterfly) (make-list 10 'none))
    :options         '()))
 
-(define (make-rapae-rev-clip :key [title 'rapae-rev-white] [prefix "{prefix}/"] #;[jumps-to 'rapae-white-touch-down])
+(define (make-rapae-rev-clip :key [title 'rapae-rev-white] [prefix "{prefix}/"])
   (make-simple-clip
    :title           title
    :cel-name-prefix prefix
@@ -832,26 +810,6 @@
    :y-random        #t
    :sounds          (append '(butterfly) (make-list 10 'none))
    :options         '()))
-
-#;(define
-  (make-rapae-touch-down-clip
-   :key
-   [title       'rapae-white-touch-down]  ;; ???
-   [prefix      "{prefix}/"]
-   [jumped-from 'rapae-white]) ;; ???
-  (let1 cel-names (map
-		   (cut string-append prefix <>)
-		   (map number->string (iota 4 1)))
-	(make-clip-primitive
-	 :title       title
-	 :cel-names   cel-names
-	 :cel-offsets (make-list (length cel-names) point-zero)
-	 :cel-numbers (iota (length cel-names))
-	 :canvas-size '(585 . 425)
-	 :reactive?   #t
-	 :sounds      (make-list (length cel-names) 'none)
-	 :options     '())))
-
 
 (define *the-clip-collection*
   (let
@@ -906,31 +864,12 @@
        ;; Papilionidae Yellow
        [papilionidae-yellow            (make-papilionidae-clip :title 'papilionidae-yellow :prefix "Butterfly/Papilionidae_Yellow/")]
        [papilionidae-yellow-rev        (make-papilionidae-rev-clip :title 'papilionidae-yellow-rev :prefix "Butterfly/Papilionidae_Yellow_Rev/")]
-       ;; Papilionidae Blue Touch-down
-       ; [papilionidae-blue-touch-down   (make-papilionidae-touch-down-clip :title 'papilionidae-blue-touch-down :prefix "Butterfly/Papilionidae_Blue/touch_down/10_")]
-       ;; Papilionidae White Touch-down
-       ;; Papilionidae-touch-down clip
-       ; [papilionidae-white-touch-down  (make-papilionidae-touch-down-clip :title 'papilionidae-white-touch-down :prefix "Butterfly/Papilionidae_White/touch_down/10_")]
-       ;; Papilionidae Yellow Touch-down
-       ;; Papilionidae-touch-down clip
-       ; [papilionidae-yellow-touch-down (make-papilionidae-touch-down-clip :title 'papilionidae-yellow-touch-down :prefix "Butterfly/Papilionidae_Yellow/touch_down/10_")]
-       ;; Papilionidae Purpule Touch-down
-       ;; Papilionidae-touch-down clip
-       ; [papilionidae-purple-touch-down (make-papilionidae-touch-down-clip :title 'papilionidae-purple-touch-down :prefix "Butterfly/Papilionidae_Purple/touch_down/10_")]
        ;; Pieris-Rapae Pink
-       ;; Rapae clip
        [pieris-rapae-pink              (make-rapae-clip :title 'pieris-rapae-pink :prefix "Butterfly/Pieris_Rapae_Pink/")]
        [pieris-rapae-pink-rev          (make-rapae-rev-clip :title 'pieris-rapae-pink-rev :prefix "Butterfly/Pieris_Rapae_Pink_Rev/")] ; dummy
        ;; Pieris-Rapae Yellow
-       ;; Rapae clip
        [pieris-rapae-yellow            (make-rapae-clip	:title 'pieris-rapae-yellow :prefix "Butterfly/Pieris_Rapae_Yellow/")]
        [pieris-rapae-yellow-rev        (make-rapae-rev-clip :title 'pieris-rapae-yellow-rev :prefix  "Butterfly/Pieris_Rapae_Yellow_Rev/")] ; dummy
-       ;; Pieris-Rapae Pink Touch-down
-       ;; Rapae-touch-douwn clip
-       ; [pieris-rapae-pink-touch-down   (make-rapae-touch-down-clip :title 'pieris-rapae-pink-touch-down :prefix "Butterfly/Pieris_Rapae_Pink/touch_down/10_")]
-       ;; Pieris-Rapae Yellow Touch-down
-       ;; Rapae-touch-down clip
-       ; [pieris-rapae-yellow-touch-down (make-rapae-touch-down-clip :title 'pieris-rapae-yellow-touch-down :prefix "Butterfly/Pieris_Rapae_Yellow/touch_down/10_")]
        ;; Elephant
        [elephant                       (let1 cel-names (map
 							  (cut string-append "Elephant2/ex/ex" <>)
@@ -949,7 +888,6 @@
 					      :sounds (make-list (length cel-names) 'none)
 					      :options '()))]
        ;; Fawn
-       ;; Simple clip
        [fawn                           (make-simple-clip
 					:title 'fawn
 					:cel-name-prefix "Fawn2/"
@@ -959,7 +897,6 @@
 					:offset '(500 . 100)
 					:sounds (make-list 116 'none))]
        ;; Fox
-       ;; Simple clip
        [fox                            (make-simple-clip
 					:title 'fox
 					:cel-name-prefix "Fox2/"
@@ -969,7 +906,6 @@
 					:offset '(0 . 0)
 					:sounds (make-list 56 'none))]
        ;; Meercat
-       ;; Simple clip
        [meercat                        (make-simple-clip
 					:title 'meercat
 					:cel-name-prefix "Meercat2/"
@@ -1019,7 +955,6 @@
 					   :loops-for   1
 					   :options     '()))]
        ;; Rabbit
-       ;; Simple clip
        [rabbit 	                       (make-simple-clip
 					:title 'rabbit
 					:cel-name-prefix "Rabbit2/"
@@ -1029,7 +964,6 @@
 					:offset '(500 . 0) ; test
 					:sounds (make-list 189 'none))]
        ;; Squirrel
-       ;; Simple clip
        [squirrel                       (make-simple-clip
 					:title 'squirrel
 					:cel-name-prefix "Squirrel2/"
@@ -1039,7 +973,6 @@
 					:offset '(3000 . 0)
 					:sounds (make-list 23 'none))]
        ;; Tanuki
-       ;; Simple clip
        [tanuki                         (make-simple-clip
 					:title 'tanuki
 					:cel-name-prefix "Tanuki2/"
@@ -1061,27 +994,17 @@
 	  (hash-table-put! hash-table 'papilionidae-purple-rev        (clip->clip-with-fade-out papilionidae-purple-rev))
 	  (hash-table-put! hash-table 'papilionidae-white-rev         (clip->clip-with-fade-out papilionidae-white-rev))
 	  (hash-table-put! hash-table 'papilionidae-yellow-rev        (clip->clip-with-fade-out papilionidae-yellow-rev))
-	  ; (hash-table-put! hash-table 'papilionidae-blue-touch-down   papilionidae-blue-touch-down)
-	  ; (hash-table-put! hash-table 'papilionidae-purple-touch-down papilionidae-purple-touch-down)
-	  ; (hash-table-put! hash-table 'papilionidae-white-touch-down  papilionidae-white-touch-down)
-	  ; (hash-table-put! hash-table 'papilionidae-yellow-touch-down papilionidae-yellow-touch-down)
 	  (hash-table-put! hash-table 'pieris-rapae-pink              (clip->clip-with-fade-out pieris-rapae-pink))
 	  (hash-table-put! hash-table 'pieris-rapae-yellow            (clip->clip-with-fade-out pieris-rapae-yellow))
 	  (hash-table-put! hash-table 'pieris-rapae-pink-rev          (clip->clip-with-fade-out pieris-rapae-pink-rev))
 	  (hash-table-put! hash-table 'pieris-rapae-yellow-rev        (clip->clip-with-fade-out pieris-rapae-yellow-rev))
-	  ; (hash-table-put! hash-table 'pieris-rapae-pink-touch-down   pieris-rapae-pink-touch-down)
-	  ; (hash-table-put! hash-table 'pieris-rapae-yellow-touch-down pieris-rapae-yellow-touch-down)
 	  (hash-table-put! hash-table 'elephant                       (clip->clip-with-fade-out elephant))
 	  (hash-table-put! hash-table 'fawn                           (clip->clip-with-fade-out fawn))
 	  (hash-table-put! hash-table 'fox                            (clip->clip-with-fade-out fox))
 	  (hash-table-put! hash-table 'meercat                        (clip->clip-with-fade-out meercat))
-	  ;; (hash-table-put! hash-table 'owl owl)
 	  (hash-table-put! hash-table 'rabbit                         (clip->clip-with-fade-out rabbit))
-	  ;; (hash-table-put! hash-table 'rabbit-to-left rabbit-to-left)
-	  ;; (hash-table-put! hash-table 'rabbit-to-right rabbit-to-right)
 	  (hash-table-put! hash-table 'squirrel                       squirrel)
 	  (hash-table-put! hash-table 'tanuki                         (clip->clip-with-fade-out tanuki))
-	  ;; (hash-table-put! hash-table 'tanuki-turn-back tanuki-turn-back)
 	  hash-table)))
 
 ;;;
@@ -1095,7 +1018,6 @@
 	(hash-table-put! hash-table 'apple-touch-down-2    '("apple_touch_down_2-1sec"    . 2))
 	(hash-table-put! hash-table 'baboon-voice          '("baboon_voice-4sec"          . 4))
 	(hash-table-put! hash-table 'birds-flying          '("birds_flying-3sec"          . 3))
-	; (hash-table-put! hash-table 'birds-touch-down      '("birds_touch_down-1sec"      . 1))
 	(hash-table-put! hash-table 'birds-twitter         '("birds_twitter-4sec"         . 4))
 	(hash-table-put! hash-table 'butterfly             '("butterfly-3sec"             . 3))
 	(hash-table-put! hash-table 'deer                  '("deer-1sec"                  . 1))
