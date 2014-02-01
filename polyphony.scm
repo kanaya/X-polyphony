@@ -151,7 +151,6 @@
    [offset      :init-keyword :offset      :init-value point-zero]    ; array of pair of real
    [size        :init-keyword :size        :init-value point-one]     ; array of pair of real
    [depth       :init-keyword :depth       :init-value 0]             ; real
-   ; [matrix      :init-keyword :matrix      :init-value id-matrix-2x2] ; array of real
    [animating   :init-keyword :animating   :init-value #f]            ; boolean
    [time-offset :init-keyword :time-offset :init-value 0]             ; real
    [x-random    :init-keyword :x-random    :init-value #f]            ; boolean
@@ -597,7 +596,6 @@
      :offset        offset
      :size          size
      :depth         depth
-     ; :matrix        matrix
      :animating     animating
      :time-offset   time-offset
      :x-random      x-random
@@ -619,7 +617,6 @@
        [offset        (ref clip 'offset)]
        [size          (ref clip 'size)]
        [depth         (ref clip 'depth)]
-       ; [matrix        (ref clip 'matrix)]
        [animating     (ref clip 'animating)]
        [time-offset   (ref clip 'time-offset)]
        [x-random      (ref clip 'x-random)]
@@ -636,7 +633,6 @@
      :offset      offset
      :size        size
      :depth       depth
-     ; :matrix      matrix
      :animating   animating
      :time-offset time-offset
      :x-random    x-random
