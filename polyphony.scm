@@ -813,174 +813,144 @@
 
 (define *the-clip-collection*
   (let
-      (
-       ;; Mazak Birds
-       ;; Simple clip
-       [mazak-birds                    (make-simple-clip
-					:title 'mazak-birds
-					:cel-name-prefix "Mazak/"
-					:n-cels 106
-					:offset '(2200 . 1400) ; cel.offset
-					:canvas-size '(2313 . 1040)
-					:reactive? #t
-					:sounds (make-list 106 'none))]
-       ;; Apple
-       ;; Simple clip
-       [apple                          (make-simple-clip
-					:title 'apple
-					:cel-name-prefix "Apple2/"
-					:n-cels 31
-					:offset '(2200 . 500)
-					:canvas-size '(2313 . 1040)
-					:reactive? #t
-					:sounds (append (make-list 15 'none)
-							'(apple-touch-down)
-							(make-list 15 'none)))]
-       ;; Baboon-weeing
-       [baboon-weeing                  (make-clip-primitive 
-					:title 'baboon-weeing
-					:cel-names (map (cut string-append "Baboon2/" <>) (map number->string (iota 66 1)))
-					:cel-numbers (iota 66)
-					:offset '(2200 . 0) ; cel.offset
-					:canvas-size `(,(* 585 4) . ,(* 637 4))
-					:reactive? #t
-					:sounds (append (make-list 23 'none)
-							'(wee)
-							(make-list 43 'none))
-					:options '())]
-       ;; Birds Blue
-       [birds-blue                     (make-birds-clip :title 'birds-blue :prefix "Birds/Birds_Blue/")]
-       ;; Birds Orange
-       [birds-orange                   (make-birds-clip :title 'birds-orange :prefix "Birds/Birds_Orange/")]
-       ;; Papilionidae Blue
-       [papilionidae-blue              (make-papilionidae-clip :title 'papilionidae-blue :prefix "Butterfly/Papilionidae_Blue/")]
-       [papilionidae-blue-rev          (make-papilionidae-rev-clip :title 'papilionidae-blue-rev :prefix "Butterfly/Papilionidae_Blue_Rev/")]
-       ;; Papilionidae Purple
-       [papilionidae-purple            (make-papilionidae-clip :title 'papilionidae-purple :prefix "Butterfly/Papilionidae_Purple/")]
-       [papilionidae-purple-rev        (make-papilionidae-rev-clip :title 'papilionidae-purple-rev :prefix "Butterfly/Papilionidae_Purple_Rev/")]
-       ;; Papilionidae White
-       [papilionidae-white             (make-papilionidae-clip :title 'papilionidae-white :prefix "Butterfly/Papilionidae_White/")]
-       [papilionidae-white-rev         (make-papilionidae-rev-clip :title 'papilionidae-white-rev :prefix "Butterfly/Papilionidae_White_Rev/")]
-       ;; Papilionidae Yellow
-       [papilionidae-yellow            (make-papilionidae-clip :title 'papilionidae-yellow :prefix "Butterfly/Papilionidae_Yellow/")]
-       [papilionidae-yellow-rev        (make-papilionidae-rev-clip :title 'papilionidae-yellow-rev :prefix "Butterfly/Papilionidae_Yellow_Rev/")]
-       ;; Pieris-Rapae Pink
-       [pieris-rapae-pink              (make-rapae-clip :title 'pieris-rapae-pink :prefix "Butterfly/Pieris_Rapae_Pink/")]
-       [pieris-rapae-pink-rev          (make-rapae-rev-clip :title 'pieris-rapae-pink-rev :prefix "Butterfly/Pieris_Rapae_Pink_Rev/")] ; dummy
-       ;; Pieris-Rapae Yellow
-       [pieris-rapae-yellow            (make-rapae-clip	:title 'pieris-rapae-yellow :prefix "Butterfly/Pieris_Rapae_Yellow/")]
-       [pieris-rapae-yellow-rev        (make-rapae-rev-clip :title 'pieris-rapae-yellow-rev :prefix  "Butterfly/Pieris_Rapae_Yellow_Rev/")] ; dummy
-       ;; Elephant
-       [elephant                       (let1 cel-names (map
-							  (cut string-append "Elephant2/ex/ex" <>)
-							  (map
-							   number->string
-							   (append (iota 28 1) (iota (- 260 28) 30))))
-					     (make-clip-primitive
-					      :title 'elephant
-					      :cel-names cel-names
-					      :cel-offsets (make-list (length cel-names) point-zero)
-					      :cel-numbers (iota (length cel-names))
-					      :alphas (make-list (length cel-names) 1.0)
-					      :canvas-size `(,(* 984 10) . ,(* 289 10))  ; 8
-					      :offset '(1000 . -300)
-					      :reactive? #t
-					      :sounds (make-list (length cel-names) 'none)
-					      :options '()))]
-       ;; Fawn
-       [fawn                           (make-simple-clip
-					:title 'fawn
-					:cel-name-prefix "Fawn2/"
-					:n-cels 116
-					:reactive? #t
-					:canvas-size `(,(* 1188 8) . ,(* 213 8))
-					:offset '(500 . 100)
-					:sounds (make-list 116 'none))]
-       ;; Fox
-       [fox                            (make-simple-clip
-					:title 'fox
-					:cel-name-prefix "Fox2/"
-					:n-cels 56
-					:reactive? #t
-					:canvas-size `(,(* 1188 4) . ,(* 213 4))
-					:offset '(0 . 0)
-					:sounds (make-list 56 'none))]
-       ;; Meercat
-       [meercat                        (make-simple-clip
-					:title 'meercat
-					:cel-name-prefix "Meercat2/"
-					:n-cels 171
-					:reactive? #t
-					:canvas-size `(,(* 1041 8) . ,(* 213 8))
-					:offset '(0 . 200)
-					:sounds (make-list 171 'none))]
-       ;; Owl
-       [owl                            (let*
-					   ([cel-names-primitive (append '(1 2 3 3 3) (iota 14 4) (iota 12 6))]
-					    [cel-names           (map (cut string-append "Owl/" <>) (map number->string cel-names-primitive))]
-					    [n-cels              (length cel-names-primitive)]
-					    [canvas-size           `(,(* 585 2) . ,(* 425 2))]
-					    [local-offsets       (append
-								    (make-list 7 point-zero)  ; 1 2 3 3 3 4 5
-								    (map (cut cons <> 0) (durations->timings (make-list owl-step 28))))]
-					    [owl-cel-set         (make <cel-set>
-								     :names                cel-names
-								     :n-names              n-cels
-								     :local-offsets        local-offsets
-								     :local-sizes          (make-list n-cels canvas-size)
-								     :local-alphas         (make-list n-cels 1.0)
-								     :local-depths         (make-list n-cels 0)
-								     :local-sounds         (append
-											      '(owl-coming)        ; 1
-											      (make-list 6 'none)  ; 2 3 3 3 4 5
-											      '(owl-flying)        ; 6
-											      (make-list 5 'none)  ; 7-11
-											      '(owl-flying)        ; 12
-											      (make-list 5 'none)  ; 13-17
-											      '(owl-flying)        ; 6
-											      (make-list 5 'none)  ; 7-11
-											      '(owl-flying)        ; 12
-											      (make-list 5 'none)))]) ; 13-17
-					 (make <clip>
-					   :title       'owl
-					   :cels        owl-cel-set
-					   :cel-numbers (iota n-cels)
-					   :timings     (durations->timings (make-list n-cels one-tick))
-					   :alphas      (make-list (* n-cels 10) 1.0)
-					   :depth       (random-real)
-					   :offset      point-zero
-					   :x-random    #t
-					   :y-random    #f
-					   :reactive?   #f
-					   :loops-for   1
-					   :options     '()))]
-       ;; Rabbit
-       [rabbit 	                       (make-simple-clip
-					:title 'rabbit
-					:cel-name-prefix "Rabbit2/"
-					:n-cels 189
-					:reactive? #t
-					:canvas-size `(,(* 1188 6) . ,(* 213 6))
-					:offset '(500 . 0) ; test
-					:sounds (make-list 189 'none))]
-       ;; Squirrel
-       [squirrel                       (make-simple-clip
-					:title 'squirrel
-					:cel-name-prefix "Squirrel2/"
-					:n-cels 23
-					:reactive? #t
-					:canvas-size `(,(* 421 1.5) . ,(* 306 1.5))
-					:offset '(3000 . 0)
-					:sounds (make-list 23 'none))]
-       ;; Tanuki
-       [tanuki                         (make-simple-clip
-					:title 'tanuki
-					:cel-name-prefix "Tanuki2/"
-					:n-cels 50
-					:reactive? #t
-					:canvas-size `(,(* 883 8) . ,(* 213 8)) ; test
-					:offset '(1000 . 0)
-					:sounds (make-list 50 'none))])
+      ([mazak-birds             (make-simple-clip 
+				 :title 'mazak-birds 
+				 :cel-name-prefix "Mazak/"
+				 :n-cels 106
+				 :offset '(2200 . 1400)
+				 :canvas-size '(2313 . 1040)
+				 :reactive? #t
+				 :sounds (make-list 106 'none))]
+       [apple                   (make-simple-clip
+				 :title 'apple
+				 :cel-name-prefix "Apple2/"
+				 :n-cels 31
+				 :offset '(2200 . 500)
+				 :canvas-size '(2313 . 1040)
+				 :reactive? #t
+				 :sounds (append (make-list 15 'none) '(apple-touch-down) (make-list 15 'none)))]
+       [baboon-weeing           (make-clip-primitive
+				 :title 'baboon-weeing
+				 :cel-names (map (cut string-append "Baboon2/" <>) (map number->string (iota 66 1)))
+				 :cel-numbers (iota 66)
+				 :offset '(2200 . 0) ; cel.offset
+				 :canvas-size `(,(* 585 4) . ,(* 637 4))
+				 :reactive? #t
+				 :sounds (append (make-list 23 'none) '(wee) (make-list 43 'none))
+				 :options '())]
+       [birds-blue              (make-birds-clip :title 'birds-blue :prefix "Birds/Birds_Blue/")]
+       [birds-orange            (make-birds-clip :title 'birds-orange :prefix "Birds/Birds_Orange/")]
+       [papilionidae-blue       (make-papilionidae-clip :title 'papilionidae-blue :prefix "Butterfly/Papilionidae_Blue/")]
+       [papilionidae-blue-rev   (make-papilionidae-rev-clip :title 'papilionidae-blue-rev :prefix "Butterfly/Papilionidae_Blue_Rev/")]
+       [papilionidae-purple     (make-papilionidae-clip :title 'papilionidae-purple :prefix "Butterfly/Papilionidae_Purple/")]
+       [papilionidae-purple-rev (make-papilionidae-rev-clip :title 'papilionidae-purple-rev :prefix "Butterfly/Papilionidae_Purple_Rev/")]
+       [papilionidae-white      (make-papilionidae-clip :title 'papilionidae-white :prefix "Butterfly/Papilionidae_White/")]
+       [papilionidae-white-rev  (make-papilionidae-rev-clip :title 'papilionidae-white-rev :prefix "Butterfly/Papilionidae_White_Rev/")]
+       [papilionidae-yellow     (make-papilionidae-clip :title 'papilionidae-yellow :prefix "Butterfly/Papilionidae_Yellow/")]
+       [papilionidae-yellow-rev (make-papilionidae-rev-clip :title 'papilionidae-yellow-rev :prefix "Butterfly/Papilionidae_Yellow_Rev/")]
+       [pieris-rapae-pink       (make-rapae-clip :title 'pieris-rapae-pink :prefix "Butterfly/Pieris_Rapae_Pink/")]
+       [pieris-rapae-pink-rev   (make-rapae-rev-clip :title 'pieris-rapae-pink-rev :prefix "Butterfly/Pieris_Rapae_Pink_Rev/")] ; dummy
+       [pieris-rapae-yellow     (make-rapae-clip :title 'pieris-rapae-yellow :prefix "Butterfly/Pieris_Rapae_Yellow/")]
+       [pieris-rapae-yellow-rev (make-rapae-rev-clip :title 'pieris-rapae-yellow-rev :prefix  "Butterfly/Pieris_Rapae_Yellow_Rev/")] ; dummy
+       [elephant                (let1 cel-names (map (cut string-append "Elephant2/ex/ex" <>) (map number->string (append (iota 28 1) (iota (- 260 28) 30))))
+				      (make-clip-primitive
+				       :title 'elephant
+				       :cel-names cel-names
+				       :cel-offsets (make-list (length cel-names) point-zero)
+				       :cel-numbers (iota (length cel-names))
+				       :alphas (make-list (length cel-names) 1.0)
+				       :canvas-size `(,(* 984 10) . ,(* 289 10))  ; 8
+				       :offset '(1000 . -300)
+				       :reactive? #t
+				       :sounds (make-list (length cel-names) 'none)
+				       :options '()))]
+       [fawn                    (make-simple-clip
+				 :title 'fawn
+				 :cel-name-prefix "Fawn2/"
+				 :n-cels 116
+				 :reactive? #t
+				 :canvas-size `(,(* 1188 8) . ,(* 213 8))
+				 :offset '(500 . 100)
+				 :sounds (make-list 116 'none))]
+       [fox                     (make-simple-clip
+				 :title 'fox
+				 :cel-name-prefix "Fox2/"
+				 :n-cels 56
+				 :reactive? #t
+				 :canvas-size `(,(* 1188 4) . ,(* 213 4))
+				 :offset '(0 . 0)
+				 :sounds (make-list 56 'none))]
+       [meercat                 (make-simple-clip
+				 :title 'meercat
+				 :cel-name-prefix "Meercat2/"
+				 :n-cels 171
+				 :reactive? #t
+				 :canvas-size `(,(* 1041 8) . ,(* 213 8))
+				 :offset '(0 . 200)
+				 :sounds (make-list 171 'none))]
+       [owl                     (let* 
+				    ([cel-names-primitive (append '(1 2 3 3 3) (iota 14 4) (iota 12 6))]
+				     [cel-names           (map (cut string-append "Owl/" <>) (map number->string cel-names-primitive))]
+				     [n-cels              (length cel-names-primitive)]
+				     [canvas-size           `(,(* 585 2) . ,(* 425 2))]
+				     [local-offsets       (append
+							   (make-list 7 point-zero)  ; 1 2 3 3 3 4 5
+							   (map (cut cons <> 0) (durations->timings (make-list owl-step 28))))]
+				     [owl-cel-set         (make <cel-set>
+							    :names         cel-names
+							    :n-names       n-cels
+							    :local-offsets local-offsets
+							    :local-sizes   (make-list n-cels canvas-size)
+							    :local-alphas  (make-list n-cels 1.0)
+							    :local-depths  (make-list n-cels 0)
+							    :local-sounds  (append
+									    '(owl-coming)        ; 1
+									    (make-list 6 'none)  ; 2 3 3 3 4 5
+									    '(owl-flying)        ; 6
+									    (make-list 5 'none)  ; 7-11
+									    '(owl-flying)        ; 12
+									    (make-list 5 'none)  ; 13-17
+									    '(owl-flying)        ; 6
+									    (make-list 5 'none)  ; 7-11
+									    '(owl-flying)        ; 12
+									    (make-list 5 'none)))]) ; 13-17
+				  (make <clip>
+				    :title       'owl
+				    :cels        owl-cel-set
+				    :cel-numbers (iota n-cels)
+				    :timings     (durations->timings (make-list n-cels one-tick))
+				    :alphas      (make-list (* n-cels 10) 1.0)
+				    :depth       (random-real)
+				    :offset      point-zero
+				    :x-random    #t
+				    :y-random    #f
+				    :reactive?   #f
+				    :loops-for   1
+				    :options     '()))]
+       [rabbit 	                (make-simple-clip
+				 :title 'rabbit
+				 :cel-name-prefix "Rabbit2/"
+				 :n-cels 189
+				 :reactive? #t
+				 :canvas-size `(,(* 1188 6) . ,(* 213 6))
+				 :offset '(500 . 0) ; test
+				 :sounds (make-list 189 'none))]
+       [squirrel                (make-simple-clip
+				 :title 'squirrel
+				 :cel-name-prefix "Squirrel2/"
+				 :n-cels 23
+				 :reactive? #t
+				 :canvas-size `(,(* 421 1.5) . ,(* 306 1.5))
+				 :offset '(3000 . 0)
+				 :sounds (make-list 23 'none))]
+       [tanuki                  (make-simple-clip
+				 :title 'tanuki
+				 :cel-name-prefix "Tanuki2/"
+				 :n-cels 50
+				 :reactive? #t
+				 :canvas-size `(,(* 883 8) . ,(* 213 8)) ; test
+				 :offset '(1000 . 0)
+				 :sounds (make-list 50 'none))])
     (let1 hash-table (make-hash-table 'eqv?)
 	  (hash-table-put! hash-table 'apple                          (clip->clip-with-fade-out apple))
 	  (hash-table-put! hash-table 'baboon-weeing                  (clip-append baboon-weeing mazak-birds))
