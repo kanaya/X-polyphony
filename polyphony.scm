@@ -472,7 +472,7 @@
   (make-clip-primitive
    :key 
    [title       'untitled]
-   [cel-names   '()]
+   [cel-names   '()]  ; clear
    [cel-offsets '()]
    [cel-numbers '()]
    [alphas      '()]
@@ -481,21 +481,19 @@
    [x-random    #f]
    [y-random    #f]
    [bottom-half #f]
-   [reactive?  #f]
-   [sounds      ()]
-   [options     ()])
+   [reactive?   #f]
+   [sounds      '()]
+   [options     '()])
   (let*
-      ([n-cels        (length cel-names)]
+      ([n-cels        (length cel-names)] ; clear
        [n-numbers     (length cel-numbers)]
-       [local-offsets (if (null? cel-offsets)
-			  (make-list n-numbers offset)
-			  cel-offsets)]
+       [local-offsets (if (null? cel-offsets) (make-list n-numbers offset) cel-offsets)]
        [cel-set       (make <cel-set>
-			:names                cel-names
-			:n-names              n-cels
-			:local-offsets        local-offsets
-			:local-sizes          (make-list n-cels canvas-size)
-			:local-sounds         sounds)]
+			:names         cel-names ; clear
+			:n-names       n-cels
+			:local-offsets local-offsets
+			:local-sizes   (make-list n-cels canvas-size)
+			:local-sounds  sounds)]
        [timings       (durations->timings (make-list n-numbers one-tick))]
        [alphas        (if (null? alphas) (make-list n-numbers 1.0) alphas)])
     (make <clip>
@@ -541,27 +539,27 @@
        [new-reactive?   (ref clip1 'reactive?)]
        [new-options     (ref clip1 'options)])
     (let1 new-cels (make <cel-set>
-		     :names                (append (ref cels1 'names)                (ref cels2 'names))
-		     :n-names              (+      (ref cels1 'n-names)              (ref cels2 'n-names))
-		     :local-offsets        (append (ref cels1 'local-offsets)        (ref cels2 'local-offsets))
-		     :local-sizes          (append (ref cels1 'local-sizes)          (ref cels2 'local-sizes))
-		     :local-alphas         (append (ref cels1 'local-alphas)         (ref cels2 'local-alphas))
-		     :local-depths         (append (ref cels1 'local-depths)         (ref cels2 'local-depths))
-		     :local-sounds         (append (ref cels1 'local-sounds)         (ref cels2 'local-sounds)))
+		     :names         (append (ref cels1 'names)         (ref cels2 'names))
+		     :n-names       (+      (ref cels1 'n-names)       (ref cels2 'n-names))
+		     :local-offsets (append (ref cels1 'local-offsets) (ref cels2 'local-offsets))
+		     :local-sizes   (append (ref cels1 'local-sizes)   (ref cels2 'local-sizes))
+		     :local-alphas  (append (ref cels1 'local-alphas)  (ref cels2 'local-alphas))
+		     :local-depths  (append (ref cels1 'local-depths)  (ref cels2 'local-depths))
+		     :local-sounds  (append (ref cels1 'local-sounds)  (ref cels2 'local-sounds)))
 	  (make <clip> 
-	    :title new-title
-	    :cels new-cels
-	    :n-cels new-n-cels
+	    :title       new-title
+	    :cels        new-cels
+	    :n-cels      new-n-cels
 	    :cel-numbers new-cel-numbers
-	    :timings new-timings
-	    :alphas new-alphas
-	    :depth new-depth
-	    :offset new-offset
-	    :x-random new-x-random
-	    :y-random new-y-random 
+	    :timings     new-timings
+	    :alphas      new-alphas
+	    :depth       new-depth
+	    :offset      new-offset
+	    :x-random    new-x-random
+	    :y-random    new-y-random 
 	    :bottom-half new-bottom-half
-	    :reactive? new-reactive?
-	    :options new-options))))
+	    :reactive?   new-reactive?
+	    :options     new-options))))
 
 ;;;
 ;;; clip->clip and clip->clip-with-fade-out
@@ -654,13 +652,11 @@
    [x-random        #f]
    [y-random        #f]
    [reactive?       #f]
-   [sounds          ()]
-   [options         ()])
+   [sounds          '()]
+   [options         '()])
   (make-clip-primitive
    :title       title
-   :cel-names   (map
-		 (cut string-append cel-name-prefix <>)
-		 (map number->string (iota n-cels 1)))
+   :cel-names   (map (cut string-append cel-name-prefix <>) (map number->string (iota n-cels 1))) ; clear
    :cel-numbers (iota n-cels)
    :cel-offsets cel-offsets
    :canvas-size canvas-size
@@ -683,11 +679,9 @@
    [jumps-to 'birds-white-take-off])
   (let1
    cel-name-primitive '(1 2 3 4 1 2 3 4 1 2 3 4 5 6 5 6 7 8 7)
-   (make-clip-primitive ; make-clip-with-fade-in/out
+   (make-clip-primitive
     :title       title
-    :cel-names   (map
-		  (cut string-append prefix <>)
-		  (map number->string cel-name-primitive))
+    :cel-names   (map (cut string-append prefix <>) (map number->string cel-name-primitive)) ; clear
     :cel-offsets `(,point-zero              ; 1
 		   ,point-zero              ; 2
 		   ,point-zero              ; 3
@@ -716,50 +710,16 @@
     :sounds      (make-list (length cel-name-primitive) 'none)
     :options     '())))
 
-(define
-  (make-birds-take-off-clip
-   :key
-   [title       'birds-white-take-off]
-   [prefix1     "{prefix}/"]
-   [prefix2     "{prefix}/"]
-   [jumped-from 'birds-white])
-  (let1 cel-names (append 
-		   (map
-		    (cut string-append prefix1 <>)
-		    (map number->string '(9 10 11 12 13)))
-		   (map
-		    (cut string-append prefix2 <>)
-		    (map number->string (iota 8 1)))
-		   (map 
-		    (cut string-append prefix2 <>)
-		    (map number->string (iota 8 1))))
-	(make-clip-primitive
-	 :title       title
-	 :cel-names   cel-names
-	 :cel-offsets (append
-		       (make-list (+ 5 8) point-zero)
-		       (make-list 8 '(-210 . 0)))
-	 :cel-numbers (iota (length cel-names))
-	 :canvas-size '(585 . 425)
-	 :reactive?   #t
-	 :sounds      (append
-		       (make-list 5 'none)
-		       '(birds-flying)
-		       (make-list 7 'none)
-		       '(birds-flying)
-		       (make-list 7 'none))
-	 :options     '())))
-
 (define (make-papilionidae-clip :key [title 'papilionidae-white] [prefix "{prefix}/"] #;[jumps-to 'papilionidae-white-touch-down])
-  (let1 cel-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
+  (let1 cel-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1)))) ; clear
 	(make-clip-primitive
 	 :title       title
-	 :cel-names   cel-names
+	 :cel-names   cel-names ; clear
 	 :cel-offsets (append
 		       (make-list 11 point-zero)
 		       (make-list 11 (cons papilionidae-stride 0))
 		       (make-list 11 (cons (* papilionidae-stride 2) 0)))
-	 :cel-numbers (iota (length cel-names))
+	 :cel-numbers (iota (length cel-names)) ; clear
 	 :canvas-size '(585 . 425)
 	 :offset      point-zero
 	 :x-random    #t
@@ -771,15 +731,15 @@
 	 :options     '())))
 
 (define (make-papilionidae-rev-clip :key [title 'papilionidae-white] [prefix "{prefix}/"] #;[jumps-to 'papilionidae-white-touch-down])
-  (let1 cel-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
+  (let1 cel-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1)))) ; clear
 	(make-clip-primitive
 	 :title       title
-	 :cel-names   cel-names
+	 :cel-names   cel-names ; clear
 	 :cel-offsets (append
 		       (make-list 11 point-zero)
 		       (make-list 11 (cons papilionidae-rev-stride 0))
 		       (make-list 11 (cons (* papilionidae-rev-stride 2) 0)))
-	 :cel-numbers (iota (length cel-names))
+	 :cel-numbers (iota (length cel-names)) ; clear
 	 :canvas-size '(585 . 425)
 	 :offset      point-zero
 	 :x-random    #t
@@ -814,8 +774,8 @@
 
 (define *the-clip-collection*
   (let
-      ([mazak-birds             (make-simple-clip 
-				 :title 'mazak-birds 
+      ([mazak-birds             (make-simple-clip
+				 :title 'mazak-birds
 				 :cel-name-prefix "Mazak/"
 				 :n-cels 106
 				 :offset '(2200 . 1400)
@@ -832,9 +792,9 @@
 				 :sounds (append (make-list 15 'none) '(apple-touch-down) (make-list 15 'none)))]
        [baboon-weeing           (make-clip-primitive
 				 :title 'baboon-weeing
-				 :cel-names (map (cut string-append "Baboon2/" <>) (map number->string (iota 66 1)))
+				 :cel-names (map (cut string-append "Baboon2/" <>) (map number->string (iota 66 1))) ; clear
 				 :cel-numbers (iota 66)
-				 :offset '(2200 . 0) ; cel.offset
+				 :offset '(2200 . 0)
 				 :canvas-size `(,(* 585 4) . ,(* 637 4))
 				 :reactive? #t
 				 :sounds (append (make-list 23 'none) '(wee) (make-list 43 'none))
@@ -850,10 +810,10 @@
        [papilionidae-yellow     (make-papilionidae-clip :title 'papilionidae-yellow :prefix "Butterfly/Papilionidae_Yellow/")]
        [papilionidae-yellow-rev (make-papilionidae-rev-clip :title 'papilionidae-yellow-rev :prefix "Butterfly/Papilionidae_Yellow_Rev/")]
        [pieris-rapae-pink       (make-rapae-clip :title 'pieris-rapae-pink :prefix "Butterfly/Pieris_Rapae_Pink/")]
-       [pieris-rapae-pink-rev   (make-rapae-rev-clip :title 'pieris-rapae-pink-rev :prefix "Butterfly/Pieris_Rapae_Pink_Rev/")] ; dummy
+       [pieris-rapae-pink-rev   (make-rapae-rev-clip :title 'pieris-rapae-pink-rev :prefix "Butterfly/Pieris_Rapae_Pink_Rev/")]
        [pieris-rapae-yellow     (make-rapae-clip :title 'pieris-rapae-yellow :prefix "Butterfly/Pieris_Rapae_Yellow/")]
-       [pieris-rapae-yellow-rev (make-rapae-rev-clip :title 'pieris-rapae-yellow-rev :prefix  "Butterfly/Pieris_Rapae_Yellow_Rev/")] ; dummy
-       [elephant                (let1 cel-names (map (cut string-append "Elephant2/ex/ex" <>) #;(map number->string (append (iota 28 1) (iota (- 260 28) 30))) (map number->string (iota 261 1)))
+       [pieris-rapae-yellow-rev (make-rapae-rev-clip :title 'pieris-rapae-yellow-rev :prefix "Butterfly/Pieris_Rapae_Yellow_Rev/")]
+       [elephant                (let1 cel-names (map (cut string-append "Elephant2/ex/ex" <>) (map number->string (iota 261 1)))
 				      (make-clip-primitive
 				       :title 'elephant
 				       :cel-names cel-names
@@ -931,8 +891,8 @@
        [rabbit 	                (make-simple-clip
 				 :title 'rabbit
 				 :cel-name-prefix "Rabbit2/"
-				 :n-cels 189
-				 :reactive? #t
+				 :n-cels 189 
+				 :reactive? #t 
 				 :canvas-size `(,(* 1188 6) . ,(* 213 6))
 				 :offset '(500 . 0) ; test
 				 :sounds (make-list 189 'none))]
@@ -947,10 +907,10 @@
        [tanuki                  (make-simple-clip
 				 :title 'tanuki
 				 :cel-name-prefix "Tanuki2/"
-				 :n-cels 50
+				 :n-cels 50 
 				 :reactive? #t
-				 :canvas-size `(,(* 883 8) . ,(* 213 8)) ; test
-				 :offset '(1000 . 0)
+				 :canvas-size `(,(* 883 8) . ,(* 213 8)) 
+				 :offset '(1000 . 0) 
 				 :sounds (make-list 50 'none))])
     (let1 hash-table (make-hash-table 'eqv?)
 	  (hash-table-put! hash-table 'apple                          (clip->clip-with-fade-out apple))
