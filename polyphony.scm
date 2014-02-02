@@ -853,7 +853,7 @@
 				    ([cel-names-primitive (append '(1 2 3 3 3) (iota 14 4) (iota 12 6))]
 				     [cel-names           (map (cut string-append "Owl/" <>) (map number->string cel-names-primitive))]
 				     [n-cels              (length cel-names-primitive)]
-				     [canvas-size           `(,(* 585 2) . ,(* 425 2))]
+				     [canvas-size         `(,(* 585 2) . ,(* 425 2))]
 				     [local-offsets       (append
 							   (make-list 7 point-zero)  ; 1 2 3 3 3 4 5
 							   (map (cut cons <> 0) (durations->timings (make-list owl-step 28))))]
