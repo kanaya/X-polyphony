@@ -472,7 +472,7 @@
   (make-clip-primitive
    :key 
    [title       'untitled]
-   [cel-names   '()]  ; clear
+   [cel-names   '()]
    [cel-offsets '()]
    [cel-numbers '()]
    [alphas      '()]
@@ -485,11 +485,11 @@
    [sounds      '()]
    [options     '()])
   (let*
-      ([n-cels        (length cel-names)] ; clear
+      ([n-cels        (length cel-names)]
        [n-numbers     (length cel-numbers)]
        [local-offsets (if (null? cel-offsets) (make-list n-numbers offset) cel-offsets)]
        [cel-set       (make <cel-set>
-			:names         cel-names ; clear
+			:names         cel-names
 			:n-names       n-cels
 			:local-offsets local-offsets
 			:local-sizes   (make-list n-cels canvas-size)
@@ -656,7 +656,7 @@
    [options         '()])
   (make-clip-primitive
    :title       title
-   :cel-names   (map (cut string-append cel-name-prefix <>) (map number->string (iota n-cels 1))) ; clear
+   :cel-names   (map (cut string-append cel-name-prefix <>) (map number->string (iota n-cels 1)))
    :cel-numbers (iota n-cels)
    :cel-offsets cel-offsets
    :canvas-size canvas-size
@@ -681,7 +681,7 @@
    cel-name-primitive '(1 2 3 4 1 2 3 4 1 2 3 4 5 6 5 6 7 8 7)
    (make-clip-primitive
     :title       title
-    :cel-names   (map (cut string-append prefix <>) (map number->string cel-name-primitive)) ; clear
+    :cel-names   (map (cut string-append prefix <>) (map number->string cel-name-primitive))
     :cel-offsets `(,point-zero              ; 1
 		   ,point-zero              ; 2
 		   ,point-zero              ; 3
@@ -711,15 +711,15 @@
     :options     '())))
 
 (define (make-papilionidae-clip :key [title 'papilionidae-white] [prefix "{prefix}/"] #;[jumps-to 'papilionidae-white-touch-down])
-  (let1 cel-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1)))) ; clear
+  (let1 cel-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
 	(make-clip-primitive
 	 :title       title
-	 :cel-names   cel-names ; clear
+	 :cel-names   cel-names
 	 :cel-offsets (append
 		       (make-list 11 point-zero)
 		       (make-list 11 (cons papilionidae-stride 0))
 		       (make-list 11 (cons (* papilionidae-stride 2) 0)))
-	 :cel-numbers (iota (length cel-names)) ; clear
+	 :cel-numbers (iota (length cel-names))
 	 :canvas-size '(585 . 425)
 	 :offset      point-zero
 	 :x-random    #t
@@ -731,15 +731,15 @@
 	 :options     '())))
 
 (define (make-papilionidae-rev-clip :key [title 'papilionidae-white] [prefix "{prefix}/"] #;[jumps-to 'papilionidae-white-touch-down])
-  (let1 cel-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1)))) ; clear
+  (let1 cel-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
 	(make-clip-primitive
 	 :title       title
-	 :cel-names   cel-names ; clear
+	 :cel-names   cel-names
 	 :cel-offsets (append
 		       (make-list 11 point-zero)
 		       (make-list 11 (cons papilionidae-rev-stride 0))
 		       (make-list 11 (cons (* papilionidae-rev-stride 2) 0)))
-	 :cel-numbers (iota (length cel-names)) ; clear
+	 :cel-numbers (iota (length cel-names))
 	 :canvas-size '(585 . 425)
 	 :offset      point-zero
 	 :x-random    #t
@@ -792,7 +792,7 @@
 				 :sounds (append (make-list 15 'none) '(apple-touch-down) (make-list 15 'none)))]
        [baboon-weeing           (make-clip-primitive
 				 :title 'baboon-weeing
-				 :cel-names (map (cut string-append "Baboon2/" <>) (map number->string (iota 66 1))) ; clear
+				 :cel-names (map (cut string-append "Baboon2/" <>) (map number->string (iota 66 1)))
 				 :cel-numbers (iota 66)
 				 :offset '(2200 . 0)
 				 :canvas-size `(,(* 585 4) . ,(* 637 4))
