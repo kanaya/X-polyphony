@@ -94,20 +94,20 @@
 ;;;
 
 (define-class <cel-set> ()  
-  ([names                :init-keyword :names                :init-value '()]    ; list of strings
-   [n-names              :init-keyword :n-names              :init-value 0]      ; cardinal
-   [local-offsets        :init-keyword :local-offsets        :init-value '()]    ; list of points
-   [local-sizes          :init-keyword :local-sizes          :init-value '()]    ; list of sizes
-   [local-alphas         :init-keyword :local-alphas         :init-value '()]    ; list of reals
-   [local-depths         :init-keyword :local-depths         :init-value '()]    ; list of reals
-   [local-sounds         :init-keyword :local-sounds         :init-value '()]))  ; list of strings
+  ([names         :init-keyword :names         :init-value '()]    ; list of strings
+   [n-names       :init-keyword :n-names       :init-value 0]      ; cardinal
+   [local-offsets :init-keyword :local-offsets :init-value '()]    ; list of points
+   [local-sizes   :init-keyword :local-sizes   :init-value '()]    ; list of sizes
+   [local-alphas  :init-keyword :local-alphas  :init-value '()]    ; list of reals
+   [local-depths  :init-keyword :local-depths  :init-value '()]    ; list of reals
+   [local-sounds  :init-keyword :local-sounds  :init-value '()]))  ; list of strings
 
 (define-class <cel> ()
-  ([name               :init-keyword :name               :init-value "unnamed"]      ; string
-   [local-offset       :init-keyword :local-offset       :init-value point-zero]     ; point (pair of reals)
-   [local-size         :init-keyword :local-size         :init-value point-hundred]  ; size (pair of pair of reals)
-   [local-depth        :init-keyword :local-depth        :init-value 0]              ; real
-   [local-sound        :init-keyword :local-sound        :init-value 'none]))        ; string
+  ([name          :init-keyword :name          :init-value "unnamed"]      ; string
+   [local-offset  :init-keyword :local-offset  :init-value point-zero]     ; point (pair of reals)
+   [local-size    :init-keyword :local-size    :init-value point-hundred]  ; size (pair of pair of reals)
+   [local-depth   :init-keyword :local-depth   :init-value 0]              ; real
+   [local-sound   :init-keyword :local-sound   :init-value 'none]))        ; string
 
 (define-method ref ([cs <cel-set>] [i <integer>]) ; returns <cel>
   (let*
@@ -123,18 +123,12 @@
 ;;;
 ;;; <clip> class
 ;;;
-;;;   The <clip> class is designed to hold a building block of
-;;;   clip.  The class will have cels (<cel-set> class),
-;;;   cel numbers (integer array), timings (real number array),
-;;;   offsets (point array), sizez (point array), and transformation
-;;;   matrices.
+;;;   The <clip> class is designed to hold a building block of clip.  The class will have cels (<cel-set> class), cel numbers (integer array), timings (real number
+;;;   array), offsets (point array), sizez (point array), and transformation matrices.
 ;;;
-;;;   The procedure (ref a t) returns the cel of timing t out of
-;;;   clip a.
+;;;   The procedure (ref a t) returns the cel of timing t out of clip a.
 ;;;
-;;;   A utility procedure (durations->timings durations) returns
-;;;   timing array from given duration array; e.g. passing '(1 1 1) to
-;;;   this procedure makes '(1 2 3).
+;;;   A utility procedure (durations->timings durations) returns timing array from given duration array; e.g. passing '(1 1 1) to this procedure makes '(1 2 3).
 ;;;
 ;;;   Multiple instances are arrowed.
 ;;;
@@ -253,14 +247,11 @@
 ;;;
 ;;; Server
 ;;;
-;;;   The procedure run-server runs infinite loop of socket listening.
-;;;   If the loop get a request, it calls handle-request procedure.
-;;;   The handle-request procedure parses the request and build up SXML tree
-;;;   upon the request, and then renders it in XML format.
+;;;   The procedure run-server runs infinite loop of socket listening. If the loop get a request, it calls handle-request procedure. The handle-request procedure
+;;;   parses the request and build up SXML tree upon the request, and then renders it in XML format.
 ;;;
 
-;; To avoid confusion of emacs, I pull out this regal expression of the
-;; following function run-server.
+;; To avoid confusion of emacs, I pull out this regal expression of the following function run-server.
 (define _pattern_ #/^(GET|HEAD)\s+(\S+)\s+HTTP\/\d+\.\d+$/)
 
 (define (run-server)
@@ -387,7 +378,6 @@
 	  (@
 	   ,(if
 	     #t
-	     #;(> (- (current-time) *t-ambient-sound-started*) duration-of-ambient-sound)
 	     '(sound "ambient-64sec")
 	     '(sound "no-sound")))
 	  "ambient sound")
@@ -405,8 +395,7 @@
     (when (< (random-real) p-appearance)
 	  (when (and (not (ref clip 'animating)) 
 		     (not (ref clip 'reactive?)))
-		(start! clip)
-		#;(print "starting " (symbol->string (ref clip 'title))) )))
+		(start! clip))))
   (hash-table-for-each clips start-clip-randomly!))
 
 ;;;
@@ -431,17 +420,14 @@
 		 (>
 		  (current-time)
 		  (+ beginning (duration-of clip))))
-					; Do I skip jumped clips???
-	    (stop! clip)
-	    #;(print "terminating " (symbol->string (ref clip 'title))) )))
+	    (stop! clip))))
   (hash-table-for-each clips terminate-clip-if-time-is-out!))
 
 ;;;
 ;;; Clip event catcher
 ;;;
 
-(define (clip-event-catcher! clips person)
-					; person is a string
+(define (clip-event-catcher! clips person) ; person is a string
   (define (pair-plus x y)
     (cons 
      (+ (car x) (car y))
@@ -488,6 +474,7 @@
       ([n-cels        (length cel-names)]
        [n-numbers     (length cel-numbers)]
        [local-offsets (if (null? cel-offsets) (make-list n-numbers offset) cel-offsets)]
+       [sounds        (if (null? sounds) (make-list n-cels 'none) sounds)]
        [cel-set       (make <cel-set>
 			:names         cel-names
 			:n-names       n-cels
@@ -562,42 +549,8 @@
 	    :options     new-options))))
 
 ;;;
-;;; clip->clip and clip->clip-with-fade-out
+;;; clip->clip-with-fade-out
 ;;;
-
-(define (clip->clip clip)  ; copy constructor
-  (let
-      ([title         (ref clip 'title)]
-       [cels          (ref clip 'cels)]
-       [n-cels        (ref clip 'n-cels)]
-       [cel-numbers   (ref clip 'cel-numbers)]
-       [timings       (ref clip 'timings)]
-       [alphas        (ref clip 'alphas)]
-       [offset        (ref clip 'offset)]
-       [size          (ref clip 'size)]
-       [depth         (ref clip 'depth)]
-       [animating     (ref clip 'animating)]
-       [time-offset   (ref clip 'time-offset)]
-       [x-random      (ref clip 'x-random)]
-       [y-random      (ref clip 'y-random)]
-       [reactive?     (ref clip 'reactive?)]
-       [options       (ref clip 'options)])
-    (make <clip>
-     :title         title
-     :cels          cels
-     :n-cels        n-cels
-     :cel-numbers   cel-numbers
-     :timings       timings
-     :alphas        alphas
-     :offset        offset
-     :size          size
-     :depth         depth
-     :animating     animating
-     :time-offset   time-offset
-     :x-random      x-random
-     :y-random      y-random
-     :reactive?     reactive?
-     :options       options)))
 
 (define (clip->clip-with-fade-out clip)
   (let
@@ -710,7 +663,7 @@
     :sounds      (make-list (length cel-name-primitive) 'none)
     :options     '())))
 
-(define (make-papilionidae-clip :key [title 'papilionidae-white] [prefix "{prefix}/"] #;[jumps-to 'papilionidae-white-touch-down])
+(define (make-papilionidae-clip :key [title 'papilionidae-white] [prefix "{prefix}/"])
   (let1 cel-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
 	(make-clip-primitive
 	 :title       title
@@ -730,7 +683,7 @@
 		       '(butterfly) (make-list 10 'none))
 	 :options     '())))
 
-(define (make-papilionidae-rev-clip :key [title 'papilionidae-white] [prefix "{prefix}/"] #;[jumps-to 'papilionidae-white-touch-down])
+(define (make-papilionidae-rev-clip :key [title 'papilionidae-white] [prefix "{prefix}/"])
   (let1 cel-names (map (cut string-append prefix <>) (map number->string (times 3 (iota 11 1))))
 	(make-clip-primitive
 	 :title       title
@@ -780,8 +733,7 @@
 				 :n-cels 106
 				 :offset '(2200 . 1400)
 				 :canvas-size '(2313 . 1040)
-				 :reactive? #t
-				 :sounds (make-list 106 'none))]
+				 :reactive? #t)]
        [apple                   (make-simple-clip
 				 :title 'apple
 				 :cel-name-prefix "Apple2/"
@@ -797,8 +749,7 @@
 				 :offset '(2200 . 0)
 				 :canvas-size `(,(* 585 4) . ,(* 637 4))
 				 :reactive? #t
-				 :sounds (append (make-list 23 'none) '(wee) (make-list 43 'none))
-				 :options '())]
+				 :sounds (append (make-list 23 'none) '(wee) (make-list 43 'none)))]
        [birds-blue              (make-birds-clip :title 'birds-blue :prefix "Birds/Birds_Blue/")]
        [birds-orange            (make-birds-clip :title 'birds-orange :prefix "Birds/Birds_Orange/")]
        [papilionidae-blue       (make-papilionidae-clip :title 'papilionidae-blue :prefix "Butterfly/Papilionidae_Blue/")]
@@ -813,43 +764,11 @@
        [pieris-rapae-pink-rev   (make-rapae-rev-clip :title 'pieris-rapae-pink-rev :prefix "Butterfly/Pieris_Rapae_Pink_Rev/")]
        [pieris-rapae-yellow     (make-rapae-clip :title 'pieris-rapae-yellow :prefix "Butterfly/Pieris_Rapae_Yellow/")]
        [pieris-rapae-yellow-rev (make-rapae-rev-clip :title 'pieris-rapae-yellow-rev :prefix "Butterfly/Pieris_Rapae_Yellow_Rev/")]
-       [elephant                (let1 cel-names (map (cut string-append "Elephant2/ex/ex" <>) (map number->string (iota 261 1)))
-				      (make-clip-primitive
-				       :title 'elephant
-				       :cel-names cel-names
-				       :cel-offsets (make-list (length cel-names) point-zero)
-				       :cel-numbers (iota (length cel-names))
-				       :alphas (make-list (length cel-names) 1.0)
-				       :canvas-size `(,(* 984 10) . ,(* 289 10))  ; 8
-				       :offset '(1000 . -300)  ;; didn't work???
-				       :reactive? #t
-				       :sounds (make-list (length cel-names) 'none)
-				       :options '()))]
-       [fawn                    (make-simple-clip
-				 :title 'fawn
-				 :cel-name-prefix "Fawn2/"
-				 :n-cels 116
-				 :reactive? #t
-				 :canvas-size `(,(* 1188 8) . ,(* 213 8))
-				 :offset '(500 . 100)
-				 :sounds (make-list 116 'none))]
-       [fox                     (make-simple-clip
-				 :title 'fox
-				 :cel-name-prefix "Fox2/"
-				 :n-cels 56
-				 :reactive? #t
-				 :canvas-size `(,(* 1188 4) . ,(* 213 4))
-				 :offset '(0 . 0)
-				 :sounds (make-list 56 'none))]
-       [meercat                 (make-simple-clip
-				 :title 'meercat
-				 :cel-name-prefix "Meercat2/"
-				 :n-cels 171
-				 :reactive? #t
-				 :canvas-size `(,(* 1041 8) . ,(* 213 8))
-				 :offset '(0 . 200)
-				 :sounds (make-list 171 'none))]
-       [owl                     (let* 
+       [elephant (make-simple-clip :title 'elephant :cel-name-prefix "Elephant2/ex/ex" :n-cels 261 :offset '(1000 . -300) :canvas-size '(9840 . 2890) :reactive? #t)]
+       [fawn                    (make-simple-clip :title 'fawn :cel-name-prefix "Fawn2/" :n-cels 116 :reactive? #t :canvas-size '(9504 . 1704) :offset '(500 . 100))]
+       [fox                     (make-simple-clip :title 'fox :cel-name-prefix "Fox2/" :n-cels 56 :reactive? #t :canvas-size '(4752 . 852) :offset '(0 . 0))]
+       [meercat                 (make-simple-clip :title 'meercat :cel-name-prefix "Meercat2/" :n-cels 171 :reactive? #t :canvas-size '(8328 . 1704) :offset '(0 . 200))]
+       [owl                     (let*
 				    ([cel-names-primitive (append '(1 2 3 3 3) (iota 14 4) (iota 12 6))]
 				     [cel-names           (map (cut string-append "Owl/" <>) (map number->string cel-names-primitive))]
 				     [n-cels              (length cel-names-primitive)]
@@ -885,57 +804,34 @@
 				    :offset      point-zero
 				    :x-random    #t
 				    :y-random    #f
-				    :reactive?   #f
-				    :loops-for   1
-				    :options     '()))]
-       [rabbit 	                (make-simple-clip
-				 :title 'rabbit
-				 :cel-name-prefix "Rabbit2/"
-				 :n-cels 189 
-				 :reactive? #t 
-				 :canvas-size `(,(* 1188 6) . ,(* 213 6))
-				 :offset '(500 . 0) ; test
-				 :sounds (make-list 189 'none))]
-       [squirrel                (make-simple-clip
-				 :title 'squirrel
-				 :cel-name-prefix "Squirrel2/"
-				 :n-cels 23
-				 :reactive? #t
-				 :canvas-size `(,(* 421 1.5) . ,(* 306 1.5))
-				 :offset '(3000 . 0)
-				 :sounds (make-list 23 'none))]
-       [tanuki                  (make-simple-clip
-				 :title 'tanuki
-				 :cel-name-prefix "Tanuki2/"
-				 :n-cels 50 
-				 :reactive? #t
-				 :canvas-size `(,(* 883 8) . ,(* 213 8)) 
-				 :offset '(1000 . 0) 
-				 :sounds (make-list 50 'none))])
+				    :reactive?   #f))]
+       [rabbit 	                (make-simple-clip :title 'rabbit :cel-name-prefix "Rabbit2/" :n-cels 189 :reactive? #t :canvas-size '(7128 . 1278) :offset '(500 . 0))]
+       [squirrel                (make-simple-clip :title 'squirrel :cel-name-prefix "Squirrel2/" :n-cels 23 :reactive? #t :canvas-size '(631.5 . 459) :offset '(3000 . 0))]
+       [tanuki                  (make-simple-clip :title 'tanuki :cel-name-prefix "Tanuki2/" :n-cels 50 :reactive? #t :canvas-size '(7064 . 1704) :offset '(1000 . 0))])
     (let1 hash-table (make-hash-table 'eqv?)
-	  (hash-table-put! hash-table 'apple                          (clip->clip-with-fade-out apple))
-	  (hash-table-put! hash-table 'baboon-weeing                  (clip-append baboon-weeing mazak-birds))
-	  (hash-table-put! hash-table 'birds-blue                     (clip->clip-with-fade-out birds-blue))
-	  (hash-table-put! hash-table 'birds-orange                   (clip->clip-with-fade-out birds-orange))
-	  (hash-table-put! hash-table 'papilionidae-blue              (clip->clip-with-fade-out papilionidae-blue))
-	  (hash-table-put! hash-table 'papilionidae-purple            (clip->clip-with-fade-out papilionidae-purple))
-	  (hash-table-put! hash-table 'papilionidae-white             (clip->clip-with-fade-out papilionidae-white))
-	  (hash-table-put! hash-table 'papilionidae-yellow            (clip->clip-with-fade-out papilionidae-yellow))
-	  (hash-table-put! hash-table 'papilionidae-blue-rev          (clip->clip-with-fade-out papilionidae-blue-rev))
-	  (hash-table-put! hash-table 'papilionidae-purple-rev        (clip->clip-with-fade-out papilionidae-purple-rev))
-	  (hash-table-put! hash-table 'papilionidae-white-rev         (clip->clip-with-fade-out papilionidae-white-rev))
-	  (hash-table-put! hash-table 'papilionidae-yellow-rev        (clip->clip-with-fade-out papilionidae-yellow-rev))
-	  (hash-table-put! hash-table 'pieris-rapae-pink              (clip->clip-with-fade-out pieris-rapae-pink))
-	  (hash-table-put! hash-table 'pieris-rapae-yellow            (clip->clip-with-fade-out pieris-rapae-yellow))
-	  (hash-table-put! hash-table 'pieris-rapae-pink-rev          (clip->clip-with-fade-out pieris-rapae-pink-rev))
-	  (hash-table-put! hash-table 'pieris-rapae-yellow-rev        (clip->clip-with-fade-out pieris-rapae-yellow-rev))
-	  (hash-table-put! hash-table 'elephant                       (clip->clip-with-fade-out elephant))
-	  (hash-table-put! hash-table 'fawn                           (clip->clip-with-fade-out fawn))
-	  (hash-table-put! hash-table 'fox                            (clip->clip-with-fade-out fox))
-	  (hash-table-put! hash-table 'meercat                        (clip->clip-with-fade-out meercat))
-	  (hash-table-put! hash-table 'rabbit                         (clip->clip-with-fade-out rabbit))
-	  (hash-table-put! hash-table 'squirrel                       squirrel)
-	  (hash-table-put! hash-table 'tanuki                         (clip->clip-with-fade-out tanuki))
+	  (hash-table-put! hash-table 'apple                   (clip->clip-with-fade-out apple))
+	  (hash-table-put! hash-table 'baboon-weeing           (clip-append baboon-weeing mazak-birds))
+	  (hash-table-put! hash-table 'birds-blue              (clip->clip-with-fade-out birds-blue))
+	  (hash-table-put! hash-table 'birds-orange            (clip->clip-with-fade-out birds-orange))
+	  (hash-table-put! hash-table 'papilionidae-blue       (clip->clip-with-fade-out papilionidae-blue))
+	  (hash-table-put! hash-table 'papilionidae-purple     (clip->clip-with-fade-out papilionidae-purple))
+	  (hash-table-put! hash-table 'papilionidae-white      (clip->clip-with-fade-out papilionidae-white))
+	  (hash-table-put! hash-table 'papilionidae-yellow     (clip->clip-with-fade-out papilionidae-yellow))
+	  (hash-table-put! hash-table 'papilionidae-blue-rev   (clip->clip-with-fade-out papilionidae-blue-rev))
+	  (hash-table-put! hash-table 'papilionidae-purple-rev (clip->clip-with-fade-out papilionidae-purple-rev))
+	  (hash-table-put! hash-table 'papilionidae-white-rev  (clip->clip-with-fade-out papilionidae-white-rev))
+	  (hash-table-put! hash-table 'papilionidae-yellow-rev (clip->clip-with-fade-out papilionidae-yellow-rev))
+	  (hash-table-put! hash-table 'pieris-rapae-pink       (clip->clip-with-fade-out pieris-rapae-pink))
+	  (hash-table-put! hash-table 'pieris-rapae-yellow     (clip->clip-with-fade-out pieris-rapae-yellow))
+	  (hash-table-put! hash-table 'pieris-rapae-pink-rev   (clip->clip-with-fade-out pieris-rapae-pink-rev))
+	  (hash-table-put! hash-table 'pieris-rapae-yellow-rev (clip->clip-with-fade-out pieris-rapae-yellow-rev))
+	  (hash-table-put! hash-table 'elephant                (clip->clip-with-fade-out elephant))
+	  (hash-table-put! hash-table 'fawn                    (clip->clip-with-fade-out fawn))
+	  (hash-table-put! hash-table 'fox                     (clip->clip-with-fade-out fox))
+	  (hash-table-put! hash-table 'meercat                 (clip->clip-with-fade-out meercat))
+	  (hash-table-put! hash-table 'rabbit                  (clip->clip-with-fade-out rabbit))
+	  (hash-table-put! hash-table 'squirrel                squirrel)
+	  (hash-table-put! hash-table 'tanuki                  (clip->clip-with-fade-out tanuki))
 	  hash-table)))
 
 ;;;
