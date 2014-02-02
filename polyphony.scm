@@ -123,18 +123,12 @@
 ;;;
 ;;; <clip> class
 ;;;
-;;;   The <clip> class is designed to hold a building block of
-;;;   clip.  The class will have cels (<cel-set> class),
-;;;   cel numbers (integer array), timings (real number array),
-;;;   offsets (point array), sizez (point array), and transformation
-;;;   matrices.
+;;;   The <clip> class is designed to hold a building block of clip.  The class will have cels (<cel-set> class), cel numbers (integer array), timings (real number
+;;;   array), offsets (point array), sizez (point array), and transformation matrices.
 ;;;
-;;;   The procedure (ref a t) returns the cel of timing t out of
-;;;   clip a.
+;;;   The procedure (ref a t) returns the cel of timing t out of clip a.
 ;;;
-;;;   A utility procedure (durations->timings durations) returns
-;;;   timing array from given duration array; e.g. passing '(1 1 1) to
-;;;   this procedure makes '(1 2 3).
+;;;   A utility procedure (durations->timings durations) returns timing array from given duration array; e.g. passing '(1 1 1) to this procedure makes '(1 2 3).
 ;;;
 ;;;   Multiple instances are arrowed.
 ;;;
@@ -253,14 +247,11 @@
 ;;;
 ;;; Server
 ;;;
-;;;   The procedure run-server runs infinite loop of socket listening.
-;;;   If the loop get a request, it calls handle-request procedure.
-;;;   The handle-request procedure parses the request and build up SXML tree
-;;;   upon the request, and then renders it in XML format.
+;;;   The procedure run-server runs infinite loop of socket listening. If the loop get a request, it calls handle-request procedure. The handle-request procedure
+;;;   parses the request and build up SXML tree upon the request, and then renders it in XML format.
 ;;;
 
-;; To avoid confusion of emacs, I pull out this regal expression of the
-;; following function run-server.
+;; To avoid confusion of emacs, I pull out this regal expression of the following function run-server.
 (define _pattern_ #/^(GET|HEAD)\s+(\S+)\s+HTTP\/\d+\.\d+$/)
 
 (define (run-server)
@@ -387,7 +378,6 @@
 	  (@
 	   ,(if
 	     #t
-	     #;(> (- (current-time) *t-ambient-sound-started*) duration-of-ambient-sound)
 	     '(sound "ambient-64sec")
 	     '(sound "no-sound")))
 	  "ambient sound")
@@ -405,8 +395,7 @@
     (when (< (random-real) p-appearance)
 	  (when (and (not (ref clip 'animating)) 
 		     (not (ref clip 'reactive?)))
-		(start! clip)
-		#;(print "starting " (symbol->string (ref clip 'title))) )))
+		(start! clip))))
   (hash-table-for-each clips start-clip-randomly!))
 
 ;;;
@@ -431,17 +420,14 @@
 		 (>
 		  (current-time)
 		  (+ beginning (duration-of clip))))
-					; Do I skip jumped clips???
-	    (stop! clip)
-	    #;(print "terminating " (symbol->string (ref clip 'title))) )))
+	    (stop! clip))))
   (hash-table-for-each clips terminate-clip-if-time-is-out!))
 
 ;;;
 ;;; Clip event catcher
 ;;;
 
-(define (clip-event-catcher! clips person)
-					; person is a string
+(define (clip-event-catcher! clips person) ; person is a string
   (define (pair-plus x y)
     (cons 
      (+ (car x) (car y))
@@ -563,42 +549,8 @@
 	    :options     new-options))))
 
 ;;;
-;;; clip->clip and clip->clip-with-fade-out
+;;; clip->clip-with-fade-out
 ;;;
-
-(define (clip->clip clip)  ; copy constructor
-  (let
-      ([title         (ref clip 'title)]
-       [cels          (ref clip 'cels)]
-       [n-cels        (ref clip 'n-cels)]
-       [cel-numbers   (ref clip 'cel-numbers)]
-       [timings       (ref clip 'timings)]
-       [alphas        (ref clip 'alphas)]
-       [offset        (ref clip 'offset)]
-       [size          (ref clip 'size)]
-       [depth         (ref clip 'depth)]
-       [animating     (ref clip 'animating)]
-       [time-offset   (ref clip 'time-offset)]
-       [x-random      (ref clip 'x-random)]
-       [y-random      (ref clip 'y-random)]
-       [reactive?     (ref clip 'reactive?)]
-       [options       (ref clip 'options)])
-    (make <clip>
-     :title         title
-     :cels          cels
-     :n-cels        n-cels
-     :cel-numbers   cel-numbers
-     :timings       timings
-     :alphas        alphas
-     :offset        offset
-     :size          size
-     :depth         depth
-     :animating     animating
-     :time-offset   time-offset
-     :x-random      x-random
-     :y-random      y-random
-     :reactive?     reactive?
-     :options       options)))
 
 (define (clip->clip-with-fade-out clip)
   (let
@@ -813,15 +765,6 @@
        [pieris-rapae-yellow     (make-rapae-clip :title 'pieris-rapae-yellow :prefix "Butterfly/Pieris_Rapae_Yellow/")]
        [pieris-rapae-yellow-rev (make-rapae-rev-clip :title 'pieris-rapae-yellow-rev :prefix "Butterfly/Pieris_Rapae_Yellow_Rev/")]
        [elephant (make-simple-clip :title 'elephant :cel-name-prefix "Elephant2/ex/ex" :n-cels 261 :offset '(1000 . -300) :canvas-size '(9840 . 2890) :reactive? #t)]
-       #;[elephant                (make-clip-primitive
-				 :title 'elephant
-				 :cel-names (map (cut string-append "Elephant2/ex/ex" <>) (map number->string (iota 261 1)))
-				 :cel-offsets (make-list 261 point-zero)
-				 :cel-numbers (iota 261)
-				 :alphas (make-list 261 1.0)
-				 :canvas-size `(,(* 984 10) . ,(* 289 10))
-				 :offset '(1000 . -300)  ;; didn't work???
-				 :reactive? #t)]
        [fawn                    (make-simple-clip :title 'fawn :cel-name-prefix "Fawn2/" :n-cels 116 :reactive? #t :canvas-size '(9504 . 1704) :offset '(500 . 100))]
        [fox                     (make-simple-clip :title 'fox :cel-name-prefix "Fox2/" :n-cels 56 :reactive? #t :canvas-size '(4752 . 852) :offset '(0 . 0))]
        [meercat                 (make-simple-clip :title 'meercat :cel-name-prefix "Meercat2/" :n-cels 171 :reactive? #t :canvas-size '(8328 . 1704) :offset '(0 . 200))]
